@@ -90,7 +90,7 @@ def process_folders(folder_path):
                 ImageClip(file_full_path)
                 .with_fps(25)
                 .with_duration(audio_duration)
-                .with_size(size)
+                .resized(size)
             )
             # Apply zoom effect using time-based resize
             slide = slide.resized(lambda t: 1 + 0.04 * t)
