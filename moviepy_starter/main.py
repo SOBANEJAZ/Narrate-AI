@@ -134,4 +134,7 @@ def process_folders(folder_path):
 
 
 if __name__ == "__main__":
-    process_folders("files")
+    import sys
+    # Use command line argument if provided, otherwise default to 'files' directory
+    folder_path = sys.argv[1] if len(sys.argv) > 1 else "files"
+    process_folders(folder_path)
