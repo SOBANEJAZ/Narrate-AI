@@ -11,6 +11,7 @@ from moviepy import (
 )
 
 from .models import ScriptSegment, TimelineItem
+from .text_utils import safe_filename
 
 try:
     from PIL import Image, ImageFilter, ImageOps
@@ -33,7 +34,10 @@ def build_timeline(segments: list[ScriptSegment]) -> list[TimelineItem]:
             )
             continue
 
-        if not segment.selected_image_path.exists() or not segment.narration_audio_path.exists():
+        if (
+            not segment.selected_image_path.exists()
+            or not segment.narration_audio_path.exists()
+        ):
             print(
                 f"[TIMELINE] Segment {segment.segment_id}: missing files on disk, skipped",
                 flush=True,
@@ -104,7 +108,9 @@ def assemble_video(
             )
             clips.append(clip)
 
-        final_clip = concatenate_videoclips(clips, method="compose", padding=-max(0.0, transition_seconds))
+        final_clip = concatenate_videoclips(
+            clips, method="compose", padding=-max(0.0, transition_seconds)
+        )
         final_clip.write_videofile(
             str(output_path),
             fps=fps,
@@ -140,20 +146,20 @@ def _build_segment_clip(
         render_cache_dir=render_cache_dir,
     )
 
-    foreground = (
-        ImageClip(str(item.image_path))
-        .with_duration(duration)
-        .with_fps(fps)
-    )
+    foreground = ImageClip(str(item.image_path)).with_duration(duration).with_fps(fps)
     foreground = foreground.resized(height=height)
     if foreground.w > width:
         foreground = foreground.resized(width=width)
 
     if zoom_strength > 0:
-        foreground = foreground.resized(lambda t: 1.0 + (zoom_strength * (t / duration)))
+        foreground = foreground.resized(
+            lambda t: 1.0 + (zoom_strength * (t / duration))
+        )
 
     foreground = foreground.with_position(("center", "center"))
-    composite = CompositeVideoClip([background, foreground], size=resolution).with_duration(duration)
+    composite = CompositeVideoClip(
+        [background, foreground], size=resolution
+    ).with_duration(duration)
     audio_clip = AudioFileClip(str(item.audio_path))
     composite = composite.with_audio(audio_clip)
     return composite
@@ -183,7 +189,8 @@ def _build_blurred_image(
     if Image is None or ImageOps is None or ImageFilter is None:
         return None
 
-    out_path = render_cache_dir / f"blur_{source_image_path.stem}.jpg"
+    safe_stem = safe_filename(source_image_path.stem, max_length=80)
+    out_path = render_cache_dir / f"blur_{safe_stem}.jpg"
     if out_path.exists():
         return out_path
 

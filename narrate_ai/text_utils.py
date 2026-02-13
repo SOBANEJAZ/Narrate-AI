@@ -38,10 +38,14 @@ def split_sentences(text: str) -> list[str]:
     cleaned = re.sub(r"\s+", " ", text).strip()
     if not cleaned:
         return []
-    return [item.strip() for item in re.split(r"(?<=[.!?])\s+", cleaned) if item.strip()]
+    return [
+        item.strip() for item in re.split(r"(?<=[.!?])\s+", cleaned) if item.strip()
+    ]
 
 
-def chunk_text(text: str, chunk_size_words: int = 180, overlap_words: int = 30) -> list[str]:
+def chunk_text(
+    text: str, chunk_size_words: int = 180, overlap_words: int = 30
+) -> list[str]:
     words = text.split()
     if not words:
         return []
@@ -71,3 +75,34 @@ def extract_keywords(text: str, limit: int = 8) -> list[str]:
 def slugify(value: str) -> str:
     value = re.sub(r"[^a-zA-Z0-9]+", "-", value).strip("-").lower()
     return value or "topic"
+
+
+def safe_filename(name: str, max_length: int = 100) -> str:
+    """Sanitize and truncate a filename to avoid 'File name too long' errors.
+
+    Args:
+        name: Original filename (may include extension)
+        max_length: Maximum allowed length for the filename (default 100)
+
+    Returns:
+        Safe filename truncated to max_length characters
+    """
+    # Keep only safe characters
+    safe = "".join(ch for ch in name if ch.isalnum() or ch in {".", "_", "-"})
+    if not safe:
+        safe = "unnamed"
+    # Ensure we don't exceed max_length
+    if len(safe) > max_length:
+        # Try to preserve extension if present
+        if "." in safe:
+            parts = safe.rsplit(".", 1)
+            stem, ext = parts[0], parts[1]
+            ext_len = len(ext) + 1  # +1 for the dot
+            max_stem = max_length - ext_len
+            if max_stem > 0:
+                safe = f"{stem[:max_stem]}.{ext}"
+            else:
+                safe = safe[:max_length]
+        else:
+            safe = safe[:max_length]
+    return safe

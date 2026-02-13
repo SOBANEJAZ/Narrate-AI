@@ -9,6 +9,7 @@ import requests
 from ..cache import MultiLayerCache
 from ..config import PipelineConfig
 from ..models import ImageCandidate, ScriptSegment
+from ..text_utils import safe_filename
 
 try:
     from ddgs import DDGS
@@ -21,7 +22,9 @@ class ImageRetrievalAgent:
     config: PipelineConfig
     cache: MultiLayerCache
 
-    def retrieve(self, segments: list[ScriptSegment], images_root: Path) -> list[ScriptSegment]:
+    def retrieve(
+        self, segments: list[ScriptSegment], images_root: Path
+    ) -> list[ScriptSegment]:
         print(
             f"[IMAGES] Retrieving images for {len(segments)} segments",
             flush=True,
@@ -49,10 +52,16 @@ class ImageRetrievalAgent:
                     if not image_url or image_url in seen_urls:
                         continue
                     seen_urls.add(image_url)
-                    title = str(item.get("title") or item.get("source") or "image").strip()
+                    title = str(
+                        item.get("title") or item.get("source") or "image"
+                    ).strip()
                     source = str(item.get("source") or item.get("url") or "").strip()
-                    candidate = ImageCandidate(url=image_url, title=title, source=source)
-                    candidate.local_path = self._download_image(candidate.url, segment_dir)
+                    candidate = ImageCandidate(
+                        url=image_url, title=title, source=source
+                    )
+                    candidate.local_path = self._download_image(
+                        candidate.url, segment_dir
+                    )
                     if candidate.local_path is None:
                         continue
                     candidates.append(candidate)
@@ -105,7 +114,7 @@ class ImageRetrievalAgent:
     def _filename_from_url(url: str, prefix: str) -> str:
         parsed = urlparse(url)
         stem = Path(parsed.path).name or "image.jpg"
-        safe_stem = "".join(ch for ch in stem if ch.isalnum() or ch in {".", "_", "-"})
+        safe_stem = safe_filename(stem, max_length=100)
         if "." not in safe_stem:
             safe_stem = f"{safe_stem}.jpg"
         return f"{prefix}_{safe_stem}"
