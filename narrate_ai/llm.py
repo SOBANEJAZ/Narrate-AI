@@ -5,7 +5,15 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
-import requests
+try:
+    from cerebras.cloud.sdk import Cerebras
+except Exception:  # pragma: no cover - optional dependency fallback
+    Cerebras = None  # type: ignore[assignment]
+
+try:
+    from groq import Groq
+except Exception:  # pragma: no cover - optional dependency fallback
+    Groq = None  # type: ignore[assignment]
 
 from .config import PipelineConfig
 
@@ -17,6 +25,31 @@ class LLMError(RuntimeError):
 @dataclass(slots=True)
 class LLMClient:
     config: PipelineConfig
+
+    def __post_init__(self):
+        # Initialize SDK clients lazily
+        self._cerebras_client = None
+        self._groq_client = None
+
+    def _get_cerebras_client(self):
+        if self._cerebras_client is None:
+            if Cerebras is None:
+                raise LLMError(
+                    "Cerebras SDK not installed. Run: pip install cerebras-cloud-sdk"
+                )
+            if not self.config.cerebras_api_key:
+                raise LLMError("Missing CEREBRAS_API_KEY")
+            self._cerebras_client = Cerebras(api_key=self.config.cerebras_api_key)
+        return self._cerebras_client
+
+    def _get_groq_client(self):
+        if self._groq_client is None:
+            if Groq is None:
+                raise LLMError("Groq SDK not installed. Run: pip install groq")
+            if not self.config.groq_api_key:
+                raise LLMError("Missing GROQ_API_KEY")
+            self._groq_client = Groq(api_key=self.config.groq_api_key)
+        return self._groq_client
 
     def generate_text(
         self,
@@ -34,7 +67,8 @@ class LLMClient:
                 temperature=temperature,
                 max_tokens=max_tokens,
             )
-        except Exception:
+        except Exception as e:
+            print(f"[LLM] Error generating text with {provider}: {e}")
             return fallback_text
 
     def generate_json(
@@ -54,7 +88,8 @@ class LLMClient:
                 max_tokens=max_tokens,
             )
             return self._extract_json(raw_text)
-        except Exception:
+        except Exception as e:
+            print(f"[LLM] Error generating JSON with {provider}: {e}")
             return fallback_json
 
     def _chat_completion(
@@ -65,43 +100,33 @@ class LLMClient:
         temperature: float,
         max_tokens: int,
     ) -> str:
-        if provider == "groq":
-            api_key = self.config.groq_api_key
-            model = self.config.groq_model
-            base_url = "https://api.groq.com/openai/v1/chat/completions"
-        elif provider == "cerebras":
-            api_key = self.config.cerebras_api_key
-            model = self.config.cerebras_model
-            base_url = "https://api.cerebras.ai/v1/chat/completions"
+        messages = [
+            {"role": "system", "content": "You are a documentary writing assistant."},
+            {"role": "user", "content": prompt},
+        ]
+
+        if provider == "cerebras":
+            client = self._get_cerebras_client()
+            response = client.chat.completions.create(
+                messages=messages,
+                model=self.config.cerebras_model,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+            return response.choices[0].message.content
+
+        elif provider == "groq":
+            client = self._get_groq_client()
+            response = client.chat.completions.create(
+                messages=messages,
+                model=self.config.groq_model,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+            return response.choices[0].message.content
+
         else:
             raise LLMError(f"Unsupported provider: {provider}")
-
-        if not api_key:
-            raise LLMError(f"Missing API key for provider: {provider}")
-
-        response = requests.post(
-            base_url,
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": model,
-                "messages": [
-                    {"role": "system", "content": "You are a documentary writing assistant."},
-                    {"role": "user", "content": prompt},
-                ],
-                "temperature": temperature,
-                "max_tokens": max_tokens,
-            },
-            timeout=self.config.request_timeout_seconds,
-        )
-        response.raise_for_status()
-        payload = response.json()
-        choices = payload.get("choices", [])
-        if not choices:
-            raise LLMError("No response choices returned from LLM API.")
-        return str(choices[0]["message"]["content"]).strip()
 
     @staticmethod
     def _extract_json(text: str) -> dict[str, Any]:
