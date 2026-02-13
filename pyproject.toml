@@ -1,11 +1,26 @@
 [project]
-name = "images-to-video-conveter"
+name = "narrate-ai"
 version = "0.1.0"
-description = "Add your description here"
+description = "Automated multi-agent documentary video generator"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "beautifulsoup4>=4.13.5",
     "ddgs>=9.10.0",
     "moviepy>=2.2.1",
+    "pillow>=11.3.0",
     "requests>=2.32.5",
+    "streamlit>=1.49.1",
+]
+
+[project.optional-dependencies]
+clip = [
+    "open-clip-torch>=2.30.0",
+    "torch>=2.8.0",
+]
+crewai = [
+    "crewai>=0.186.1",
+]
+crawl = [
+    "crawl4ai>=0.7.4",
 ]
