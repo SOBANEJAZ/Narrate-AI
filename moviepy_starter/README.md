@@ -1,44 +1,41 @@
-# MoviePy Starter Code
+# MoviePy Starter (Step 9 + 10)
 
-This directory contains the starter code for timeline synchronization (Step 9) of the automated documentary generation system.
+This module assembles pre-existing segment assets into a final slideshow video.
 
-## Overview
+## Expected Input
 
-This code handles the timeline synchronization and video assembly aspects of the documentary generation pipeline:
-
-- Processes folders containing `.webp` images and `.mp3` audio files
-- Creates video clips from images with zoom effects
-- Adds audio to video clips
-- Concatenates all clips into a final output
-- Manages temporary files and cleanup
-
-## Files Structure
-
-The code expects the following structure:
 ```
 files/
-├── 1/
-│   ├── image1.webp
-│   ├── image1.mp3
-│   ├── image2.webp
-│   └── image2.mp3
-├── 2/
-│   ├── ...
+  1/
+    1.webp
+    1.mp3
+  2/
+    2.webp
+    2.mp3
+  ...
 ```
 
-Each numbered folder represents a segment of the documentary with corresponding image and audio files.
+Each numbered folder should contain at least one image and one audio file.
+
+Supported image types: `.webp`, `.png`, `.jpg`, `.jpeg`  
+Supported audio types: `.mp3`, `.wav`, `.m4a`, `.aac`
+
+## Output Behavior
+
+- Produces `1280x720` MP4
+- Centers images regardless of source resolution
+- Preserves aspect ratio
+- Uses black background fill
+- Applies subtle zoom + smooth transition timing
 
 ## Usage
 
-Run the script to process all folders in the `files/` directory:
-
 ```bash
-python main.py
+python moviepy_starter/main.py moviepy_starter/files
 ```
 
-The script will:
-1. Process each folder containing `.webp` images and `.mp3` audio files
-2. Create intermediate videos with zoom effects
-3. Combine audio and video
-4. Concatenate all segments into a final output
-5. Clean up temporary files
+Output:
+
+```
+files/final_output.mp4
+```
