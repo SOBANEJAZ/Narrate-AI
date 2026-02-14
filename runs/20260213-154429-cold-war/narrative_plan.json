@@ -1,0 +1,33 @@
+{
+  "topic": "cold war",
+  "tone": "grave yet inquisitive",
+  "pacing": "steady",
+  "target_duration_seconds": 300,
+  "sections": [
+    {
+      "title": "Opening: The World Divided",
+      "objective": "Introduce the post\u2011World War\u202fII landscape and the emergence of two opposing superpowers, setting the stage for the Cold War.",
+      "duration_seconds": 45
+    },
+    {
+      "title": "Rising Tensions: Ideology and Arms",
+      "objective": "Explain how competing ideologies, the Truman Doctrine, and the arms race escalated mistrust between the United States and the Soviet Union.",
+      "duration_seconds": 60
+    },
+    {
+      "title": "Proxy Conflicts: Battles Without Direct Fire",
+      "objective": "Showcase key proxy wars\u2014Korea, Vietnam, and the Cuban Missile Crisis\u2014as flashpoints that amplified global stakes without direct superpower combat.",
+      "duration_seconds": 70
+    },
+    {
+      "title": "The Nuclear Brink: Deterrence and Fear",
+      "objective": "Explore the doctrine of Mutually Assured Destruction, the space race, and moments when the world teetered on the edge of nuclear war.",
+      "duration_seconds": 80
+    },
+    {
+      "title": "Resolution & Legacy: From Collapse to Echoes",
+      "objective": "Detail the dissolution of the Soviet Union, the end of the Cold War, and the lasting political, cultural, and technological impacts today.",
+      "duration_seconds": 45
+    }
+  ]
+}

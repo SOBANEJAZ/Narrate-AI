@@ -1,7 +1,9 @@
+"""Image ranking agent using functional programming style."""
+
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from typing import TypedDict
 
 from ..models import ImageCandidate, ScriptSegment
 from ..text_utils import extract_keywords
@@ -22,96 +24,153 @@ except Exception:  # pragma: no cover - optional dependency fallback
     Image = None  # type: ignore[assignment]
 
 
-@dataclass(slots=True)
-class ImageRankingAgent:
-    model_name: str = "ViT-B-16"
-    pretrained_name: str = "laion2b_s34b_b88k"
-    _clip_ready: bool = field(default=False, init=False)
-    _clip_model: object | None = field(default=None, init=False)
-    _clip_preprocess: object | None = field(default=None, init=False)
-    _clip_tokenizer: object | None = field(default=None, init=False)
-    _device: str = field(default="cpu", init=False)
+class ImageRankingState(TypedDict):
+    """State for image ranking operations."""
 
-    def __post_init__(self) -> None:
-        if torch is None or open_clip is None or Image is None:
-            print("[RANK] OpenCLIP unavailable; using keyword-overlap fallback", flush=True)
-            return
-        try:
-            self._device = "cuda" if torch.cuda.is_available() else "cpu"
-            model, _, preprocess = open_clip.create_model_and_transforms(
-                self.model_name,
-                pretrained=self.pretrained_name,
-            )
-            model = model.to(self._device)
-            model.eval()
-            tokenizer = open_clip.get_tokenizer(self.model_name)
-            self._clip_model = model
-            self._clip_preprocess = preprocess
-            self._clip_tokenizer = tokenizer
-            self._clip_ready = True
-            print(f"[RANK] OpenCLIP ready on device: {self._device}", flush=True)
-        except Exception:
-            self._clip_ready = False
-            print("[RANK] OpenCLIP initialization failed; using fallback ranker", flush=True)
+    model_name: str
+    pretrained_name: str
+    clip_ready: bool
+    clip_model: object | None
+    clip_preprocess: object | None
+    clip_tokenizer: object | None
+    device: str
 
-    def rank(self, segments: list[ScriptSegment]) -> list[ScriptSegment]:
-        print(f"[RANK] Ranking images for {len(segments)} segments", flush=True)
-        for segment in segments:
-            if not segment.candidate_images:
-                print(f"[RANK] Segment {segment.segment_id}: no candidates to rank", flush=True)
-                continue
-            if self._clip_ready:
-                self._rank_with_clip(segment)
-            else:
-                self._rank_with_text_overlap(segment)
 
-            winner = max(segment.candidate_images, key=lambda candidate: candidate.score)
-            segment.selected_image_path = winner.local_path
+def create_ranking_state(
+    model_name: str = "ViT-L-14",
+    pretrained_name: str = "laion2b_s32b_b82k",
+) -> ImageRankingState:
+    """Create image ranking state and initialize CLIP if available."""
+    state: ImageRankingState = {
+        "model_name": model_name,
+        "pretrained_name": pretrained_name,
+        "clip_ready": False,
+        "clip_model": None,
+        "clip_preprocess": None,
+        "clip_tokenizer": None,
+        "device": "cpu",
+    }
+
+    if torch is None or open_clip is None or Image is None:
+        print(
+            "[RANK] OpenCLIP unavailable; using keyword-overlap fallback",
+            flush=True,
+        )
+        return state
+
+    try:
+        state["device"] = "cuda" if torch.cuda.is_available() else "cpu"
+        model, _, preprocess = open_clip.create_model_and_transforms(
+            model_name,
+            pretrained=pretrained_name,
+        )
+        model = model.to(state["device"])
+        model.eval()
+        tokenizer = open_clip.get_tokenizer(model_name)
+        state["clip_model"] = model
+        state["clip_preprocess"] = preprocess
+        state["clip_tokenizer"] = tokenizer
+        state["clip_ready"] = True
+        print(f"[RANK] OpenCLIP ready on device: {state['device']}", flush=True)
+    except Exception:
+        state["clip_ready"] = False
+        print(
+            "[RANK] OpenCLIP initialization failed; using fallback ranker",
+            flush=True,
+        )
+
+    return state
+
+
+def rank_images(
+    state: ImageRankingState,
+    segments: list[ScriptSegment],
+) -> list[ScriptSegment]:
+    """Rank images for all segments.
+
+    Args:
+        state: Image ranking state
+        segments: List of script segments with candidates
+
+    Returns:
+        Segments with ranked and selected images (modified in place)
+    """
+    print(f"[RANK] Ranking images for {len(segments)} segments", flush=True)
+    for segment in segments:
+        candidates = segment.get("candidate_images", [])
+        if not candidates:
             print(
-                f"[RANK] Segment {segment.segment_id}: selected image (score={winner.score:.4f})",
+                f"[RANK] Segment {segment['segment_id']}: no candidates to rank",
                 flush=True,
             )
-        return segments
+            continue
+        if state["clip_ready"]:
+            _rank_with_clip(state, segment)
+        else:
+            _rank_with_text_overlap(segment)
 
-    def _rank_with_clip(self, segment: ScriptSegment) -> None:
-        assert self._clip_model is not None
-        assert self._clip_preprocess is not None
-        assert self._clip_tokenizer is not None
-        assert torch is not None
-        assert Image is not None
+        winner = max(candidates, key=lambda candidate: candidate.get("score", 0.0))
+        segment["selected_image_path"] = winner.get("local_path")
+        print(
+            f"[RANK] Segment {segment['segment_id']}: selected image (score={winner.get('score', 0.0):.4f})",
+            flush=True,
+        )
+    return segments
 
-        valid_candidates = [
-            candidate
-            for candidate in segment.candidate_images
-            if candidate.local_path is not None and candidate.local_path.exists()
-        ]
-        if not valid_candidates:
-            self._rank_with_text_overlap(segment)
-            return
 
-        with torch.no_grad():
-            text_tokens = self._clip_tokenizer([segment.visual_description]).to(self._device)
-            text_features = self._clip_model.encode_text(text_tokens)
-            text_features /= text_features.norm(dim=-1, keepdim=True)
+def _rank_with_clip(state: ImageRankingState, segment: ScriptSegment) -> None:
+    """Rank images using CLIP embeddings."""
+    assert state["clip_model"] is not None
+    assert state["clip_preprocess"] is not None
+    assert state["clip_tokenizer"] is not None
+    assert torch is not None
+    assert Image is not None
 
-            for candidate in valid_candidates:
-                try:
-                    image = Image.open(candidate.local_path).convert("RGB")
-                    tensor = self._clip_preprocess(image).unsqueeze(0).to(self._device)
-                    image_features = self._clip_model.encode_image(tensor)
-                    image_features /= image_features.norm(dim=-1, keepdim=True)
-                    similarity = float((image_features @ text_features.T).squeeze().item())
-                    candidate.score = similarity
-                except Exception:
-                    candidate.score = self._fallback_score(segment.visual_description, candidate)
+    visual_desc = segment.get("visual_description", "")
+    valid_candidates = [
+        candidate
+        for candidate in segment.get("candidate_images", [])
+        if candidate.get("local_path") is not None and candidate["local_path"].exists()
+    ]
+    if not valid_candidates:
+        _rank_with_text_overlap(segment)
+        return
 
-    def _rank_with_text_overlap(self, segment: ScriptSegment) -> None:
-        for candidate in segment.candidate_images:
-            candidate.score = self._fallback_score(segment.visual_description, candidate)
+    with torch.no_grad():
+        text_tokens = state["clip_tokenizer"]([visual_desc]).to(state["device"])
+        text_features = state["clip_model"].encode_text(text_tokens)
+        text_features /= text_features.norm(dim=-1, keepdim=True)
 
-    def _fallback_score(self, text: str, candidate: ImageCandidate) -> float:
-        keywords = set(extract_keywords(text, limit=12))
-        candidate_text = f"{candidate.title} {candidate.source} {candidate.url}".lower()
-        tokenized = set(re.findall(r"[a-z0-9'-]+", candidate_text))
-        overlap = len(keywords & tokenized)
-        return float(overlap)
+        for candidate in valid_candidates:
+            try:
+                local_path = candidate["local_path"]
+                if local_path is None:
+                    continue
+                image = Image.open(local_path).convert("RGB")
+                tensor = (
+                    state["clip_preprocess"](image).unsqueeze(0).to(state["device"])
+                )
+                image_features = state["clip_model"].encode_image(tensor)
+                image_features /= image_features.norm(dim=-1, keepdim=True)
+                similarity = float((image_features @ text_features.T).squeeze().item())
+                candidate["score"] = similarity
+            except Exception:
+                candidate["score"] = _fallback_score(visual_desc, candidate)
+
+
+def _rank_with_text_overlap(segment: ScriptSegment) -> None:
+    """Rank images using keyword overlap as fallback."""
+    visual_desc = segment.get("visual_description", "")
+    for candidate in segment.get("candidate_images", []):
+        candidate["score"] = _fallback_score(visual_desc, candidate)
+
+
+def _fallback_score(text: str, candidate: ImageCandidate) -> float:
+    """Calculate score based on keyword overlap."""
+    keywords = set(extract_keywords(text, limit=12))
+    candidate_text = (
+        f"{candidate['title']} {candidate['source']} {candidate['url']}".lower()
+    )
+    tokenized = set(re.findall(r"[a-z0-9'-]+", candidate_text))
+    overlap = len(keywords & tokenized)
+    return float(overlap)

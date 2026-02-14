@@ -1,0 +1,844 @@
+{
+  "topic": "History of Roman Empire",
+  "created_at_utc": "2026-02-13T14:22:34.964860+00:00",
+  "plan": {
+    "topic": "History of Roman Empire",
+    "tone": "informative",
+    "pacing": "moderate",
+    "target_duration_seconds": 360,
+    "sections": [
+      {
+        "title": "Introduction to the Roman Empire",
+        "objective": "Set the stage for the Roman Empire's rise and fall",
+        "duration_seconds": 60
+      },
+      {
+        "title": "The Republic and Expansion",
+        "objective": "Explore the Roman Republic's growth and conquests",
+        "duration_seconds": 90
+      },
+      {
+        "title": "The Imperial Era and Decline",
+        "objective": "Examine the Roman Empire's peak and eventual decline",
+        "duration_seconds": 120
+      },
+      {
+        "title": "Legacy of the Roman Empire",
+        "objective": "Discuss the lasting impact of the Roman Empire on modern society",
+        "duration_seconds": 90
+      }
+    ]
+  },
+  "segment_count": 6,
+  "segments": [
+    {
+      "segment_id": 1,
+      "text": "Introduction to the Roman Empire. Set the stage for the Roman Empire's rise and fall Ancient Rome - Facts, Location, & Timeline | HISTORY Open navigation Close navigation Home Shows This Day in History Videos U.S. U.S.",
+      "text_range": "Sentence 1-3",
+      "search_queries": [
+        "Roman Forum ancient ruins",
+        "Roman legions marching",
+        "Colosseum construction",
+        "Roman Emperor Augustus portrait",
+        "Roman Empire map expansion"
+      ],
+      "visual_description": "A grand aerial view of the ancient Roman Forum, with the sun casting a warm glow over the sprawling ruins of temples, basilicas, and markets, as people in traditional Roman attire walk along the cobblestone streets.",
+      "image_candidates": [
+        {
+          "url": "https://a.cdn-hotels.com/gdcs/production171/d1538/62ecef81-422e-4d03-aae2-09f6980cad06.jpg",
+          "title": "Roman Forum in Rome - Visit the Site of an Ancient Roman Marketplace ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_62ecef81-422e-4d03-aae2-09f6980cad06.jpg",
+          "score": 3.0
+        },
+        {
+          "url": "https://cdn.britannica.com/77/187677-138-73F32D16/buildings-Rome-Roman-Forum.jpg",
+          "title": "History of the Roman Forum | Britannica",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_buildings-Rome-Roman-Forum.jpg",
+          "score": 2.0
+        },
+        {
+          "url": "https://c8.alamy.com/comp/E87BHP/the-roman-forum-a-landmark-site-with-the-ruins-of-ancient-government-E87BHP.jpg",
+          "title": "The Roman Forum, a landmark site with the ruins of ancient government ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_the-roman-forum-a-landmark-site-with-the-ruins-of-ancient-government-E87BHP.jpg",
+          "score": 3.0
+        },
+        {
+          "url": "https://cdn.britannica.com/99/128399-050-EB6E336F/Temple-of-Saturn-Roman-Forum-Rome.jpg",
+          "title": "Roman Forum | History, Location, Buildings, & Facts | Britannica",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_Temple-of-Saturn-Roman-Forum-Rome.jpg",
+          "score": 2.0
+        },
+        {
+          "url": "https://www.romeactually.com/wp-content/uploads/2021/09/roman-forum-2048x1536.jpg",
+          "title": "27 Ancient Roman Ruins That Are A Must-See - Rome Actually",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_roman-forum-2048x1536.jpg",
+          "score": 2.0
+        },
+        {
+          "url": "https://static.vecteezy.com/system/resources/previews/047/326/912/non_2x/roman-legion-marching-in-formation-photo.jpg",
+          "title": "Roman legion marching in formation 47326912 Stock Photo at Vecteezy",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_roman-legion-marching-in-formation-photo.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://static.vecteezy.com/system/resources/previews/054/375/986/large_2x/ancient-roman-legion-marching-through-historic-streets-photo.jpeg",
+          "title": "Ancient Roman Legion Marching Through Historic Streets 54375986 Stock ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_ancient-roman-legion-marching-through-historic-streets-photo.jpeg",
+          "score": 2.0
+        },
+        {
+          "url": "https://imperiumromanum.pl/wp-content/uploads/2017/08/thecenturions.jpg",
+          "title": "Roman army march \u00ab IMPERIUM ROMANUM",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_thecenturions.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://i.pinimg.com/originals/eb/f6/75/ebf675eee08cd0d9e2b6d282a69ac524.jpg",
+          "title": "History Of The Roman Legionary: 1st Century BC - 3rd Century AD | Roman ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_ebf675eee08cd0d9e2b6d282a69ac524.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://i.pinimg.com/originals/1f/69/db/1f69dbe2319dc8344f173ebdf1fcd02f.jpg",
+          "title": "Roman legion marching into Gaul | Roman armor, Ancient rome, Roman soldiers",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_1f69dbe2319dc8344f173ebdf1fcd02f.jpg",
+          "score": 2.0
+        },
+        {
+          "url": "https://thumbs.dreamstime.com/b/highly-detailed-painting-captures-construction-colosseum-rome-d-showcasing-wooden-scaffolding-roman-369754645.jpg",
+          "title": "Construction of the Colosseum in Rome, Year 75 a.D., Ancient ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_highly-detailed-painting-captures-construction-colosseum-rome-d-showcasing-wooden-scaffolding-ro.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://thumbs.dreamstime.com/b/construction-colosseum-rome-d-immersive-painting-captures-showcasing-roman-engineers-laborers-working-369754618.jpg",
+          "title": "Construction of the Colosseum in Rome, 75 a.D. Stock Illustration ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_construction-colosseum-rome-d-immersive-painting-captures-showcasing-roman-engineers-laborers-wo.jpg",
+          "score": 0.0
+        },
+        {
+          "url": "https://rome.us/wp-content/uploads/Construction-of-the-Colosseum.jpg",
+          "title": "The Colosseum in Rome | All Things You Should Know About",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_Construction-of-the-Colosseum.jpg",
+          "score": 0.0
+        },
+        {
+          "url": "https://www.kmeel.com/wp-content/uploads/2023/12/DALL\u00b7E-2023-12-30-14.26.16-An-ancient-scene-in-a-16_9-format-depicting-the-construction-of-the-Colosseum-in-Rome.-The-image-should-feature-a-wide-bustling-construction-site-wit-768x439.png",
+          "title": "The Colosseum in Rome: History, Architecture, and Cultural Significance",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_DALLE-2023-12-30-14.26.16-An-ancient-scene-in-a-16_9-format-depicting-the-construction-of-the-Co.png",
+          "score": 0.0
+        },
+        {
+          "url": "https://cdn.britannica.com/02/179502-138-F6583A57/effects-construction-Rome-Colosseum.jpg",
+          "title": "Colosseum | Facts & Definition | Britannica.com",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_effects-construction-Rome-Colosseum.jpg",
+          "score": 0.0
+        },
+        {
+          "url": "https://www.mygodpictures.com/wp-content/uploads/2015/09/Roman-Portrait-Of-Emperor-Augustus.jpg",
+          "title": "Augustus - God Pictures",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_Roman-Portrait-Of-Emperor-Augustus.jpg",
+          "score": 0.0
+        },
+        {
+          "url": "https://landmarkevents.org/assets/email/2018/09-24-history-highlight/inline-julius.jpg",
+          "title": "Augustus : Augustus Roman emperor bust with Bevilacqua silver color ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_inline-julius.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://cdn.britannica.com/55/102155-050-285AC32A/Caesar-Augustus-marble-statue-Vatican-City-Museums.jpg",
+          "title": "Augustus | Biography, Accomplishments, Statue, Death, Definition ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_Caesar-Augustus-marble-statue-Vatican-City-Museums.jpg",
+          "score": 0.0
+        },
+        {
+          "url": "https://www.liebieghaus.de/sites/default/files/media/image/liebieghaus_antike_augustus_10_0.jpg",
+          "title": "Portrait of the Roman Emperor Augustus | Liebieghaus",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_liebieghaus_antike_augustus_10_0.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://img.freepik.com/premium-photo/augustus-first-roman-emperor-oil-painting-depicting-ancient-history-military-armor_972182-2644.jpg",
+          "title": "Premium Photo | Augustus the first Roman Emperor in an oil painting ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_augustus-first-roman-emperor-oil-painting-depicting-ancient-history-military-armor_972182-2644.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/264498ee-73ce-49d8-8ebc-f1f845fff514/dejbesc-b5d9db96-8b65-445b-825a-9f1e9ccfed2a.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzI2NDQ5OGVlLTczY2UtNDlkOC04ZWJjLWYxZjg0NWZmZjUxNFwvZGVqYmVzYy1iNWQ5ZGI5Ni04YjY1LTQ0NWItODI1YS05ZjFlOWNjZmVkMmEucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.LHKNkKkFYgfISswPxOJ5WrxW06kSqb9bIwnLOYWHoBo",
+          "title": "The expansion of the Roman Empire to 117 CE by Undevicesimus on DeviantArt",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_dejbesc-b5d9db96-8b65-445b-825a-9f1e9ccfed2a.png",
+          "score": 1.0
+        },
+        {
+          "url": "https://i.redd.it/nmmkn81x3b931.png",
+          "title": "Timeline of Roman expansion. : r/europe",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_nmmkn81x3b931.png",
+          "score": 1.0
+        },
+        {
+          "url": "https://cdn.mos.cms.futurecdn.net/JSMY2W8LF83AkyQ7xS6YNd.jpg",
+          "title": "The Roman Empire: Rulers, expansion and fall | Live Science",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_JSMY2W8LF83AkyQ7xS6YNd.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://image1.slideserve.com/2006866/mapping-the-expansion-of-the-roman-empire-l.jpg",
+          "title": "PPT - Mapping the Expansion of the Roman Empire PowerPoint Presentation ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_mapping-the-expansion-of-the-roman-empire-l.jpg",
+          "score": 1.0
+        }
+      ],
+      "selected_image_path": "runs/20260213-141740-history-of-roman-empire/images/segment_001/img_62ecef81-422e-4d03-aae2-09f6980cad06.jpg",
+      "narration_audio_path": "runs/20260213-141740-history-of-roman-empire/audio/segment_001.wav",
+      "duration_seconds": 3.1
+    },
+    {
+      "segment_id": 2,
+      "text": "History U.S. History All the major chapters in the American story, from Indigenous beg This moment connects directly to the next chapter in the story. The Republic and Expansion.",
+      "text_range": "Sentence 4-6",
+      "search_queries": [
+        "Roman Empire map",
+        "Roman Forum architecture",
+        "Roman legions in battle",
+        "Roman Emperor Augustus portrait",
+        "Colosseum ancient Rome"
+      ],
+      "visual_description": "A grand, sunlit aerial view of the ancient Roman Forum, with towering marble columns, bustling market stalls, and people in traditional Roman attire walking along the cobblestone streets, surrounded by the majestic architecture of the Roman Empire.",
+      "image_candidates": [
+        {
+          "url": "https://istanbulclues.com/wp-content/uploads/2016/10/Roman-Empire-Map-Cities.jpg",
+          "title": "Roman Empire Map, History, Facts, Rome At Its Height - Istanbul Clues",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_002/img_Roman-Empire-Map-Cities.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://as1.ftcdn.net/v2/jpg/04/85/66/26/1000_F_485662624_ynlOybKx0b6JPU9394viZD9t5aaL8PUK.jpg",
+          "title": "Map of Roman Empire territory at its peak Stock Illustration | Adobe Stock",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_002/img_1000_F_485662624_ynlOybKx0b6JPU9394viZD9t5aaL8PUK.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://roman-empire.net/wp-content/uploads/2021/12/Roman-Empire-Map-AD-117.jpg",
+          "title": "Roman Empire Map: Unveiling Its Vast Territory",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_002/img_Roman-Empire-Map-AD-117.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://c8.alamy.com/comp/E4C9M2/the-roman-empire-at-its-greatest-extent-in-117-ad-at-the-time-of-trajan-E4C9M2.jpg",
+          "title": "Roman Empire Map At Its Height",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_002/img_the-roman-empire-at-its-greatest-extent-in-117-ad-at-the-time-of-trajan-E4C9M2.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "http://cdn3.vox-cdn.com/assets/4822044/RomanEmpire_117.svg.png",
+          "title": "40 maps that explain the Roman Empire - Vox",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_002/img_RomanEmpire_117.svg.png",
+          "score": 1.0
+        },
+        {
+          "url": "https://thumbs.dreamstime.com/z/roman-forum-architecture-rome-city-center-italy-ethernal-architectural-details-130761423.jpg",
+          "title": "Roman Forum Architecture in Rome City Center Stock Image - Image of ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_002/img_roman-forum-architecture-rome-city-center-italy-ethernal-architectural-details-130761423.jpg",
+          "score": 2.0
+        },
+        {
+          "url": "https://www.romesightseeing.net/media/hojaok0k/roman-forum.jpg",
+          "title": "The Roman Forum: Famous Ruins of Rome | Vidan.org",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_002/img_roman-forum.jpg",
+          "score": 2.0
+        },
+        {
+          "url": "https://i.pinimg.com/originals/71/4f/be/714fbefd711dfc39488c5800af54f9e8.jpg",
+          "title": "Roman legions in battle, during the Roman Civil War | Ancient warfare ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_002/img_714fbefd711dfc39488c5800af54f9e8.jpg",
+          "score": 2.0
+        },
+        {
+          "url": "https://i.pinimg.com/originals/82/92/a1/8292a1f0209de1691604f5c087f5e35f.jpg",
+          "title": "10 Brutal Facts About the Roman Legions - Toptenz.net | Roman history ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_002/img_8292a1f0209de1691604f5c087f5e35f.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://digitalmapsoftheancientworld.files.wordpress.com/2022/05/roman_army.jpg",
+          "title": "The Roman Army - Digital Maps of the Ancient World",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_002/img_roman_army.jpg",
+          "score": 2.0
+        },
+        {
+          "url": "https://i.pinimg.com/originals/1d/5d/32/1d5d325af8ae80fd03b04723fb2ac3ab.jpg",
+          "title": "Pin on Legiones romanas",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_002/img_1d5d325af8ae80fd03b04723fb2ac3ab.jpg",
+          "score": 0.0
+        },
+        {
+          "url": "https://wallpaperaccess.com/full/658230.jpg",
+          "title": "Roman Army Wallpapers - Top Free Roman Army Backgrounds - WallpaperAccess",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_002/img_658230.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://thumbs.dreamstime.com/z/colosseum-rome-23180533.jpg",
+          "title": "The Colosseum of Rome editorial stock photo. Image of landmark - 23180533",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_002/img_colosseum-rome-23180533.jpg",
+          "score": 0.0
+        },
+        {
+          "url": "https://c8.alamy.com/comp/EYWPYY/colosseum-ancient-roman-forum-unesco-world-heritage-site-rome-lazio-EYWPYY.jpg",
+          "title": "Colosseum, Ancient Roman Forum, UNESCO World Heritage Site, Rome, Lazio ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_002/img_colosseum-ancient-roman-forum-unesco-world-heritage-site-rome-lazio-EYWPYY.jpg",
+          "score": 3.0
+        },
+        {
+          "url": "https://c8.alamy.com/comp/RYCEAP/the-ancient-colosseum-in-rome-at-sunset-RYCEAP.jpg",
+          "title": "Ancient colosseum in rome capital hi-res stock photography and images ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_002/img_the-ancient-colosseum-in-rome-at-sunset-RYCEAP.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://c8.alamy.com/comp/T58WWH/ancient-colosseum-in-rome-near-the-roman-forum-T58WWH.jpg",
+          "title": "Colosseum coliseum colosseo colisseum coloseum ancient rome italy roma ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_002/img_ancient-colosseum-in-rome-near-the-roman-forum-T58WWH.jpg",
+          "score": 1.0
+        }
+      ],
+      "selected_image_path": "runs/20260213-141740-history-of-roman-empire/images/segment_002/img_colosseum-ancient-roman-forum-unesco-world-heritage-site-rome-lazio-EYWPYY.jpg",
+      "narration_audio_path": "runs/20260213-141740-history-of-roman-empire/audio/segment_002.wav",
+      "duration_seconds": 2.24
+    },
+    {
+      "segment_id": 3,
+      "text": "Explore the Roman Republic's growth and conquests the American story, from Indigenous beginnings to the present day. Colonial America Colonial America American Revolution American Revolution Early U.S. Early U.S.",
+      "text_range": "Sentence 7-9",
+      "search_queries": [
+        "Roman Republic conquest of Italy",
+        "Roman legions in battle",
+        "Roman Senate in session",
+        "Roman generals like Julius Caesar",
+        "Roman architecture in the Republic era"
+      ],
+      "visual_description": "A vivid depiction of a Roman legion marching through a conquered Italian landscape, with Roman generals and senators standing atop a hill, overlooking the vast expanse of the Republic's expanding territories.",
+      "image_candidates": [
+        {
+          "url": "https://www.unrv.com/images/1200width/conquest-of-italy.jpg",
+          "title": "Roman Conquest of Italy | UNRV Roman History",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_003/img_conquest-of-italy.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "http://upload.wikimedia.org/wikipedia/commons/4/4a/Roman_conquest_of_Italy.PNG",
+          "title": "File:Roman conquest of Italy.PNG - Wikimedia Commons",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_003/img_Roman_conquest_of_Italy.PNG",
+          "score": 1.0
+        },
+        {
+          "url": "http://explorethemed.com/Images/Maps/RiseRome936.jpg",
+          "title": "The Roman Conquest of Italy",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_003/img_RiseRome936.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://cdn.britannica.com/40/1040-050-16A3C0EC/expansion-Roman-Italy.jpg",
+          "title": "Roman Republic | History, Government, Map, & Facts | Britannica",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_003/img_expansion-Roman-Italy.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://human.libretexts.org/@api/deki/files/125597/0bdaf8ab0eb7eb77005a8f71ffeebd3f1a9e2def?revision=1",
+          "title": "6.5: The Roman Republic - Humanities LibreTexts",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_003/img_0bdaf8ab0eb7eb77005a8f71ffeebd3f1a9e2def.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://romanempiretimes.com/content/images/size/w2000/2024/02/DALL-E-2024-02-07-11.28.55---Create-an-image-depicting-a-meeting-of-the-Roman-Senate-in-full-session.-The-scene-is-set-within-the-Curia--the-Senate-s-official-meeting-place--fille.webp",
+          "title": "The Pillars of Rome: Unveiling the Power and Intrigue of the Roman Senate",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_003/img_DALL-E-2024-02-07-11.28.55---Create-an-image-depicting-a-meeting-of-the-Roman-Senate-in-full-se.webp",
+          "score": 1.0
+        },
+        {
+          "url": "https://romanempiretimes.com/content/images/2024/02/DALL-E-2024-02-07-12.13.30---Adjust-the-image-of-the-Roman-Senate-meeting-to-replace-any-modern-elements-like-paper-with-historically-accurate-waxed-tablets--which-were-commonly-u.webp",
+          "title": "The Pillars of Rome: Unveiling the Power and Intrigue of the Roman Senate",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_003/img_DALL-E-2024-02-07-12.13.30---Adjust-the-image-of-the-Roman-Senate-meeting-to-replace-any-modern.webp",
+          "score": 1.0
+        },
+        {
+          "url": "https://c8.alamy.com/comp/2NDD6W2/roman-senate-in-session-on-a-19th-century-fresco-in-the-palazzo-madamarome-it-shows-cicero-attacking-catiline-2NDD6W2.jpg",
+          "title": "Roman senate hi-res stock photography and images - Alamy",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_003/img_roman-senate-in-session-on-a-19th-century-fresco-in-the-palazzo-madamarome-it-shows-cicero-attac.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Cicero_Denounces_Catiline_in_the_Roman_Senate_by_Cesare_Maccari.png/600px-Cicero_Denounces_Catiline_in_the_Roman_Senate_by_Cesare_Maccari.png",
+          "title": "Roman Senate - Wikipedia",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_003/img_600px-Cicero_Denounces_Catiline_in_the_Roman_Senate_by_Cesare_Maccari.png",
+          "score": 1.0
+        },
+        {
+          "url": "https://img.freepik.com/premium-photo/ancient-roman-senator-giving-speech-senate-historical-scene-with-soldiers-audience-classical-architecture_1297921-2508.jpg",
+          "title": "Ancient Roman senator giving speech in the Senate historical scene with ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_003/img_ancient-roman-senator-giving-speech-senate-historical-scene-with-soldiers-audience-classical-arc.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://img.freepik.com/premium-photo/gaius-julius-caesar-roman-general-statesman-iconic-historical-figure-ancient-history-military-prowess-political-acumen-complex-rise-power_771426-48494.jpg",
+          "title": "Premium Photo | Gaius Julius Caesar roman general statesman and iconic ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_003/img_gaius-julius-caesar-roman-general-statesman-iconic-historical-figure-ancient-history-military-pr.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://img.freepik.com/premium-photo/gaius-julius-caesar-roman-general-statesman-iconic-historical-figure-ancient-history-military-prowess-political-acumen-complex-rise-power_771426-41061.jpg",
+          "title": "Gaius julius caesar roman general statesman and iconic historical ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_003/img_gaius-julius-caesar-roman-general-statesman-iconic-historical-figure-ancient-history-military-pr.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://img.freepik.com/premium-photo/julius-caesar-mighty-roman-general-conquering-ancient-rome-concept-roman-empire-julius-caesar-ancient-warfare-conquest-gaul-roman-generals_918839-217529.jpg?w=1480",
+          "title": "Julius Caesar A Mighty Roman General Conquering in Ancient Rome Concept ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_003/img_julius-caesar-mighty-roman-general-conquering-ancient-rome-concept-roman-empire-julius-caesar-an.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://img.freepik.com/premium-photo/julius-caesar-mighty-roman-general-conquering-ancient-rome-concept-roman-empire-julius-caesar-ancient-warfare-conquest-gaul-roman-generals_918839-217462.jpg?w=2000",
+          "title": "Premium Photo | Julius Caesar A Mighty Roman General Conquering in ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_003/img_julius-caesar-mighty-roman-general-conquering-ancient-rome-concept-roman-empire-julius-caesar-an.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://img.freepik.com/premium-photo/gus-julius-caesar-renowned-roman-general-iconic-historical-figure-ancient-history-concept-ancient-rome-julius-caesar-roman-empire-military-strategies-historical-figures_918839-146253.jpg?w=2000",
+          "title": "Premium Photo | Gus Julius Caesar A Renowned Roman General and Iconic ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_003/img_gus-julius-caesar-renowned-roman-general-iconic-historical-figure-ancient-history-concept-ancien.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://media.architecturaldigest.com/photos/64526cc2666a676998a9ecc4/master/w_1600,c_limit/GettyImages-642290985.jpg",
+          "title": "Roman Architecture: Everything You Need to Know | Architectural Digest",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_003/img_GettyImages-642290985.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Roma06(js).jpg",
+          "title": "Ancient Roman architecture - Wikipedia",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_003/img_Roma06js.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://www.ancienthistorylists.com/wp-content/uploads/2015/09/Maison-Carr\u00e9e.jpg",
+          "title": "Top 10 Magnificent Examples of Ancient Roman Architecture",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_003/img_Maison-Carr\u00e9e.jpg",
+          "score": 1.0
+        }
+      ],
+      "selected_image_path": "runs/20260213-141740-history-of-roman-empire/images/segment_003/img_conquest-of-italy.jpg",
+      "narration_audio_path": "runs/20260213-141740-history-of-roman-empire/audio/segment_003.wav",
+      "duration_seconds": 2.92
+    },
+    {
+      "segment_id": 4,
+      "text": "Slavery Slavery Civil War Civil War Immigration Immigrat This moment connects directly to the next chapter in the story. The Imperial Era and Decline. Examine the Roman Empire's peak and eventual decline Civil War Civil War Immigration Immigration Great Depression Great Depression Black History Black History Hispanic History Hispanic History Women\u2019s History Women\u2019s History LGBTQ+ History LGBTQ+ History Native American Hi This moment connects directly to the next chapter in the story.",
+      "text_range": "Sentence 10-12",
+      "search_queries": [
+        "Roman Empire map",
+        "Roman slave market",
+        "Roman Imperial Era architecture",
+        "Roman Civil War battle scenes",
+        "Roman Empire decline and fall illustrations"
+      ],
+      "visual_description": "A grand, yet worn, stone column stands amidst the ruins of the Roman Forum, with a faded fresco of a Roman emperor in the background, as the sun sets over the once-mighty empire.",
+      "image_candidates": [
+        {
+          "url": "https://media.istockphoto.com/id/964958802/vector/roman-slave-market.jpg?s=1024x1024&w=is&k=20&c=Dkmsh0K9PUl0xDPVcGP4eMSHmuuexPCX10AxBC8-zI4=",
+          "title": "Roman Slave Market Stock Illustration - Download Image Now - Slavery ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_004/img_roman-slave-market.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://www.worldhistory.org/img/c/p/360x202/2113.png?v=1733403429",
+          "title": "Ancient Roman Slave Market - World History Encyclopedia",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_004/img_2113.png",
+          "score": 1.0
+        },
+        {
+          "url": "http://www.strangehistory.net/blog/wp-content/uploads/2017/02/slave-market.jpg",
+          "title": "Daily History Picture: Slave Market in Roman London - Beachcombing's ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_004/img_slave-market.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://cdn.britannica.com/78/187678-138-6D546A12/infrastructure-masonry-Rome-Roman.jpg",
+          "title": "Roman Empire | ancient state [27 bc-476 ad] | Britannica.com",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_004/img_infrastructure-masonry-Rome-Roman.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Roma06(js).jpg/1200px-Roma06(js).jpg",
+          "title": "Ancient Roman architecture - Wikipedia",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_004/img_1200px-Roma06js.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://www.worldatlas.com/upload/7d/45/7e/shutterstock-98484677.jpg",
+          "title": "The 9 Most Important Cities Of The Roman Empire - WorldAtlas",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_004/img_shutterstock-98484677.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://cdn.britannica.com/59/152559-131-67C5F744/Roman-Forum-Temple-of-Saturn-Italy-Rome.jpg",
+          "title": "The Roman Empire Quiz | Britannica",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_004/img_Roman-Forum-Temple-of-Saturn-Italy-Rome.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://roman-empire.net/wp-content/uploads/2024/05/Pharsalus.jpg",
+          "title": "Pharsalus 48 BC - The Battle That Ended Roman Civil War",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_004/img_Pharsalus.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://www.ancienthistorylists.com/wp-content/uploads/2019/07/Caesars-Civil-War.jpg",
+          "title": "Top 12 of Rome's Greatest Battles - Ancient History Lists",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_004/img_Caesars-Civil-War.jpg",
+          "score": 0.0
+        },
+        {
+          "url": "https://express.adobe.com/page/DVbAhNkS9OowF/images/a86fcaeb-ca45-4057-bbb2-ca2a6cb66ac1.jpg?asset_id=4cf6179a-50f1-4c8f-9b53-6cc06b3369a4&img_etag=4f7722c01b342bea66faaeaca2d0dcc8&size=770",
+          "title": "Roman Civil War",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_004/img_a86fcaeb-ca45-4057-bbb2-ca2a6cb66ac1.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://cdn.thecollector.com/wp-content/uploads/2021/10/roman-battle-munda.jpg?width=1400&quality=55",
+          "title": "5 Lesser-Known Roman Battles that Changed the World",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_004/img_roman-battle-munda.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://paintingvalley.com/images/roman-war-painting-9.jpg",
+          "title": "Roman War Painting at PaintingValley.com | Explore collection of Roman ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_004/img_roman-war-painting-9.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://www.anticariat-unu.ro/uploads/products/the-decline-and-fall-of-the-roman-empire-by-edward-gibbon-illustrations-by-giovanni-battista-piranesi-2014-p311434-0.JPG",
+          "title": "THE DECLINE AND FALL OF THE ROMAN EMPIRE by EDWARD GIBBON ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_004/img_the-decline-and-fall-of-the-roman-empire-by-edward-gibbon-illustrations-by-giovanni-battista-pir.JPG",
+          "score": 1.0
+        },
+        {
+          "url": "https://gertitashkomd.com/wp-content/uploads/2025/05/Tashko-Fall-Western-Roman-Empire-476-CE.jpg",
+          "title": "The Fall of the Western Roman Empire (476 CE): Collapse of Power ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_004/img_Tashko-Fall-Western-Roman-Empire-476-CE.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://up.bookfusion.com/book/cover/002/533/965/large_cf2c433b00b21627.jpg",
+          "title": "The History of the Decline and Fall of the Roman Empire by Edward ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_004/img_large_cf2c433b00b21627.jpg",
+          "score": 1.0
+        }
+      ],
+      "selected_image_path": "runs/20260213-141740-history-of-roman-empire/images/segment_004/img_roman-slave-market.jpg",
+      "narration_audio_path": "runs/20260213-141740-history-of-roman-empire/audio/segment_004.wav",
+      "duration_seconds": 7.51
+    },
+    {
+      "segment_id": 5,
+      "text": "Legacy of the Roman Empire. Discuss the lasting impact of the Roman Empire on modern society istory LGBTQ+ History Native American History Native American History Asian American, Native Hawaiian & Pacific Islander History Asian American, Native Hawaiian & Pacific Islander History U.S. Presidents U.S.",
+      "text_range": "Sentence 13-15",
+      "search_queries": [
+        "Roman Colosseum architecture",
+        "Roman Senate meeting",
+        "Roman Empire map",
+        "Roman aqueducts construction",
+        "Roman Forum ruins"
+      ],
+      "visual_description": "A grand, sunlit aerial view of the ancient Roman Colosseum, with its iconic arches and columns set against a backdrop of sprawling cityscape and distant rolling hills.",
+      "image_candidates": [
+        {
+          "url": "http://www.mostamazingwonders.com/wp-content/uploads/2014/06/Roman-Colosseum1.jpg?0cc007",
+          "title": "The Roman Colosseum, The Incredible Architectural Wonder - Most Amazing ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_005/img_Roman-Colosseum1.jpg",
+          "score": 2.0
+        },
+        {
+          "url": "https://cdn.britannica.com/75/75775-050-1FC4B34B/Colosseum-Rome.jpg",
+          "title": "Amphitheatre | Architecture, History & Uses | Britannica",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_005/img_Colosseum-Rome.jpg",
+          "score": 0.0
+        },
+        {
+          "url": "http://cdn.history.com/sites/2/2014/01/aerial-view-colosseum-P.jpeg",
+          "title": "aerial-view-of-the-colosseum-in-rome - Roman Architecture and ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_005/img_aerial-view-colosseum-P.jpeg",
+          "score": 1.0
+        },
+        {
+          "url": "http://cdn.history.com/sites/2/2014/01/interior-colosseum-P.jpeg",
+          "title": "aerial-view-of-the-colosseum-in-rome - Roman Architecture and ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_005/img_interior-colosseum-P.jpeg",
+          "score": 1.0
+        },
+        {
+          "url": "https://www.thepinnaclelist.com/wp-content/uploads/2021/08/Roman-Colosseum-Rome-Italy.jpg",
+          "title": "Roman Colosseum - Rome, Italy - The Pinnacle List",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_005/img_Roman-Colosseum-Rome-Italy.jpg",
+          "score": 2.0
+        },
+        {
+          "url": "http://c8.alamy.com/comp/ERGTNY/the-roman-empire-the-senate-assembled-in-a-temple-romans-white-tunic-ERGTNY.jpg",
+          "title": "The Roman Empire - the Senate assembled in a temple. Romans, white ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_005/img_the-roman-empire-the-senate-assembled-in-a-temple-romans-white-tunic-ERGTNY.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://img.freepik.com/premium-photo/ancient-roman-senate-assembly-meeting-historic-political-discussion-leadership_209484-54081.jpg",
+          "title": "Ancient Roman Senate Assembly Meeting Historic Political Discussion ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_005/img_ancient-roman-senate-assembly-meeting-historic-political-discussion-leadership_209484-54081.jpg",
+          "score": 2.0
+        },
+        {
+          "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Cicero_Denounces_Catiline_in_the_Roman_Senate_by_Cesare_Maccari.png/1200px-Cicero_Denounces_Catiline_in_the_Roman_Senate_by_Cesare_Maccari.png?20230604121557",
+          "title": "File:Cicero Denounces Catiline in the Roman Senate by Cesare Maccari ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_005/img_1200px-Cicero_Denounces_Catiline_in_the_Roman_Senate_by_Cesare_Maccari.png",
+          "score": 1.0
+        },
+        {
+          "url": "https://mir-s3-cdn-cf.behance.net/project_modules/1400/083605129113715.6164777f6b505.jpg",
+          "title": "Roman aqueduct construction (Segovia) 2nd century C.E. on Behance",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_005/img_083605129113715.6164777f6b505.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "http://brewminate.com/wp-content/uploads/2017/12/120617-68-Architecture-Art-History-Rome.jpg",
+          "title": "Modern Roman Construction and Ancient Roman Ruins",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_005/img_120617-68-Architecture-Art-History-Rome.jpg",
+          "score": 2.0
+        },
+        {
+          "url": "https://romanempiretimes.com/content/images/2024/03/DALL-E-2024-03-21-19.18.40---Create-a-photorealistic-image-showing-workers-constructing-an-ancient-Roman-aqueduct.-The-setting-is-an-expansive-landscape--capturing-the-significant-1-1.webp",
+          "title": "The Marvels of Ancient Roman Aqueducts: Engineering Mastery That Stood ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_005/img_DALL-E-2024-03-21-19.18.40---Create-a-photorealistic-image-showing-workers-constructing-an-anci.webp",
+          "score": 2.0
+        },
+        {
+          "url": "https://i.pinimg.com/originals/f7/0d/77/f70d77bb1f71c629cccdcd6417089eb6.jpg",
+          "title": "What Were Roman Aqueducts Made Of at Wayne Stevens blog",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_005/img_f70d77bb1f71c629cccdcd6417089eb6.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://cdn.thecollector.com/wp-content/uploads/2022/06/roman-aqueducts-diagram.jpg?width=1200&quality=55",
+          "title": "How Did Romans Build Aqueducts? | TheCollector",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_005/img_roman-aqueducts-diagram.jpg",
+          "score": 0.0
+        },
+        {
+          "url": "https://as2.ftcdn.net/v2/jpg/01/02/92/45/1000_F_102924598_2D52YB0dRfkYuEm0sp2Hwl1VhW9orrrk.jpg",
+          "title": "Roman Forum. Ruins of Roman Forum in Rome, Italy during sunrise. Stock ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_005/img_1000_F_102924598_2D52YB0dRfkYuEm0sp2Hwl1VhW9orrrk.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://cdn.britannica.com/91/129091-050-1DC27D1B/ruins-Roman-Forum-Rome.jpg",
+          "title": "Rome - Ancient Forum, Colosseum, Pantheon | Britannica",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_005/img_ruins-Roman-Forum-Rome.jpg",
+          "score": 2.0
+        }
+      ],
+      "selected_image_path": "runs/20260213-141740-history-of-roman-empire/images/segment_005/img_Roman-Colosseum1.jpg",
+      "narration_audio_path": "runs/20260213-141740-history-of-roman-empire/audio/segment_005.wav",
+      "duration_seconds": 4.12
+    },
+    {
+      "segment_id": 6,
+      "text": "Presidents This moment connects directly to the next chapter in the story.",
+      "text_range": "Sentence 16-16",
+      "search_queries": [
+        "Roman Emperor Augustus portrait",
+        "Roman Senate meeting scene",
+        "Roman legions marching illustration",
+        "Roman Forum architecture",
+        "Roman Imperial eagle symbol"
+      ],
+      "visual_description": "A grand, sunlit Roman Forum scene unfolds, with marble columns and statues of emperors surrounding a bustling crowd of robed citizens, while the imposing figure of Augustus stands tall, overseeing the proceedings from atop a ornate pedestal.",
+      "image_candidates": [
+        {
+          "url": "https://romanempiretimes.com/content/images/size/w1200/2024/02/DALL-E-2024-02-07-11.28.55---Create-an-image-depicting-a-meeting-of-the-Roman-Senate-in-full-session.-The-scene-is-set-within-the-Curia--the-Senate-s-official-meeting-place--fille.webp",
+          "title": "The Pillars of Rome: Unveiling the Power and Intrigue of the Roman Senate",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_006/img_DALL-E-2024-02-07-11.28.55---Create-an-image-depicting-a-meeting-of-the-Roman-Senate-in-full-se.webp",
+          "score": 1.0
+        },
+        {
+          "url": "https://brewminate.com/wp-content/uploads/2020/04/041920-13-History-Ancient-Rome-Roman-Senate.jpg",
+          "title": "Sen\u0101tus R\u014dm\u0101nus: Waxing and Waning Power of the Ancient Roman Senate ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_006/img_041920-13-History-Ancient-Rome-Roman-Senate.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://c8.alamy.com/comp/ERGTNY/the-roman-empire-the-senate-assembled-in-a-temple-romans-white-tunic-ERGTNY.jpg",
+          "title": "Roman Senate Building Interior",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_006/img_the-roman-empire-the-senate-assembled-in-a-temple-romans-white-tunic-ERGTNY.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://media.gettyimages.com/id/88021783/vector/illustration-of-roman-legion-marching-in-formation-holding-shields-and-javelins.jpg?s=1024x1024&w=gi&k=20&c=kD4Tb6wYcE_qeKp1dcjBuAePsoCJHXRFBcOiVuEa5l0=",
+          "title": "Illustration Of Roman Legion Marching In Formation Holding Shields And ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_006/img_illustration-of-roman-legion-marching-in-formation-holding-shields-and-javelins.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://thumbs.dreamstime.com/b/roman-legionaries-172513906.jpg",
+          "title": "Roman Legion Ancient Rome Illustration Isometric Icons on Isolated ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_006/img_roman-legionaries-172513906.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://thumbs.dreamstime.com/b/ancient-roman-legion-entering-grand-city-adorned-iconic-architecture-banners-army-marches-triumphantly-amidst-vast-403037893.jpg",
+          "title": "Roman Legion Marching Stock Illustrations - 29 Roman Legion Marching ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_006/img_ancient-roman-legion-entering-grand-city-adorned-iconic-architecture-banners-army-marches-triump.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://thumbs.dreamstime.com/b/roman-legion-marching-to-city-sunset-powerful-image-roman-legion-marching-towards-fortified-city-sunset-330582601.jpg",
+          "title": "Roman Legion Marching To City at Sunset Stock Illustration ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_006/img_roman-legion-marching-to-city-sunset-powerful-image-roman-legion-marching-towards-fortified-city.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://as1.ftcdn.net/v2/jpg/02/59/03/36/1000_F_259033613_Mg8ExLO7y4bqOveK3oqO7XgTajRGKibW.jpg",
+          "title": "roman eagle symbol of roman empire Stock Vector | Adobe Stock",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_006/img_1000_F_259033613_Mg8ExLO7y4bqOveK3oqO7XgTajRGKibW.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://imperiumromanum.pl/wp-content/uploads/2015/05/Eagle-e1488130899402.jpg",
+          "title": "Eagle Roman Empire at Virginia Olsen blog",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_006/img_Eagle-e1488130899402.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://www.pngitem.com/pimgs/m/18-183930_roman-imperial-eagle-symbol-hd-png-download.png",
+          "title": "Roman Imperial Eagle Symbol, HD Png Download , Transparent Png Image ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_006/img_18-183930_roman-imperial-eagle-symbol-hd-png-download.png",
+          "score": 1.0
+        },
+        {
+          "url": "https://c8.alamy.com/comp/F3898T/double-headed-eagle-common-symbol-in-heraldry-and-vexillology-it-is-F3898T.jpg",
+          "title": "Eagle Roman Empire at Virginia Olsen blog",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_006/img_double-headed-eagle-common-symbol-in-heraldry-and-vexillology-it-is-F3898T.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://thiswaytoitaly.com/wp-content/uploads/2022/09/Roman-Aquila-Symbols-of-Rome.webp",
+          "title": "Symbols of Rome: 10 Most Famous Ancient Roman Symbols - This Way To Italy",
+          "source": "Bing",
+          "local_path": "runs/20260213-141740-history-of-roman-empire/images/segment_006/img_Roman-Aquila-Symbols-of-Rome.webp",
+          "score": 1.0
+        }
+      ],
+      "selected_image_path": "runs/20260213-141740-history-of-roman-empire/images/segment_006/img_DALL-E-2024-02-07-11.28.55---Create-an-image-depicting-a-meeting-of-the-Roman-Senate-in-full-se.webp",
+      "narration_audio_path": "runs/20260213-141740-history-of-roman-empire/audio/segment_006.wav",
+      "duration_seconds": 0.73
+    }
+  ],
+  "final_video_path": "runs/20260213-141740-history-of-roman-empire/final_output.mp4"
+}

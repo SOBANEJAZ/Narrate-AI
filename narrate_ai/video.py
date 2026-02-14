@@ -1,3 +1,5 @@
+"""Video assembly module using functional programming style."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -10,7 +12,7 @@ from moviepy import (
     concatenate_videoclips,
 )
 
-from .models import ScriptSegment, TimelineItem
+from .models import ScriptSegment, TimelineItem, create_timeline_item
 from .text_utils import safe_filename
 
 try:
@@ -22,49 +24,57 @@ except Exception:  # pragma: no cover - optional dependency fallback
 
 
 def build_timeline(segments: list[ScriptSegment]) -> list[TimelineItem]:
+    """Build a timeline from script segments.
+
+    Args:
+        segments: List of script segments
+
+    Returns:
+        List of timeline items
+    """
     print(f"[TIMELINE] Building timeline from {len(segments)} segments", flush=True)
     timeline: list[TimelineItem] = []
     cursor = 0.0
 
     for segment in segments:
-        if segment.selected_image_path is None or segment.narration_audio_path is None:
+        selected_image = segment.get("selected_image_path")
+        narration_audio = segment.get("narration_audio_path")
+
+        if selected_image is None or narration_audio is None:
             print(
-                f"[TIMELINE] Segment {segment.segment_id}: missing image/audio, skipped",
+                f"[TIMELINE] Segment {segment['segment_id']}: missing image/audio, skipped",
                 flush=True,
             )
             continue
 
-        if (
-            not segment.selected_image_path.exists()
-            or not segment.narration_audio_path.exists()
-        ):
+        if not selected_image.exists() or not narration_audio.exists():
             print(
-                f"[TIMELINE] Segment {segment.segment_id}: missing files on disk, skipped",
+                f"[TIMELINE] Segment {segment['segment_id']}: missing files on disk, skipped",
                 flush=True,
             )
             continue
 
         try:
-            with AudioFileClip(str(segment.narration_audio_path)) as audio_clip:
+            with AudioFileClip(str(narration_audio)) as audio_clip:
                 duration = float(audio_clip.duration)
         except Exception:
-            duration = max(3.0, segment.duration_seconds or 3.0)
+            duration = max(3.0, segment.get("duration_seconds", 3.0))
 
-        segment.duration_seconds = duration
+        segment["duration_seconds"] = duration
         timeline.append(
-            TimelineItem(
-                segment_id=segment.segment_id,
-                text=segment.text,
+            create_timeline_item(
+                segment_id=segment["segment_id"],
+                text=segment["text"],
                 start_seconds=cursor,
                 end_seconds=cursor + duration,
                 duration_seconds=duration,
-                image_path=segment.selected_image_path,
-                audio_path=segment.narration_audio_path,
+                image_path=selected_image,
+                audio_path=narration_audio,
             )
         )
         cursor += duration
         print(
-            f"[TIMELINE] Segment {segment.segment_id}: duration={duration:.2f}s start={timeline[-1].start_seconds:.2f}s",
+            f"[TIMELINE] Segment {segment['segment_id']}: duration={duration:.2f}s start={timeline[-1]['start_seconds']:.2f}s",
             flush=True,
         )
     print(f"[TIMELINE] Timeline ready with {len(timeline)} items", flush=True)
@@ -81,6 +91,20 @@ def assemble_video(
     zoom_strength: float = 0.04,
     background_mode: str = "black",
 ) -> Path:
+    """Assemble video from timeline items.
+
+    Args:
+        timeline: List of timeline items
+        output_path: Output path for video
+        resolution: Video resolution
+        fps: Frames per second
+        transition_seconds: Transition duration between clips
+        zoom_strength: Zoom effect strength
+        background_mode: Background mode ("black" or "blur")
+
+    Returns:
+        Path to assembled video
+    """
     if not timeline:
         raise ValueError("Timeline is empty; cannot assemble video.")
 
@@ -95,7 +119,7 @@ def assemble_video(
     try:
         for item in timeline:
             print(
-                f"[VIDEO] Building clip for segment {item.segment_id} ({item.duration_seconds:.2f}s)",
+                f"[VIDEO] Building clip for segment {item['segment_id']} ({item['duration_seconds']:.2f}s)",
                 flush=True,
             )
             clip = _build_segment_clip(
@@ -135,18 +159,21 @@ def _build_segment_clip(
     background_mode: str,
     render_cache_dir: Path,
 ) -> CompositeVideoClip:
+    """Build a single segment clip."""
     width, height = resolution
-    duration = max(0.1, item.duration_seconds)
+    duration = max(0.1, item["duration_seconds"])
 
     background = _background_clip(
-        item.image_path,
+        item["image_path"],
         duration=duration,
         resolution=resolution,
         background_mode=background_mode,
         render_cache_dir=render_cache_dir,
     )
 
-    foreground = ImageClip(str(item.image_path)).with_duration(duration).with_fps(fps)
+    foreground = (
+        ImageClip(str(item["image_path"])).with_duration(duration).with_fps(fps)
+    )
     foreground = foreground.resized(height=height)
     if foreground.w > width:
         foreground = foreground.resized(width=width)
@@ -160,7 +187,7 @@ def _build_segment_clip(
     composite = CompositeVideoClip(
         [background, foreground], size=resolution
     ).with_duration(duration)
-    audio_clip = AudioFileClip(str(item.audio_path))
+    audio_clip = AudioFileClip(str(item["audio_path"]))
     composite = composite.with_audio(audio_clip)
     return composite
 
@@ -173,6 +200,7 @@ def _background_clip(
     background_mode: str,
     render_cache_dir: Path,
 ):
+    """Create a background clip for a segment."""
     if background_mode == "blur":
         blurred_path = _build_blurred_image(image_path, resolution, render_cache_dir)
         if blurred_path is not None:
@@ -186,6 +214,7 @@ def _build_blurred_image(
     resolution: tuple[int, int],
     render_cache_dir: Path,
 ) -> Path | None:
+    """Build a blurred background image."""
     if Image is None or ImageOps is None or ImageFilter is None:
         return None
 

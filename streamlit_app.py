@@ -1,3 +1,5 @@
+"""Streamlit UI for Narrate-AI with TTS provider selection."""
+
 from __future__ import annotations
 
 import os
@@ -18,6 +20,7 @@ DEFAULT_MAX_WEBSITES = 4
 DEFAULT_MAX_QUERIES = 5
 DEFAULT_IMAGES_PER_QUERY = 5
 DEFAULT_SENTENCE_SPAN = 3
+DEFAULT_TTS_PROVIDER = "elevenlabs"
 
 
 def _build_command(
@@ -29,7 +32,9 @@ def _build_command(
     max_queries: int,
     images_per_query: int,
     sentence_span: int,
+    tts_provider: str,
 ) -> list[str]:
+    """Build the command to run the pipeline."""
     return [
         sys.executable,
         str(MAIN_SCRIPT),
@@ -46,10 +51,13 @@ def _build_command(
         str(images_per_query),
         "--sentence-span",
         str(sentence_span),
+        "--tts-provider",
+        tts_provider,
     ]
 
 
 def _extract_value(lines: list[str], prefix: str) -> str | None:
+    """Extract a value from log lines."""
     for line in reversed(lines):
         if line.startswith(prefix):
             return line.split(":", 1)[1].strip()
@@ -57,9 +65,10 @@ def _extract_value(lines: list[str], prefix: str) -> str | None:
 
 
 def main() -> None:
+    """Main Streamlit app."""
     st.set_page_config(page_title="Narrate-AI", layout="wide")
     st.title("Narrate-AI Documentary Generator")
-    st.caption("Streamlit UI for running the same `main.py` pipeline command.")
+    st.caption("Streamlit UI for running the documentary pipeline.")
 
     with st.expander("Default CLI Options", expanded=True):
         st.markdown(
@@ -68,7 +77,8 @@ def main() -> None:
             "- `--max-websites`: `4`\n"
             "- `--max-queries`: `5`\n"
             "- `--images-per-query`: `5`\n"
-            "- `--sentence-span`: `3`"
+            "- `--sentence-span`: `3`\n"
+            "- `--tts-provider`: `elevenlabs`"
         )
 
     col1, col2 = st.columns(2)
@@ -81,17 +91,51 @@ def main() -> None:
             index=0 if DEFAULT_BACKGROUND == "black" else 1,
         )
     with col2:
-        max_websites = st.number_input("Max Websites", min_value=1, step=1, value=DEFAULT_MAX_WEBSITES)
-        max_queries = st.number_input("Max Queries", min_value=1, step=1, value=DEFAULT_MAX_QUERIES)
+        max_websites = st.number_input(
+            "Max Websites", min_value=1, step=1, value=DEFAULT_MAX_WEBSITES
+        )
+        max_queries = st.number_input(
+            "Max Queries", min_value=1, step=1, value=DEFAULT_MAX_QUERIES
+        )
         images_per_query = st.number_input(
             "Images Per Query",
             min_value=1,
             step=1,
             value=DEFAULT_IMAGES_PER_QUERY,
         )
-        sentence_span = st.number_input("Sentence Span", min_value=1, step=1, value=DEFAULT_SENTENCE_SPAN)
+        sentence_span = st.number_input(
+            "Sentence Span", min_value=1, step=1, value=DEFAULT_SENTENCE_SPAN
+        )
 
-    run_clicked = st.button("Generate Documentary", type="primary", use_container_width=True)
+    # TTS Provider selection
+    st.subheader("Text-to-Speech Provider")
+
+    # Check if ElevenLabs API key is available
+    has_elevenlabs_key = bool(os.getenv("ELEVENLABS_API_KEY"))
+
+    tts_provider = st.radio(
+        "Select TTS Provider",
+        options=["elevenlabs", "edge_tts"],
+        index=0 if DEFAULT_TTS_PROVIDER == "elevenlabs" else 1,
+        help="ElevenLabs provides higher quality voices but requires an API key. Edge TTS is free but lower quality.",
+    )
+
+    if tts_provider == "elevenlabs" and not has_elevenlabs_key:
+        st.warning(
+            "⚠️ ElevenLabs API key not found in environment. "
+            "Set ELEVENLABS_API_KEY environment variable or switch to Edge TTS. "
+            "The pipeline will use fallback audio if ElevenLabs is unavailable."
+        )
+
+    if tts_provider == "edge_tts":
+        st.info(
+            "ℹ️ Edge TTS uses Microsoft's free text-to-speech service. "
+            "No API key required, but quality is lower than ElevenLabs."
+        )
+
+    run_clicked = st.button(
+        "Generate Documentary", type="primary", use_container_width=True
+    )
     if not run_clicked:
         return
 
@@ -108,6 +152,7 @@ def main() -> None:
         max_queries=int(max_queries),
         images_per_query=int(images_per_query),
         sentence_span=int(sentence_span),
+        tts_provider=tts_provider,
     )
     st.markdown("**Running command:**")
     st.code(" ".join(shlex.quote(part) for part in command), language="bash")

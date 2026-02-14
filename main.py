@@ -1,12 +1,21 @@
+"""CLI entry point for documentary generation."""
+
 from __future__ import annotations
 
 import argparse
 from pathlib import Path
 
-from narrate_ai import DocumentaryPipeline, PipelineConfig
+from narrate_ai import (
+    create_config_from_env,
+    get_resolution,
+    run_pipeline,
+    update_config,
+)
+from narrate_ai.tts.factory import TTSProviderType
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Build the argument parser."""
     parser = argparse.ArgumentParser(
         description="Generate a slideshow-style documentary video from a single topic.",
     )
@@ -27,32 +36,44 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max-queries", type=int, default=5)
     parser.add_argument("--images-per-query", type=int, default=5)
     parser.add_argument("--sentence-span", type=int, default=3)
+    parser.add_argument(
+        "--tts-provider",
+        choices=["elevenlabs", "edge_tts"],
+        default="elevenlabs",
+        help="TTS provider to use for narration (elevenlabs requires API key).",
+    )
     return parser
 
 
 def main() -> int:
+    """Main entry point."""
     args = build_parser().parse_args()
 
-    config = PipelineConfig.from_env()
-    config.run_root = args.run_root
-    config.background_mode = args.background
-    config.max_websites = max(1, args.max_websites)
-    config.max_queries_per_segment = max(1, args.max_queries)
-    config.images_per_query = max(1, args.images_per_query)
-    config.sentence_span_per_segment = max(1, args.sentence_span)
+    config = create_config_from_env()
+    config = update_config(
+        config,
+        run_root=args.run_root,
+        background_mode=args.background,
+        max_websites=max(1, args.max_websites),
+        max_queries_per_segment=max(1, args.max_queries),
+        images_per_query=max(1, args.images_per_query),
+        sentence_span_per_segment=max(1, args.sentence_span),
+        tts_provider=args.tts_provider,
+    )
+
     print(
         "[CLI] Config:"
-        f" run_root={config.run_root}"
-        f", background={config.background_mode}"
-        f", max_websites={config.max_websites}"
-        f", max_queries={config.max_queries_per_segment}"
-        f", images_per_query={config.images_per_query}"
-        f", sentence_span={config.sentence_span_per_segment}",
+        f" run_root={config['run_root']}"
+        f", background={config['background_mode']}"
+        f", max_websites={config['max_websites']}"
+        f", max_queries={config['max_queries_per_segment']}"
+        f", images_per_query={config['images_per_query']}"
+        f", sentence_span={config['sentence_span_per_segment']}"
+        f", tts_provider={config['tts_provider']}",
         flush=True,
     )
 
-    pipeline = DocumentaryPipeline(config)
-    result = pipeline.run(args.topic)
+    result = run_pipeline(config, args.topic)
     print(f"Run directory: {result.run_dir}")
     print(f"Script: {result.script_path}")
     print(f"Timeline: {result.timeline_path}")

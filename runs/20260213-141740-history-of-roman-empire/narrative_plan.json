@@ -1,0 +1,28 @@
+{
+  "topic": "History of Roman Empire",
+  "tone": "informative",
+  "pacing": "moderate",
+  "target_duration_seconds": 360,
+  "sections": [
+    {
+      "title": "Introduction to the Roman Empire",
+      "objective": "Set the stage for the Roman Empire's rise and fall",
+      "duration_seconds": 60
+    },
+    {
+      "title": "The Republic and Expansion",
+      "objective": "Explore the Roman Republic's growth and conquests",
+      "duration_seconds": 90
+    },
+    {
+      "title": "The Imperial Era and Decline",
+      "objective": "Examine the Roman Empire's peak and eventual decline",
+      "duration_seconds": 120
+    },
+    {
+      "title": "Legacy of the Roman Empire",
+      "objective": "Discuss the lasting impact of the Roman Empire on modern society",
+      "duration_seconds": 90
+    }
+  ]
+}

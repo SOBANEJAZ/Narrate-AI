@@ -1,0 +1,371 @@
+{
+  "topic": "cold war",
+  "created_at_utc": "2026-02-13T15:49:54.753032+00:00",
+  "plan": {
+    "topic": "cold war",
+    "tone": "grave yet inquisitive",
+    "pacing": "steady",
+    "target_duration_seconds": 300,
+    "sections": [
+      {
+        "title": "Opening: The World Divided",
+        "objective": "Introduce the post\u2011World War\u202fII landscape and the emergence of two opposing superpowers, setting the stage for the Cold War.",
+        "duration_seconds": 45
+      },
+      {
+        "title": "Rising Tensions: Ideology and Arms",
+        "objective": "Explain how competing ideologies, the Truman Doctrine, and the arms race escalated mistrust between the United States and the Soviet Union.",
+        "duration_seconds": 60
+      },
+      {
+        "title": "Proxy Conflicts: Battles Without Direct Fire",
+        "objective": "Showcase key proxy wars\u2014Korea, Vietnam, and the Cuban Missile Crisis\u2014as flashpoints that amplified global stakes without direct superpower combat.",
+        "duration_seconds": 70
+      },
+      {
+        "title": "The Nuclear Brink: Deterrence and Fear",
+        "objective": "Explore the doctrine of Mutually Assured Destruction, the space race, and moments when the world teetered on the edge of nuclear war.",
+        "duration_seconds": 80
+      },
+      {
+        "title": "Resolution & Legacy: From Collapse to Echoes",
+        "objective": "Detail the dissolution of the Soviet Union, the end of the Cold War, and the lasting political, cultural, and technological impacts today.",
+        "duration_seconds": 45
+      }
+    ]
+  },
+  "segment_count": 8,
+  "segments": [
+    {
+      "segment_id": 1,
+      "text": "The world lay in ruins, its borders redrawn by weary leaders who had just survived a war unlike any before. In the ash of Europe, two giants rose from the rubble: the United States, buoyed by industry and a promise of liberty, and the Soviet Union, hardened by sacrifice and driven by a vision of a workers\u2019 paradise. Their alliance, forged in the crucible of defeat, began to crumble as each claimed the right to shape the new order. Berlin, once a symbol of unity, split into silent sectors, and the globe felt the first tremor of a rivalry that would stretch for nearly half a century.",
+      "text_range": "Sentence 1-4",
+      "search_queries": [
+        "Berlin 1945 divided sectors ruins",
+        "American and Soviet troops in Berlin 1945"
+      ],
+      "visual_description": "A devastated Berlin street in 1945, half lined with American flags and the other half with Soviet red banners, rubble piled beside broken buildings, and soldiers from both powers patrolling their respective sectors.",
+      "image_candidates": [
+        {
+          "url": "https://3.bp.blogspot.com/-5q8TTSFU6AI/WAxOoadWOgI/AAAAAAAALns/keyCTZQZtd8WOpdLFE-8POY8kW5RES-yQCLcB/s1600/Berlin+in+1945+2.jpg",
+          "title": "Photographs of Berlin at the end of the World War II, 1945 - Rare ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_001/img_Berlinin19452.jpg",
+          "score": 2.0
+        },
+        {
+          "url": "https://c8.alamy.com/comp/F7P5GK/world-war-ii-ruins-of-berlin-1945-F7P5GK.jpg",
+          "title": "World War II ruins of Berlin 1945 Stock Photo - Alamy",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_001/img_world-war-ii-ruins-of-berlin-1945-F7P5GK.jpg",
+          "score": 2.0
+        },
+        {
+          "url": "https://i.natgeofe.com/n/bd3a0a82-63db-4627-be44-9e1d26ec3a54/soviet-american-embrace_4x3.jpg",
+          "title": "The Battle of Berlin was the Soviet victory that ended WWII",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_001/img_soviet-american-embrace_4x3.jpg",
+          "score": 2.0
+        },
+        {
+          "url": "https://49fe30bb3aa7406c16dc-5c968119d095dc32d807923c59347cc2.ssl.cf1.rackcdn.com/2009.131.018_1.jpg",
+          "title": "American soldiers posing with Russian male and female soldiers, Berlin ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_001/img_2009.131.018_1.jpg",
+          "score": 2.0
+        }
+      ],
+      "selected_image_path": "runs/20260213-154429-cold-war/images/segment_001/img_Berlinin19452.jpg",
+      "narration_audio_path": "runs/20260213-154429-cold-war/audio/segment_001.wav",
+      "duration_seconds": 6.69
+    },
+    {
+      "segment_id": 2,
+      "text": "From that uneasy peace, ideology sharpened like a blade. In March 1947, President Truman announced a doctrine that would become a rallying cry against the spread of communism, pledging aid to any nation threatened by the Red tide. Across the Atlantic, Stalin\u2019s Soviet Union responded with its own sphere, tightening control over Eastern Europe. The Marshall Plan poured billions into war\u2011torn economies, not merely to rebuild but to anchor them to the West.",
+      "text_range": "Sentence 5-8",
+      "search_queries": [
+        "Truman Doctrine announcement March 1947 White House press conference",
+        "Marshall Plan aid distribution to Western Europe 1947"
+      ],
+      "visual_description": "A black\u2011and\u2011white 1947 newsreel still of President Harry S. Truman speaking at a podium in the White House, with a large map of Europe behind him highlighting the dividing line between the Soviet sphere in the east and the United States\u2011backed Marshall Plan zones in the west.",
+      "image_candidates": [
+        {
+          "url": "https://www.trumanlibrary.gov/public/styles/tiff_to_jpg_watermarked/public/photographs/59/59-804.tif.jpg?VersionId=ih0YckytIGUI.X0HknJW87GXrotcRDrX&itok=Nsy1zTf-",
+          "title": "President Harry S. Truman addressing a Joint Session of Congress, the ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_002/img_59-804.tif.jpg",
+          "score": 3.0
+        },
+        {
+          "url": "https://s3.amazonaws.com/NARAprodstorage/lz/presidential-libraries/truman/photographs/59/59-1252-4.jpg",
+          "title": "President Truman delivering Truman Doctrine speech to Congress | Harry ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_002/img_59-1252-4.jpg",
+          "score": 3.0
+        },
+        {
+          "url": "https://getbacklauretta.com/wp-content/uploads/2018/02/main-qimg-deb590d4e0568e0d4c4f2d7dc7b4aff7-c.jpeg",
+          "title": "The Marshall Plan | get back, lauretta!",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_002/img_main-qimg-deb590d4e0568e0d4c4f2d7dc7b4aff7-c.jpeg",
+          "score": 0.0
+        },
+        {
+          "url": "https://mkadventuresinhistory.weebly.com/uploads/8/5/1/5/8515231/marshallplan_orig.png",
+          "title": "The Marshall Plan - ADVENTURES IN HISTORY",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_002/img_marshallplan_orig.png",
+          "score": 0.0
+        }
+      ],
+      "selected_image_path": "runs/20260213-154429-cold-war/images/segment_002/img_59-804.tif.jpg",
+      "narration_audio_path": "runs/20260213-154429-cold-war/audio/segment_002.wav",
+      "duration_seconds": 5.41
+    },
+    {
+      "segment_id": 3,
+      "text": "Meanwhile, the race for ever\u2011more powerful weapons began in earnest: the United States tested the first atomic bomb in 1945, and the Soviets detonated theirs a year later, igniting a competition that would soon eclipse conventional armies. Each side built arsenals, each parade of missiles a warning that the other could not ignore. The clash of ideas soon spilled into distant lands, where the superpowers fought through proxies rather than each other. In Korea, 1950\u201153, a peninsula was torn apart\u2014North, backed by Moscow and Beijing, thrust southward; the United Nations, led by American troops, pushed back, only to settle the line near the 38th parallel.",
+      "text_range": "Sentence 9-12",
+      "search_queries": [
+        "cold war each united soon other historical photograph",
+        "cold war each united soon other archive image"
+      ],
+      "visual_description": "A historically grounded documentary image about cold war, showing Meanwhile, the race for ever\u2011more powerful weapons began in earnest: the United States tested the first atomic bomb in 1945, and the Soviets detonated theirs a year later, igniting a competition that would soon eclipse c.",
+      "image_candidates": [
+        {
+          "url": "https://study.com/cimages/videopreview/videopreview-full/two_super_powers_the_united_states_and_the_soviet_union_122255.jpg",
+          "title": "Two World Superpowers in the Cold War | US & Soviet Union - Lesson ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_003/img_two_super_powers_the_united_states_and_the_soviet_union_122255.jpg",
+          "score": 2.0
+        },
+        {
+          "url": "http://historythings.com/wp-content/uploads/2017/01/140304141123-05-cold-war-history-horizontal-large-gallery-2.jpg",
+          "title": "Cold War Photos That Will Never Let Us Forget",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_003/img_140304141123-05-cold-war-history-horizontal-large-gallery-2.jpg",
+          "score": 2.0
+        },
+        {
+          "url": "https://usercontent2.hubstatic.com/229151_f496.jpg",
+          "title": "The Cold War - an overview | HubPages",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_003/img_229151_f496.jpg",
+          "score": 2.0
+        },
+        {
+          "url": "https://userscontent2.emaze.com/images/ddcfd6c7-f234-4d4e-950e-bdadf405748b/2f633f7173696e116cdad9d11ccfd60a.jpg",
+          "title": "Cold War INS on emaze",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_003/img_2f633f7173696e116cdad9d11ccfd60a.jpg",
+          "score": 2.0
+        }
+      ],
+      "selected_image_path": "runs/20260213-154429-cold-war/images/segment_003/img_two_super_powers_the_united_states_and_the_soviet_union_122255.jpg",
+      "narration_audio_path": "runs/20260213-154429-cold-war/audio/segment_003.wav",
+      "duration_seconds": 7.73
+    },
+    {
+      "segment_id": 4,
+      "text": "Decades later, Vietnam became another crucible: a fledgling South, armed and funded by Washington, resisted a communist North bolstered by Soviet advisers and Chinese supplies. The war raged in jungles and villages, a brutal reminder that the great powers could wage devastation without ever crossing each other\u2019s borders. And then, in October 1962, the world held its breath as Soviet missiles emerged in Cuba, just miles from American shores. For thirteen harrowing days, a standoff of telegrams and secret meetings brought humanity to the brink, before a quiet agreement pulled the missiles back and averted catastrophe.",
+      "text_range": "Sentence 13-16",
+      "search_queries": [
+        "Vietnam War jungle combat South Vietnamese troops 1965",
+        "Cuban Missile Crisis Soviet missile sites in Cuba October 1962"
+      ],
+      "visual_description": "A dense Vietnamese jungle scene with American soldiers in green fatigues and M16 rifles moving through misty foliage, juxtaposed with a stark aerial view of Soviet SS-4 medium-range missiles positioned on Cuban launch pads under a clear sky, with US naval vessels patrolling the nearby waters.",
+      "image_candidates": [
+        {
+          "url": "https://i.redd.it/jh22u19zdlk61.jpg",
+          "title": "A South Vietnamese soldier punches a captured Viet Cong guerrilla ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_004/img_jh22u19zdlk61.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://media.gettyimages.com/id/1457896224/photo/south-vietnamese-troop-base-in-the-jungle-during-the-vietnam-war.jpg?s=612x612&w=gi&k=20&c=yytAFn4EUXb101eTNvDHeFhJeesjt09r0BW5SSoB1AU=",
+          "title": "3,438 South Vietnamese Soldier Stock Photos, High-Res Pictures, and ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_004/img_south-vietnamese-troop-base-in-the-jungle-during-the-vietnam-war.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://nsarchive2.gwu.edu/nsa/cuba_mis_cri/21.jpg",
+          "title": "The Cuban Missile Crisis, 1962: The Photographs",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_004/img_21.jpg",
+          "score": 0.0
+        },
+        {
+          "url": "https://cubanmissilecrisis1962.weebly.com/uploads/1/0/9/9/10997112/7057113_orig.jpg",
+          "title": "Day 1 - Cuban Missile Crisis",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_004/img_7057113_orig.jpg",
+          "score": 0.0
+        }
+      ],
+      "selected_image_path": "runs/20260213-154429-cold-war/images/segment_004/img_jh22u19zdlk61.jpg",
+      "narration_audio_path": "runs/20260213-154429-cold-war/audio/segment_004.wav",
+      "duration_seconds": 7.19
+    },
+    {
+      "segment_id": 5,
+      "text": "Behind those flashpoints lay a deeper, ever\u2011present dread: Mutually Assured Destruction. The doctrine held that any nuclear strike would guarantee the annihilation of both attacker and defender, a balance of terror that paradoxically kept the peace. Space became the new arena, where rockets that could carry warheads instead launched men and machines into orbit, each side vying to out\u2011shine the other\u2014Sputnik\u2019s beeping in 1957, the United States\u2019 Apollo moon landing in 1969\u2014symbols of technological supremacy that also hinted at the power to deliver weapons from the heavens. Crises flickered like lightning: the 1972 SALT talks attempted to cap the arms race, yet each side continued to hide new delivery systems.",
+      "text_range": "Sentence 17-20",
+      "search_queries": [
+        "Sputnik 1 launch 1957",
+        "Apollo 11 moon landing 1969"
+      ],
+      "visual_description": "A dramatic composite showing the beeping Sputnik satellite against a starry sky beside the iconic moment of astronauts stepping onto the lunar surface during Apollo 11, highlighting the Cold War space race.",
+      "image_candidates": [
+        {
+          "url": "https://i.redd.it/e7wefthvaek11.jpg",
+          "title": "Launch of Sputnik 1, 4 October 1957 : r/rocketporn",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_005/img_e7wefthvaek11.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "http://ww1.hdnux.com/photos/12/12/64/2665748/10/920x920.jpg",
+          "title": "Sputnik: The little metal ball that fueled the Cold War - SFGate",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_005/img_920x920.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://c8.alamy.com/comp/BPW39B/buzz-aldrin-apollo-11-moon-landing-20-july-1969-photo-nasa-BPW39B.jpg",
+          "title": "BUZZ ALDRIN APOLLO 11 MOON LANDING 20 July 1969, Photo NASA Stock Photo ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_005/img_buzz-aldrin-apollo-11-moon-landing-20-july-1969-photo-nasa-BPW39B.jpg",
+          "score": 0.0
+        },
+        {
+          "url": "http://d1jqu7g1y74ds1.cloudfront.net/wp-content/uploads/2014/07/337294main_pg62_as11-40-5903_full.jpg",
+          "title": "Apollo 11 Moon Landing 45 Years Ago on July 20, 1969: Relive the Moment ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_005/img_337294main_pg62_as11-40-5903_full.jpg",
+          "score": 1.0
+        }
+      ],
+      "selected_image_path": "runs/20260213-154429-cold-war/images/segment_005/img_e7wefthvaek11.jpg",
+      "narration_audio_path": "runs/20260213-154429-cold-war/audio/segment_005.wav",
+      "duration_seconds": 8.51
+    },
+    {
+      "segment_id": 6,
+      "text": "The world watched, uneasy, as the doctrine of deterrence turned every crisis into a rehearsal for survival. By the late 1980s, the iron curtain began to fray. Mikhail Gorbachev\u2019s reforms\u2014glasnost and perestroika\u2014opened a dialogue that the West could not ignore. In 1989, a wall that had stood for three decades crumbled under the weight of popular protest, and the symbols of division fell silent.",
+      "text_range": "Sentence 21-24",
+      "search_queries": [
+        "Berlin Wall demolition November 9 1989 crowd",
+        "Mikhail Gorbachev glasnost perestroika speech 1987"
+      ],
+      "visual_description": "A sea of East Berliners presses against the Brandenburg Gate as demolition crews topple concrete sections of the Berlin Wall on November 9, 1989, with graffiti\u2011scarred slabs crashing to the ground and red flags fluttering amid jubilant cheers.",
+      "image_candidates": [
+        {
+          "url": "https://cdn.britannica.com/67/179667-138-323137D6/events-announcement-revolution-Berlin-Wall-November-9-1989.jpg?w=900&h=508&c=crop",
+          "title": "November 9, 1989, the fall of the Berlin Wall | Britannica",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_006/img_events-announcement-revolution-Berlin-Wall-November-9-1989.jpg",
+          "score": 0.0
+        },
+        {
+          "url": "https://static.foxnews.com/foxnews.com/content/uploads/2019/11/Berlin-Wall-3.jpg",
+          "title": "On this day in history, November 9, 1989, Berlin Wall falls, marking ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_006/img_Berlin-Wall-3.jpg",
+          "score": 0.0
+        },
+        {
+          "url": "https://media.gettyimages.com/id/98044820/video/mikhail-gorbachevs-speech-about-perestroika-and-achievements-of-the-soviet-union-since-1985.jpg?s=640x640&k=20&c=jRRwdh8ZhhcvRg2Br2cgqL4Cg214PD9_fIYcuItx0F4=",
+          "title": "796 Mikhail Gorbachev Stock Videos, Footage, & 4K Video Clips - Getty ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_006/img_mikhail-gorbachevs-speech-about-perestroika-and-achievements-of-the-soviet-union-since-1985.jpg",
+          "score": 0.0
+        },
+        {
+          "url": "https://cdn.britannica.com/85/177585-050-5BE02E0D/Mikhail-Gorbachev-1987.jpg",
+          "title": "Mikhail Gorbachev - Soviet Leader, Perestroika, Glasnost | Britannica",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_006/img_Mikhail-Gorbachev-1987.jpg",
+          "score": 0.0
+        }
+      ],
+      "selected_image_path": "runs/20260213-154429-cold-war/images/segment_006/img_events-announcement-revolution-Berlin-Wall-November-9-1989.jpg",
+      "narration_audio_path": "runs/20260213-154429-cold-war/audio/segment_006.wav",
+      "duration_seconds": 4.7
+    },
+    {
+      "segment_id": 7,
+      "text": "A year later, the Soviet Union dissolved, its republics stepping into a new, uncertain future. The Cold War\u2019s battles ended, but its echoes linger: the internet, born from a defense network; the lingering nuclear stockpiles that still shape global politics; cultural memories of espionage, of fear, and of the relentless quest for progress. As we look back, the grave lessons of that era remind us that rivalry can be both a catalyst for innovation and a shadow that looms over every generation. The story of the Cold War is not merely a chronicle of weapons and treaties; it is a testament to humanity\u2019s capacity to stand at the edge of annihilation and still choose dialogue over devastation.",
+      "text_range": "Sentence 25-28",
+      "search_queries": [
+        "1991 dissolution of the Soviet Union",
+        "ARPANET early computer network"
+      ],
+      "visual_description": "A dramatic collage showing the tattered Soviet flag being lowered beside a glowing ARPANET server room, with looming nuclear missile silos in the background and a shadowy spy silhouette, evoking the lingering legacy of the Cold War.",
+      "image_candidates": [
+        {
+          "url": "https://cdn.britannica.com/72/121672-050-3E609B0B/Pres-Russian-front-vehicle-flag-Boris-N-August-19-1991.jpg",
+          "title": "Collapse of the Soviet Union - End of Communism, Gorbachev, Glasnost ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_007/img_Pres-Russian-front-vehicle-flag-Boris-N-August-19-1991.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://portswigger.net/cms/images/e0/91/1afc66d7078e-article-arpanet-infographic-map.png",
+          "title": "ARPANET anniversary: The internet's first transmission was sent 50 ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_007/img_1afc66d7078e-article-arpanet-infographic-map.png",
+          "score": 1.0
+        }
+      ],
+      "selected_image_path": "runs/20260213-154429-cold-war/images/segment_007/img_Pres-Russian-front-vehicle-flag-Boris-N-August-19-1991.jpg",
+      "narration_audio_path": "runs/20260213-154429-cold-war/audio/segment_007.wav",
+      "duration_seconds": 8.14
+    },
+    {
+      "segment_id": 8,
+      "text": "In the quiet that followed the Soviet collapse, we are left to ask: what other divisions will we bridge, and what new frontiers will we dare to explore, knowing that the stakes have never been higher?",
+      "text_range": "Sentence 29-29",
+      "search_queries": [
+        "1991 Soviet Union dissolution ceremony Red Square flag lowering",
+        "Berlin Wall after fall 1990 abandoned concrete barrier with graffiti"
+      ],
+      "visual_description": "A bleak winter scene in Red Square, 1991, showing the Soviet flag being lowered against a backdrop of empty, snow\u2011covered streets and silent, towering monuments, symbolizing the quiet aftermath of the USSR's collapse.",
+      "image_candidates": [
+        {
+          "url": "https://dayinhist.com/wp-content/uploads/2023/12/DALL\u00b7E-2024-12-17-13.32.36-A-symbolic-and-historical-scene-showing-the-Soviet-flag-being-lowered-for-the-last-time-over-the-Kremlin.-The-setting-is-a-cold-winter-evening-with-fa.webp",
+          "title": "Gorbachev Resigns: The Dissolution of the Soviet Union - This Day in ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_008/img_DALLE-2024-12-17-13.32.36-A-symbolic-and-historical-scene-showing-the-Soviet-flag-being-lowered.webp",
+          "score": 1.0
+        },
+        {
+          "url": "https://thetenaflyecho.com/wp-content/uploads/2022/01/Soviet-Flag-lowered.jpg",
+          "title": "30 Years After the Fall of Soviet Union, Russia Still Lacks Democracy ...",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_008/img_Soviet-Flag-lowered.jpg",
+          "score": 1.0
+        },
+        {
+          "url": "https://c8.alamy.com/comp/MR5B16/photograph-showing-some-of-the-graffiti-on-the-berlin-wall-berliner-mauer-the-berlin-wall-which-was-a-guarded-concrete-barrier-that-divided-berlin-from-1961-to-1989-constructed-by-the-german-democratic-republic-gdr-east-germany-the-wall-completely-cut-off-west-berlin-from-surrounding-east-germany-and-from-east-berlin-until-government-officials-opened-it-in-november-1989-its-demolition-officially-began-on-13-june-1990-and-was-completed-in-1992-dated-21st-century-MR5B16.jpg",
+          "title": "June 1992 in berlin hi-res stock photography and images - Alamy",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_008/img_photograph-showing-some-of-the-graffiti-on-the-berlin-wall-berliner-mauer-the-berlin-wall-which-.jpg",
+          "score": 0.0
+        },
+        {
+          "url": "https://c8.alamy.com/comp/MR5B3H/photograph-showing-some-of-the-graffiti-on-the-berlin-wall-berliner-mauer-the-berlin-wall-which-was-a-guarded-concrete-barrier-that-divided-berlin-from-1961-to-1989-constructed-by-the-german-democratic-republic-gdr-east-germany-the-wall-completely-cut-off-west-berlin-from-surrounding-east-germany-and-from-east-berlin-until-government-officials-opened-it-in-november-1989-its-demolition-officially-began-on-13-june-1990-and-was-completed-in-1992-dated-21st-century-MR5B3H.jpg",
+          "title": "June 1992 in berlin hi-res stock photography and images - Alamy",
+          "source": "Bing",
+          "local_path": "runs/20260213-154429-cold-war/images/segment_008/img_photograph-showing-some-of-the-graffiti-on-the-berlin-wall-berliner-mauer-the-berlin-wall-which-.jpg",
+          "score": 0.0
+        }
+      ],
+      "selected_image_path": "runs/20260213-154429-cold-war/images/segment_008/img_DALLE-2024-12-17-13.32.36-A-symbolic-and-historical-scene-showing-the-Soviet-flag-being-lowered.webp",
+      "narration_audio_path": "runs/20260213-154429-cold-war/audio/segment_008.wav",
+      "duration_seconds": 2.1
+    }
+  ],
+  "final_video_path": "runs/20260213-154429-cold-war/final_output.mp4"
+}
