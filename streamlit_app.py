@@ -13,7 +13,6 @@ APP_ROOT = Path(__file__).resolve().parent
 MAIN_SCRIPT = APP_ROOT / "main.py"
 
 DEFAULT_BACKGROUND = "black"
-DEFAULT_RUN_ROOT = "runs"
 DEFAULT_MAX_WEBSITES = 4
 DEFAULT_MAX_QUERIES = 5
 DEFAULT_IMAGES_PER_QUERY = 5
@@ -23,7 +22,6 @@ DEFAULT_TTS_PROVIDER = "elevenlabs"
 
 def _build_command(
     topic,
-    run_root,
     background,
     max_websites,
     max_queries,
@@ -36,8 +34,6 @@ def _build_command(
         sys.executable,
         str(MAIN_SCRIPT),
         topic,
-        "--run-root",
-        run_root,
         "--background",
         background,
         "--max-websites",
@@ -69,7 +65,6 @@ def main():
 
     with st.expander("Default CLI Options", expanded=True):
         st.markdown(
-            "- `--run-root`: `runs`\n"
             "- `--background`: `black`\n"
             "- `--max-websites`: `4`\n"
             "- `--max-queries`: `5`\n"
@@ -81,7 +76,6 @@ def main():
     col1, col2 = st.columns(2)
     with col1:
         topic = st.text_input("Topic", value="Apollo Program")
-        run_root = st.text_input("Run Root", value=DEFAULT_RUN_ROOT)
         background = st.selectbox(
             "Background",
             options=["black", "blur"],
@@ -141,7 +135,6 @@ def main():
 
     command = _build_command(
         topic=topic,
-        run_root=run_root.strip() or DEFAULT_RUN_ROOT,
         background=background,
         max_websites=int(max_websites),
         max_queries=int(max_queries),
