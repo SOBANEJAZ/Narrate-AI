@@ -61,41 +61,91 @@ def main():
     """Main Streamlit app."""
     st.set_page_config(page_title="Narrate-AI", layout="wide")
     st.title("Narrate-AI Documentary Generator")
-    st.caption("Streamlit UI for running the documentary pipeline.")
+    st.caption(
+        "Transform any topic into a documentary video with AI narration and images."
+    )
 
-    with st.expander("Default CLI Options", expanded=True):
-        st.markdown(
-            "- `--background`: `black`\n"
-            "- `--max-websites`: `4`\n"
-            "- `--max-queries`: `5`\n"
-            "- `--images-per-query`: `5`\n"
-            "- `--sentence-span`: `3`\n"
-            "- `--tts-provider`: `elevenlabs`"
-        )
+    st.info("""
+    **How it works:** Enter a topic, and the AI will:
+    1. Research the topic from authoritative sources
+    2. Write a documentary script
+    3. Find and rank relevant images
+    4. Generate AI narration
+    5. Assemble everything into a video
+    """)
+
+    with st.expander("Configuration Options Help", expanded=False):
+        st.markdown("""
+        ### **--background** `black` or `blur`
+        How images fill the screen when their aspect ratio doesn't match the video (16:9).
+        - **black**: Puts black bars around images (letterboxing)
+        - **blur**: Blurs and stretches the image to fill the entire screen
+        
+        ### **--max-websites** `4`
+        Maximum number of websites to crawl for research. The system searches Google/DuckDuckGo 
+        and picks the top authoritative sources (Wikipedia, .edu, .gov sites, etc.) to gather 
+        information for the script. More = better research but slower processing.
+        
+        ### **--max-queries** `5`
+        Maximum image search queries per video segment. Each segment generates up to 5 different 
+        search queries to find relevant images. Higher = more image variety but slower processing.
+        
+        ### **--images-per-query** `5`
+        Number of images to download per search query. If searching for "Apollo 11 landing", 
+        it will download the top 5 images from that query.
+        
+        ### **--sentence-span** `3`
+        How many sentences of the script are grouped together into one video segment. 
+        - Lower (1-2): Faster image changes, more dynamic
+        - Higher (4-5): Slower changes, more time per image
+        
+        ### **--tts-provider** `elevenlabs` or `edge_tts`
+        Text-to-speech engine for narration:
+        - **elevenlabs**: High-quality AI voices (requires ELEVENLABS_API_KEY)
+        - **edge_tts**: Free Microsoft voices (lower quality, no API key needed)
+        """)
 
     col1, col2 = st.columns(2)
     with col1:
-        topic = st.text_input("Topic", value="Apollo Program")
+        topic = st.text_input(
+            "Topic",
+            value="Apollo Program",
+            help="Enter any historical topic, event, person, or concept you want a documentary about",
+        )
         background = st.selectbox(
             "Background",
             options=["black", "blur"],
             index=0 if DEFAULT_BACKGROUND == "black" else 1,
+            help="How to display images: black bars (letterbox) or blur-fill",
         )
     with col2:
         max_websites = st.number_input(
-            "Max Websites", min_value=1, step=1, value=DEFAULT_MAX_WEBSITES
+            "Max Websites",
+            min_value=1,
+            step=1,
+            value=DEFAULT_MAX_WEBSITES,
+            help="Number of websites to research (more = better script but slower)",
         )
         max_queries = st.number_input(
-            "Max Queries", min_value=1, step=1, value=DEFAULT_MAX_QUERIES
+            "Max Queries",
+            min_value=1,
+            step=1,
+            value=DEFAULT_MAX_QUERIES,
+            help="Image search queries per video segment",
         )
         images_per_query = st.number_input(
             "Images Per Query",
             min_value=1,
             step=1,
             value=DEFAULT_IMAGES_PER_QUERY,
+            help="Images to download per search query",
         )
         sentence_span = st.number_input(
-            "Sentence Span", min_value=1, step=1, value=DEFAULT_SENTENCE_SPAN
+            "Sentence Span",
+            min_value=1,
+            step=1,
+            value=DEFAULT_SENTENCE_SPAN,
+            help="Sentences grouped per video clip (lower = faster image changes)",
         )
 
     st.subheader("Text-to-Speech Provider")
@@ -106,7 +156,7 @@ def main():
         "Select TTS Provider",
         options=["elevenlabs", "edge_tts"],
         index=0 if DEFAULT_TTS_PROVIDER == "elevenlabs" else 1,
-        help="ElevenLabs provides higher quality voices but requires an API key. Edge TTS is free but lower quality.",
+        help="Voice synthesis: ElevenLabs (high quality, paid) or Edge TTS (free, lower quality)",
     )
 
     if tts_provider == "elevenlabs" and not has_elevenlabs_key:
