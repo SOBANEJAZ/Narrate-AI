@@ -1,7 +1,5 @@
 """Streamlit UI for Narrate-AI with TTS provider selection."""
 
-from __future__ import annotations
-
 import os
 import shlex
 import subprocess
@@ -24,16 +22,15 @@ DEFAULT_TTS_PROVIDER = "elevenlabs"
 
 
 def _build_command(
-    *,
-    topic: str,
-    run_root: str,
-    background: str,
-    max_websites: int,
-    max_queries: int,
-    images_per_query: int,
-    sentence_span: int,
-    tts_provider: str,
-) -> list[str]:
+    topic,
+    run_root,
+    background,
+    max_websites,
+    max_queries,
+    images_per_query,
+    sentence_span,
+    tts_provider,
+):
     """Build the command to run the pipeline."""
     return [
         sys.executable,
@@ -56,7 +53,7 @@ def _build_command(
     ]
 
 
-def _extract_value(lines: list[str], prefix: str) -> str | None:
+def _extract_value(lines, prefix):
     """Extract a value from log lines."""
     for line in reversed(lines):
         if line.startswith(prefix):
@@ -64,7 +61,7 @@ def _extract_value(lines: list[str], prefix: str) -> str | None:
     return None
 
 
-def main() -> None:
+def main():
     """Main Streamlit app."""
     st.set_page_config(page_title="Narrate-AI", layout="wide")
     st.title("Narrate-AI Documentary Generator")
@@ -107,10 +104,8 @@ def main() -> None:
             "Sentence Span", min_value=1, step=1, value=DEFAULT_SENTENCE_SPAN
         )
 
-    # TTS Provider selection
     st.subheader("Text-to-Speech Provider")
 
-    # Check if ElevenLabs API key is available
     has_elevenlabs_key = bool(os.getenv("ELEVENLABS_API_KEY"))
 
     tts_provider = st.radio(
@@ -158,7 +153,7 @@ def main() -> None:
     st.code(" ".join(shlex.quote(part) for part in command), language="bash")
 
     log_box = st.empty()
-    logs: list[str] = []
+    logs = []
     env = os.environ.copy()
     env["PYTHONUNBUFFERED"] = "1"
 

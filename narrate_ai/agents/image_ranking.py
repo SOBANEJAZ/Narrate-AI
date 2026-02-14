@@ -1,47 +1,28 @@
 """Image ranking agent using functional programming style."""
 
-from __future__ import annotations
-
 import re
-from typing import TypedDict
 
-from ..models import ImageCandidate, ScriptSegment
 from ..text_utils import extract_keywords
 
 try:
     import torch
-except Exception:  # pragma: no cover - optional dependency fallback
-    torch = None  # type: ignore[assignment]
+except Exception:
+    torch = None
 
 try:
     import open_clip
-except Exception:  # pragma: no cover - optional dependency fallback
-    open_clip = None  # type: ignore[assignment]
+except Exception:
+    open_clip = None
 
 try:
     from PIL import Image
-except Exception:  # pragma: no cover - optional dependency fallback
-    Image = None  # type: ignore[assignment]
+except Exception:
+    Image = None
 
 
-class ImageRankingState(TypedDict):
-    """State for image ranking operations."""
-
-    model_name: str
-    pretrained_name: str
-    clip_ready: bool
-    clip_model: object | None
-    clip_preprocess: object | None
-    clip_tokenizer: object | None
-    device: str
-
-
-def create_ranking_state(
-    model_name: str = "ViT-L-14",
-    pretrained_name: str = "laion2b_s32b_b82k",
-) -> ImageRankingState:
+def create_ranking_state(model_name="ViT-L-14", pretrained_name="laion2b_s32b_b82k"):
     """Create image ranking state and initialize CLIP if available."""
-    state: ImageRankingState = {
+    state = {
         "model_name": model_name,
         "pretrained_name": pretrained_name,
         "clip_ready": False,
@@ -82,19 +63,8 @@ def create_ranking_state(
     return state
 
 
-def rank_images(
-    state: ImageRankingState,
-    segments: list[ScriptSegment],
-) -> list[ScriptSegment]:
-    """Rank images for all segments.
-
-    Args:
-        state: Image ranking state
-        segments: List of script segments with candidates
-
-    Returns:
-        Segments with ranked and selected images (modified in place)
-    """
+def rank_images(state, segments):
+    """Rank images for all segments."""
     print(f"[RANK] Ranking images for {len(segments)} segments", flush=True)
     for segment in segments:
         candidates = segment.get("candidate_images", [])
@@ -118,7 +88,7 @@ def rank_images(
     return segments
 
 
-def _rank_with_clip(state: ImageRankingState, segment: ScriptSegment) -> None:
+def _rank_with_clip(state, segment):
     """Rank images using CLIP embeddings."""
     assert state["clip_model"] is not None
     assert state["clip_preprocess"] is not None
@@ -158,14 +128,14 @@ def _rank_with_clip(state: ImageRankingState, segment: ScriptSegment) -> None:
                 candidate["score"] = _fallback_score(visual_desc, candidate)
 
 
-def _rank_with_text_overlap(segment: ScriptSegment) -> None:
+def _rank_with_text_overlap(segment):
     """Rank images using keyword overlap as fallback."""
     visual_desc = segment.get("visual_description", "")
     for candidate in segment.get("candidate_images", []):
         candidate["score"] = _fallback_score(visual_desc, candidate)
 
 
-def _fallback_score(text: str, candidate: ImageCandidate) -> float:
+def _fallback_score(text, candidate):
     """Calculate score based on keyword overlap."""
     keywords = set(extract_keywords(text, limit=12))
     candidate_text = (

@@ -1,43 +1,28 @@
 """Edge TTS implementation using Microsoft's Edge TTS service."""
 
-from __future__ import annotations
-
 import asyncio
 from pathlib import Path
-
-from .base import SynthesisResult, TTSConfig
 
 try:
     import edge_tts
 
     EDGE_TTS_AVAILABLE = True
 except Exception:
-    edge_tts = None  # type: ignore[assignment]
+    edge_tts = None
     EDGE_TTS_AVAILABLE = False
 
 
 DEFAULT_EDGE_VOICE = "en-US-AriaNeural"
 
 
-async def _synthesize_async(text: str, out_path: Path, voice: str) -> None:
+async def _synthesize_async(text, out_path, voice):
     """Async helper to synthesize with edge-tts."""
     communicate = edge_tts.Communicate(text, voice)
     await communicate.save(str(out_path))
 
 
-def synthesize_with_edge_tts(
-    text: str, out_path: Path, config: TTSConfig
-) -> SynthesisResult:
-    """Synthesize speech using Microsoft Edge TTS (free, no API key required).
-
-    Args:
-        text: Text to synthesize
-        out_path: Output path for audio file
-        config: TTS configuration
-
-    Returns:
-        SynthesisResult with success status and audio path
-    """
+def synthesize_with_edge_tts(text, out_path, config):
+    """Synthesize speech using Microsoft Edge TTS (free, no API key required)."""
     if not EDGE_TTS_AVAILABLE:
         return {
             "success": False,
@@ -64,12 +49,8 @@ def synthesize_with_edge_tts(
         }
 
 
-def get_available_voices() -> list[dict[str, str]]:
-    """Get list of available Edge TTS voices.
-
-    Returns:
-        List of voice dictionaries with name and locale
-    """
+def get_available_voices():
+    """Get list of available Edge TTS voices."""
     if not EDGE_TTS_AVAILABLE:
         return []
 

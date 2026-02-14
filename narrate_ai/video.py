@@ -1,7 +1,5 @@
 """Video assembly module using functional programming style."""
 
-from __future__ import annotations
-
 from pathlib import Path
 
 from moviepy import (
@@ -12,28 +10,21 @@ from moviepy import (
     concatenate_videoclips,
 )
 
-from .models import ScriptSegment, TimelineItem, create_timeline_item
+from .models import create_timeline_item
 from .text_utils import safe_filename
 
 try:
     from PIL import Image, ImageFilter, ImageOps
-except Exception:  # pragma: no cover - optional dependency fallback
-    Image = None  # type: ignore[assignment]
-    ImageFilter = None  # type: ignore[assignment]
-    ImageOps = None  # type: ignore[assignment]
+except Exception:
+    Image = None
+    ImageFilter = None
+    ImageOps = None
 
 
-def build_timeline(segments: list[ScriptSegment]) -> list[TimelineItem]:
-    """Build a timeline from script segments.
-
-    Args:
-        segments: List of script segments
-
-    Returns:
-        List of timeline items
-    """
+def build_timeline(segments):
+    """Build a timeline from script segments."""
     print(f"[TIMELINE] Building timeline from {len(segments)} segments", flush=True)
-    timeline: list[TimelineItem] = []
+    timeline = []
     cursor = 0.0
 
     for segment in segments:
@@ -82,29 +73,15 @@ def build_timeline(segments: list[ScriptSegment]) -> list[TimelineItem]:
 
 
 def assemble_video(
-    timeline: list[TimelineItem],
-    output_path: Path,
-    *,
-    resolution: tuple[int, int] = (1280, 720),
-    fps: int = 24,
-    transition_seconds: float = 0.3,
-    zoom_strength: float = 0.04,
-    background_mode: str = "black",
-) -> Path:
-    """Assemble video from timeline items.
-
-    Args:
-        timeline: List of timeline items
-        output_path: Output path for video
-        resolution: Video resolution
-        fps: Frames per second
-        transition_seconds: Transition duration between clips
-        zoom_strength: Zoom effect strength
-        background_mode: Background mode ("black" or "blur")
-
-    Returns:
-        Path to assembled video
-    """
+    timeline,
+    output_path,
+    resolution=(1280, 720),
+    fps=24,
+    transition_seconds=0.3,
+    zoom_strength=0.04,
+    background_mode="black",
+):
+    """Assemble video from timeline items."""
     if not timeline:
         raise ValueError("Timeline is empty; cannot assemble video.")
 
@@ -151,14 +128,13 @@ def assemble_video(
 
 
 def _build_segment_clip(
-    item: TimelineItem,
-    *,
-    resolution: tuple[int, int],
-    fps: int,
-    zoom_strength: float,
-    background_mode: str,
-    render_cache_dir: Path,
-) -> CompositeVideoClip:
+    item,
+    resolution,
+    fps,
+    zoom_strength,
+    background_mode,
+    render_cache_dir,
+):
     """Build a single segment clip."""
     width, height = resolution
     duration = max(0.1, item["duration_seconds"])
@@ -193,12 +169,11 @@ def _build_segment_clip(
 
 
 def _background_clip(
-    image_path: Path,
-    *,
-    duration: float,
-    resolution: tuple[int, int],
-    background_mode: str,
-    render_cache_dir: Path,
+    image_path,
+    duration,
+    resolution,
+    background_mode,
+    render_cache_dir,
 ):
     """Create a background clip for a segment."""
     if background_mode == "blur":
@@ -210,10 +185,10 @@ def _background_clip(
 
 
 def _build_blurred_image(
-    source_image_path: Path,
-    resolution: tuple[int, int],
-    render_cache_dir: Path,
-) -> Path | None:
+    source_image_path,
+    resolution,
+    render_cache_dir,
+):
     """Build a blurred background image."""
     if Image is None or ImageOps is None or ImageFilter is None:
         return None

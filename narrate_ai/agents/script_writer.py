@@ -1,32 +1,11 @@
 """Script writer agent using functional programming style."""
 
-from __future__ import annotations
-
-from ..llm import LLMClientState, generate_text
-from ..models import (
-    NarrativePlan,
-    ResearchNote,
-    create_narrative_section,
-)
+from ..llm import generate_text
+from ..models import create_narrative_section
 
 
-def write_script(
-    client: LLMClientState,
-    topic: str,
-    plan: NarrativePlan,
-    notes: list[ResearchNote],
-) -> str:
-    """Write a documentary script based on the plan and research notes.
-
-    Args:
-        client: LLM client state
-        topic: Documentary topic
-        plan: Narrative plan
-        notes: Research notes
-
-    Returns:
-        Generated script text
-    """
+def write_script(client, topic, plan, notes):
+    """Write a documentary script based on the plan and research notes."""
     print(
         f"[SCRIPT] Writing script for '{topic}' using {len(notes)} research notes",
         flush=True,
@@ -78,11 +57,7 @@ Write a single flowing narration script:
     return script
 
 
-def _build_fallback_script(
-    topic: str,
-    plan: NarrativePlan,
-    notes: list[ResearchNote],
-) -> str:
+def _build_fallback_script(topic, plan, notes):
     """Build a fallback script when LLM fails."""
     snippets = [note["text"] for note in notes[:12]]
     stitched = " ".join(snippets)
@@ -92,7 +67,7 @@ def _build_fallback_script(
             "moves through major turning points, and closes with long-term impact."
         )
 
-    sections: list[str] = []
+    sections = []
     for index, section in enumerate(plan["sections"]):
         start = index * 180
         stop = start + 220

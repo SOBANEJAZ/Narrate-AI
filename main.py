@@ -1,7 +1,5 @@
 """CLI entry point for documentary generation."""
 
-from __future__ import annotations
-
 import argparse
 from pathlib import Path
 
@@ -11,10 +9,9 @@ from narrate_ai import (
     run_pipeline,
     update_config,
 )
-from narrate_ai.tts.factory import TTSProviderType
 
 
-def build_parser() -> argparse.ArgumentParser:
+def build_parser():
     """Build the argument parser."""
     parser = argparse.ArgumentParser(
         description="Generate a slideshow-style documentary video from a single topic.",
@@ -45,7 +42,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main() -> int:
+def main():
     """Main entry point."""
     args = build_parser().parse_args()
 

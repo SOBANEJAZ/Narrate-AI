@@ -1,7 +1,5 @@
 """Research pipeline using functional programming style."""
 
-from __future__ import annotations
-
 import asyncio
 import re
 from urllib.parse import urlparse
@@ -9,29 +7,23 @@ from urllib.parse import urlparse
 import requests
 
 from ..cache import MultiLayerCache
-from ..config import PipelineConfig
-from ..models import (
-    ResearchNote,
-    ResearchSource,
-    create_research_note,
-    create_research_source,
-)
+from ..models import create_research_note, create_research_source
 from ..text_utils import chunk_text
 
 try:
     from bs4 import BeautifulSoup
-except Exception:  # pragma: no cover - optional dependency fallback
-    BeautifulSoup = None  # type: ignore[assignment]
+except Exception:
+    BeautifulSoup = None
 
 try:
     from ddgs import DDGS
-except Exception:  # pragma: no cover - optional dependency fallback
-    DDGS = None  # type: ignore[assignment]
+except Exception:
+    DDGS = None
 
 try:
     from crawl4ai import AsyncWebCrawler
-except Exception:  # pragma: no cover - optional dependency fallback
-    AsyncWebCrawler = None  # type: ignore[assignment]
+except Exception:
+    AsyncWebCrawler = None
 
 
 AUTHORITATIVE_HINTS = (
@@ -44,21 +36,8 @@ AUTHORITATIVE_HINTS = (
 )
 
 
-def discover_sources(
-    config: PipelineConfig,
-    cache: MultiLayerCache,
-    topic: str,
-) -> list[ResearchSource]:
-    """Discover authoritative sources for the given topic.
-
-    Args:
-        config: Pipeline configuration
-        cache: Cache instance
-        topic: Research topic
-
-    Returns:
-        List of research sources
-    """
+def discover_sources(config, cache, topic):
+    """Discover authoritative sources for the given topic."""
     print(f"[RESEARCH] Discovering sources for topic: {topic}", flush=True)
     cache_key = f"sources::{topic.lower()}"
     cached = cache.get("research", cache_key)
@@ -76,7 +55,7 @@ def discover_sources(
         ]
 
     query = f"{topic} history timeline facts"
-    sources: list[ResearchSource] = []
+    sources = []
 
     if DDGS is not None:
         try:
@@ -113,7 +92,7 @@ def discover_sources(
             ),
         ]
 
-    deduped: dict[str, ResearchSource] = {}
+    deduped = {}
     for source in sources:
         deduped[source["url"]] = source
 
@@ -135,23 +114,10 @@ def discover_sources(
     return selected
 
 
-def crawl_and_build_notes(
-    config: PipelineConfig,
-    cache: MultiLayerCache,
-    sources: list[ResearchSource],
-) -> list[ResearchNote]:
-    """Crawl sources and build research notes.
-
-    Args:
-        config: Pipeline configuration
-        cache: Cache instance
-        sources: List of sources to crawl
-
-    Returns:
-        List of research notes
-    """
+def crawl_and_build_notes(config, cache, sources):
+    """Crawl sources and build research notes."""
     print(f"[RESEARCH] Crawling {len(sources)} sources and building notes", flush=True)
-    notes: list[ResearchNote] = []
+    notes = []
     for source in sources:
         print(f"[RESEARCH] Crawling: {source['url']}", flush=True)
         raw = _crawl_url(config, cache, source["url"])
@@ -180,7 +146,7 @@ def crawl_and_build_notes(
     return notes
 
 
-def _source_score(source: ResearchSource) -> int:
+def _source_score(source):
     """Calculate authority score for a source."""
     parsed = urlparse(source["url"])
     domain = parsed.netloc.lower()
@@ -194,7 +160,7 @@ def _source_score(source: ResearchSource) -> int:
     return score
 
 
-def _crawl_url(config: PipelineConfig, cache: MultiLayerCache, url: str) -> str:
+def _crawl_url(config, cache, url):
     """Crawl a URL and return text content."""
     cache_key = f"page::{url}"
     cached = cache.get("crawl", cache_key)
@@ -217,11 +183,11 @@ def _crawl_url(config: PipelineConfig, cache: MultiLayerCache, url: str) -> str:
     return text
 
 
-def _crawl_with_crawl4ai(url: str) -> str:
+def _crawl_with_crawl4ai(url):
     """Crawl URL using crawl4ai."""
 
-    async def _run() -> str:
-        async with AsyncWebCrawler() as crawler:  # type: ignore[misc]
+    async def _run():
+        async with AsyncWebCrawler() as crawler:
             result = await crawler.arun(url=url)
             markdown = getattr(result, "markdown", "") or ""
             cleaned = getattr(result, "cleaned_html", "") or ""
@@ -233,7 +199,7 @@ def _crawl_with_crawl4ai(url: str) -> str:
         return ""
 
 
-def _crawl_with_requests(config: PipelineConfig, url: str) -> str:
+def _crawl_with_requests(config, url):
     """Crawl URL using requests as fallback."""
     try:
         response = requests.get(

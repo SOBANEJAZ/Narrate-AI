@@ -1,29 +1,11 @@
 """Visual intelligence agent using functional programming style."""
 
-from __future__ import annotations
-
-from ..llm import LLMClientState, generate_json
-from ..models import ScriptSegment
+from ..llm import generate_json
 from ..text_utils import extract_keywords
 
 
-def enrich_segments(
-    client: LLMClientState,
-    topic: str,
-    segments: list[ScriptSegment],
-    max_queries_per_segment: int = 5,
-) -> list[ScriptSegment]:
-    """Enrich segments with search queries and visual descriptions.
-
-    Args:
-        client: LLM client state
-        topic: Documentary topic
-        segments: List of script segments to enrich
-        max_queries_per_segment: Maximum search queries per segment
-
-    Returns:
-        Enriched segments (modified in place)
-    """
+def enrich_segments(client, topic, segments, max_queries_per_segment=5):
+    """Enrich segments with search queries and visual descriptions."""
     print(
         f"[VISUAL] Generating search queries + descriptions for {len(segments)} segments",
         flush=True,
@@ -56,7 +38,7 @@ Requirements:
             generated.get("visual_description") or fallback["visual_description"]
         )
 
-        clean_queries: list[str] = []
+        clean_queries = []
         for query in queries:
             query_str = str(query).strip()
             if query_str:
@@ -70,11 +52,7 @@ Requirements:
     return segments
 
 
-def _fallback(
-    topic: str,
-    text: str,
-    max_queries_per_segment: int,
-) -> dict[str, object]:
+def _fallback(topic, text, max_queries_per_segment):
     """Create fallback search queries and description."""
     keywords = extract_keywords(text, limit=10)
     query_base = " ".join(keywords[:4]) if keywords else topic

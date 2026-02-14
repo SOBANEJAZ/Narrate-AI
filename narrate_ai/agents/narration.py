@@ -1,35 +1,15 @@
 """Narration agent using functional programming style with multiple TTS providers."""
 
-from __future__ import annotations
-
 import math
 import struct
 import wave
 from pathlib import Path
 
-from ..config import PipelineConfig
-from ..models import ScriptSegment
 from ..tts import create_tts_config, create_tts_synthesizer
-from ..tts.factory import TTSProviderType
 
 
-def synthesize_audio(
-    config: PipelineConfig,
-    segments: list[ScriptSegment],
-    audio_root: Path,
-    provider: TTSProviderType = "elevenlabs",
-) -> list[ScriptSegment]:
-    """Synthesize audio for script segments.
-
-    Args:
-        config: Pipeline configuration
-        segments: List of script segments
-        audio_root: Root directory for audio files
-        provider: TTS provider to use ("elevenlabs" or "edge_tts")
-
-    Returns:
-        Segments with synthesized audio (modified in place)
-    """
+def synthesize_audio(config, segments, audio_root, provider="elevenlabs"):
+    """Synthesize audio for script segments."""
     print(
         f"[TTS] Generating narration for {len(segments)} segments (provider={provider})",
         flush=True,
@@ -49,7 +29,6 @@ def synthesize_audio(
                 flush=True,
             )
         else:
-            # Fall back to fallback audio if synthesis failed
             duration = _estimate_duration(segment["text"])
             _write_fallback_audio(out_path, duration)
             print(
@@ -62,14 +41,14 @@ def synthesize_audio(
     return segments
 
 
-def _estimate_duration(text: str, words_per_minute: int = 150) -> float:
+def _estimate_duration(text, words_per_minute=150):
     """Estimate audio duration based on word count."""
     words = max(1, len(text.split()))
     duration = (words / words_per_minute) * 60.0
     return max(3.0, duration)
 
 
-def _write_fallback_audio(out_path: Path, duration_seconds: float) -> None:
+def _write_fallback_audio(out_path, duration_seconds):
     """Generate fallback sine wave audio."""
     sample_rate = 22050
     amplitude = 0.1

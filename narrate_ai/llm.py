@@ -4,23 +4,19 @@ This module provides LLM operations as pure functions instead of a class,
 following functional programming principles.
 """
 
-from __future__ import annotations
-
 import json
 import re
-from typing import Any, TypedDict
 
-from .config import PipelineConfig
 
 try:
     from cerebras.cloud.sdk import Cerebras
-except Exception:  # pragma: no cover - optional dependency fallback
-    Cerebras = None  # type: ignore[assignment]
+except Exception:
+    Cerebras = None
 
 try:
     from groq import Groq
-except Exception:  # pragma: no cover - optional dependency fallback
-    Groq = None  # type: ignore[assignment]
+except Exception:
+    Groq = None
 
 
 class LLMError(RuntimeError):
@@ -29,23 +25,8 @@ class LLMError(RuntimeError):
     pass
 
 
-class LLMClientState(TypedDict):
-    """State for LLM client operations."""
-
-    config: PipelineConfig
-    _cerebras_client: Any | None
-    _groq_client: Any | None
-
-
-def create_llm_client(config: PipelineConfig) -> LLMClientState:
-    """Create an LLM client state dictionary.
-
-    Args:
-        config: Pipeline configuration
-
-    Returns:
-        Client state dictionary
-    """
+def create_llm_client(config):
+    """Create an LLM client state dictionary."""
     return {
         "config": config,
         "_cerebras_client": None,
@@ -53,7 +34,7 @@ def create_llm_client(config: PipelineConfig) -> LLMClientState:
     }
 
 
-def _get_cerebras_client(client: LLMClientState) -> Any:
+def _get_cerebras_client(client):
     """Get or create the Cerebras client (mutates state for caching)."""
     if client["_cerebras_client"] is None:
         if Cerebras is None:
@@ -68,7 +49,7 @@ def _get_cerebras_client(client: LLMClientState) -> Any:
     return client["_cerebras_client"]
 
 
-def _get_groq_client(client: LLMClientState) -> Any:
+def _get_groq_client(client):
     """Get or create the Groq client (mutates state for caching)."""
     if client["_groq_client"] is None:
         if Groq is None:
@@ -79,14 +60,7 @@ def _get_groq_client(client: LLMClientState) -> Any:
     return client["_groq_client"]
 
 
-def _chat_completion(
-    client: LLMClientState,
-    *,
-    provider: str,
-    prompt: str,
-    temperature: float,
-    max_tokens: int,
-) -> str:
+def _chat_completion(client, provider, prompt, temperature, max_tokens):
     """Make a chat completion request to the specified provider."""
     messages = [
         {"role": "system", "content": "You are a documentary writing assistant."},
@@ -120,27 +94,9 @@ def _chat_completion(
 
 
 def generate_text(
-    client: LLMClientState,
-    prompt: str,
-    *,
-    provider: str,
-    fallback_text: str,
-    temperature: float = 0.4,
-    max_tokens: int = 1200,
-) -> str:
-    """Generate text using the specified LLM provider.
-
-    Args:
-        client: LLM client state
-        prompt: The prompt to send
-        provider: Provider name ("cerebras" or "groq")
-        fallback_text: Text to return on error
-        temperature: Sampling temperature
-        max_tokens: Maximum tokens to generate
-
-    Returns:
-        Generated text or fallback on error
-    """
+    client, prompt, provider, fallback_text, temperature=0.4, max_tokens=1200
+):
+    """Generate text using the specified LLM provider."""
     try:
         return _chat_completion(
             client,
@@ -155,27 +111,9 @@ def generate_text(
 
 
 def generate_json(
-    client: LLMClientState,
-    prompt: str,
-    *,
-    provider: str,
-    fallback_json: dict[str, Any],
-    temperature: float = 0.2,
-    max_tokens: int = 600,
-) -> dict[str, Any]:
-    """Generate JSON using the specified LLM provider.
-
-    Args:
-        client: LLM client state
-        prompt: The prompt to send
-        provider: Provider name ("cerebras" or "groq")
-        fallback_json: JSON to return on error
-        temperature: Sampling temperature
-        max_tokens: Maximum tokens to generate
-
-    Returns:
-        Generated JSON or fallback on error
-    """
+    client, prompt, provider, fallback_json, temperature=0.2, max_tokens=600
+):
+    """Generate JSON using the specified LLM provider."""
     try:
         raw_text = _chat_completion(
             client,
@@ -190,7 +128,7 @@ def generate_json(
         return fallback_json
 
 
-def _extract_json(text: str) -> dict[str, Any]:
+def _extract_json(text):
     """Extract JSON from text response."""
     text = text.strip()
     if text.startswith("{") and text.endswith("}"):

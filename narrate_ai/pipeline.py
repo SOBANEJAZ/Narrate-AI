@@ -1,11 +1,8 @@
 """Documentary pipeline using functional programming style."""
 
-from __future__ import annotations
-
 import json
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
 
 from .agents import (
     build_narrative_plan,
@@ -20,62 +17,49 @@ from .agents import (
     write_script,
 )
 from .cache import MultiLayerCache
-from .config import PipelineConfig, get_resolution
+from .config import get_resolution
 from .llm import create_llm_client
-from .models import (
-    ScriptSegment,
-    TimelineItem,
-    create_script_segment,
-    create_timeline_item,
-)
+from .models import create_script_segment, create_timeline_item
 from .text_utils import slugify
 from .video import assemble_video, build_timeline
 
 try:
     from PIL import Image, ImageDraw
-except Exception:  # pragma: no cover - optional dependency fallback
-    Image = None  # type: ignore[assignment]
-    ImageDraw = None  # type: ignore[assignment]
+except Exception:
+    Image = None
+    ImageDraw = None
 
 
 class PipelineResult(dict):
     """Pipeline result as a dictionary with property accessors."""
 
     @property
-    def topic(self) -> str:
+    def topic(self):
         return self["topic"]
 
     @property
-    def run_dir(self) -> Path:
+    def run_dir(self):
         return self["run_dir"]
 
     @property
-    def script_path(self) -> Path:
+    def script_path(self):
         return self["script_path"]
 
     @property
-    def timeline_path(self) -> Path:
+    def timeline_path(self):
         return self["timeline_path"]
 
     @property
-    def manifest_path(self) -> Path:
+    def manifest_path(self):
         return self["manifest_path"]
 
     @property
-    def final_video_path(self) -> Path:
+    def final_video_path(self):
         return self["final_video_path"]
 
 
-def run_pipeline(config: PipelineConfig, topic: str) -> PipelineResult:
-    """Run the documentary generation pipeline.
-
-    Args:
-        config: Pipeline configuration
-        topic: Documentary topic
-
-    Returns:
-        Pipeline result with paths to all artifacts
-    """
+def run_pipeline(config, topic):
+    """Run the documentary generation pipeline."""
     print(f"[PIPELINE] Starting documentary generation for topic: {topic}", flush=True)
     run_dir = _create_run_dir(config, topic)
     print(f"[PIPELINE] Run directory: {run_dir}", flush=True)
@@ -178,7 +162,7 @@ def run_pipeline(config: PipelineConfig, topic: str) -> PipelineResult:
         manifest_path,
         {
             "topic": topic,
-            "created_at_utc": datetime.now(UTC).isoformat(),
+            "created_at_utc": datetime.now(timezone.utc).isoformat(),
             "plan": plan,
             "segment_count": len(segments),
             "segments": [_segment_manifest_entry(segment) for segment in segments],
@@ -198,16 +182,16 @@ def run_pipeline(config: PipelineConfig, topic: str) -> PipelineResult:
     )
 
 
-def _create_run_dir(config: PipelineConfig, topic: str) -> Path:
+def _create_run_dir(config, topic):
     """Create a run directory for the documentary."""
-    now = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
+    now = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     dir_name = f"{now}-{slugify(topic)[:60]}"
     run_dir = config["run_root"] / dir_name
     run_dir.mkdir(parents=True, exist_ok=True)
     return run_dir
 
 
-def _write_json(path: Path, payload: object) -> None:
+def _write_json(path, payload):
     """Write JSON data to a file."""
     path.write_text(
         json.dumps(payload, ensure_ascii=True, indent=2, default=str),
@@ -215,11 +199,7 @@ def _write_json(path: Path, payload: object) -> None:
     )
 
 
-def _ensure_images_for_segments(
-    config: PipelineConfig,
-    segments: list[ScriptSegment],
-    output_dir: Path,
-) -> int:
+def _ensure_images_for_segments(config, segments, output_dir):
     """Ensure all segments have images, creating placeholders if needed."""
     output_dir.mkdir(parents=True, exist_ok=True)
     placeholder_count = 0
@@ -252,11 +232,7 @@ def _ensure_images_for_segments(
     return placeholder_count
 
 
-def _make_placeholder_image(
-    config: PipelineConfig,
-    output_path: Path,
-    text: str,
-) -> Path:
+def _make_placeholder_image(config, output_path, text):
     """Create a placeholder image with text."""
     if Image is None or ImageDraw is None:
         raise RuntimeError(
@@ -275,11 +251,11 @@ def _make_placeholder_image(
     return output_path
 
 
-def _wrap_text(text: str, max_chars_per_line: int) -> str:
+def _wrap_text(text, max_chars_per_line):
     """Wrap text to fit within a character limit per line."""
     words = text.split()
-    lines: list[str] = []
-    current: list[str] = []
+    lines = []
+    current = []
     current_len = 0
     for word in words:
         next_len = current_len + len(word) + (1 if current else 0)
@@ -295,7 +271,7 @@ def _wrap_text(text: str, max_chars_per_line: int) -> str:
     return "\n".join(lines)
 
 
-def _segment_manifest_entry(segment: ScriptSegment) -> dict[str, object]:
+def _segment_manifest_entry(segment):
     """Create a manifest entry for a segment."""
     return {
         "segment_id": segment["segment_id"],

@@ -1,29 +1,14 @@
 """ElevenLabs TTS implementation."""
 
-from __future__ import annotations
-
 import struct
 import wave
 from pathlib import Path
 
 import requests
 
-from .base import SynthesisResult, TTSConfig
 
-
-def synthesize_with_elevenlabs(
-    text: str, out_path: Path, config: TTSConfig
-) -> SynthesisResult:
-    """Synthesize speech using ElevenLabs API.
-
-    Args:
-        text: Text to synthesize
-        out_path: Output path for audio file
-        config: TTS configuration
-
-    Returns:
-        SynthesisResult with success status and audio path
-    """
+def synthesize_with_elevenlabs(text, out_path, config):
+    """Synthesize speech using ElevenLabs API."""
     api_key = config.get("elevenlabs_api_key")
     if not api_key:
         return {
@@ -85,7 +70,7 @@ def synthesize_with_elevenlabs(
         }
 
 
-def _write_pcm_as_wav(out_path: Path, pcm_bytes: bytes, sample_rate: int) -> None:
+def _write_pcm_as_wav(out_path, pcm_bytes, sample_rate):
     """Write PCM bytes as a WAV file."""
     with wave.open(str(out_path), "wb") as wav_file:
         wav_file.setnchannels(1)

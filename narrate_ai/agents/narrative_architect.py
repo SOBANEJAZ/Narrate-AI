@@ -1,26 +1,11 @@
 """Narrative architect agent using functional programming style."""
 
-from __future__ import annotations
-
-from ..llm import LLMClientState, generate_json
-from ..models import (
-    NarrativePlan,
-    NarrativeSection,
-    create_narrative_plan,
-    create_narrative_section,
-)
+from ..llm import generate_json
+from ..models import create_narrative_plan, create_narrative_section
 
 
-def build_narrative_plan(client: LLMClientState, topic: str) -> NarrativePlan:
-    """Build a narrative plan for the given topic.
-
-    Args:
-        client: LLM client state
-        topic: Documentary topic
-
-    Returns:
-        NarrativePlan with sections and metadata
-    """
+def build_narrative_plan(client, topic):
+    """Build a narrative plan for the given topic."""
     print(f"[NARRATIVE] Building narrative plan for topic: {topic}", flush=True)
 
     fallback_sections = [
@@ -84,7 +69,7 @@ Constraints:
     )
 
     raw_sections = plan_json.get("sections", fallback["sections"])
-    sections: list[NarrativeSection] = []
+    sections = []
     for entry in raw_sections:
         try:
             sections.append(

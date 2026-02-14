@@ -4,43 +4,11 @@ This module provides configuration as a dictionary with factory functions
 instead of a dataclass, following functional programming principles.
 """
 
-from __future__ import annotations
-
 import os
 from pathlib import Path
-from typing import TypedDict
-
-from .tts.factory import TTSProviderType
 
 
-class PipelineConfig(TypedDict):
-    """Pipeline configuration using TypedDict for functional style."""
-
-    run_root: Path
-    max_websites: int
-    max_queries_per_segment: int
-    images_per_query: int
-    sentence_span_per_segment: int
-    resolution_width: int
-    resolution_height: int
-    fps: int
-    transition_seconds: float
-    zoom_strength: float
-    background_mode: str
-    request_timeout_seconds: int
-    cache_dir_name: str
-    groq_api_key: str | None
-    groq_model: str
-    cerebras_api_key: str | None
-    cerebras_model: str
-    elevenlabs_api_key: str | None
-    elevenlabs_voice_id: str
-    elevenlabs_model_id: str
-    edge_tts_voice: str
-    tts_provider: TTSProviderType
-
-
-def create_default_config() -> PipelineConfig:
+def create_default_config():
     """Create a pipeline config with default values."""
     return {
         "run_root": Path("runs"),
@@ -68,7 +36,7 @@ def create_default_config() -> PipelineConfig:
     }
 
 
-def create_config_from_env() -> PipelineConfig:
+def create_config_from_env():
     """Create a pipeline config from environment variables."""
     config = create_default_config()
     config.update(
@@ -92,16 +60,13 @@ def create_config_from_env() -> PipelineConfig:
     return config
 
 
-def get_resolution(config: PipelineConfig) -> tuple[int, int]:
+def get_resolution(config):
     """Get the video resolution as a tuple."""
     return (config["resolution_width"], config["resolution_height"])
 
 
-def update_config(
-    config: PipelineConfig,
-    **kwargs: object,
-) -> PipelineConfig:
+def update_config(config, **kwargs):
     """Create a new config with updated values (immutable update)."""
     new_config = dict(config)
     new_config.update(kwargs)
-    return new_config  # type: ignore[return-value]
+    return new_config

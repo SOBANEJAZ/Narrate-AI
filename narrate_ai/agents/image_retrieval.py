@@ -1,46 +1,28 @@
 """Image retrieval agent using functional programming style."""
 
-from __future__ import annotations
-
 from pathlib import Path
 from urllib.parse import urlparse
 
 import requests
 
 from ..cache import MultiLayerCache
-from ..config import PipelineConfig
-from ..models import ImageCandidate, ScriptSegment, create_image_candidate
+from ..models import create_image_candidate
 from ..text_utils import safe_filename
 
 try:
     from ddgs import DDGS
-except Exception:  # pragma: no cover - optional dependency fallback
-    DDGS = None  # type: ignore[assignment]
+except Exception:
+    DDGS = None
 
 
-def retrieve_images(
-    config: PipelineConfig,
-    cache: MultiLayerCache,
-    segments: list[ScriptSegment],
-    images_root: Path,
-) -> list[ScriptSegment]:
-    """Retrieve images for script segments.
-
-    Args:
-        config: Pipeline configuration
-        cache: Cache instance
-        segments: List of script segments
-        images_root: Root directory for images
-
-    Returns:
-        Segments with retrieved images (modified in place)
-    """
+def retrieve_images(config, cache, segments, images_root):
+    """Retrieve images for script segments."""
     print(
         f"[IMAGES] Retrieving images for {len(segments)} segments",
         flush=True,
     )
     images_root.mkdir(parents=True, exist_ok=True)
-    seen_urls: set[str] = set()
+    seen_urls = set()
 
     for segment in segments:
         segment_dir = images_root / f"segment_{segment['segment_id']:03d}"
@@ -50,7 +32,7 @@ def retrieve_images(
             flush=True,
         )
 
-        candidates: list[ImageCandidate] = []
+        candidates = []
         queries = segment.get("search_queries", [])[: config["max_queries_per_segment"]]
         for query in queries:
             results = _search_images(config, cache, query, config["images_per_query"])
@@ -82,12 +64,7 @@ def retrieve_images(
     return segments
 
 
-def _search_images(
-    config: PipelineConfig,
-    cache: MultiLayerCache,
-    query: str,
-    max_results: int,
-) -> list[dict]:
+def _search_images(config, cache, query, max_results):
     """Search for images using DDGS."""
     cache_key = f"images::{query.lower()}::{max_results}"
     cached = cache.get("images", cache_key)
@@ -106,11 +83,7 @@ def _search_images(
         return []
 
 
-def _download_image(
-    config: PipelineConfig,
-    url: str,
-    output_dir: Path,
-) -> Path | None:
+def _download_image(config, url, output_dir):
     """Download an image from URL."""
     file_name = _filename_from_url(url, prefix="img")
     path = output_dir / file_name
@@ -133,7 +106,7 @@ def _download_image(
         return None
 
 
-def _filename_from_url(url: str, prefix: str) -> str:
+def _filename_from_url(url, prefix):
     """Generate safe filename from URL."""
     parsed = urlparse(url)
     stem = Path(parsed.path).name or "image.jpg"

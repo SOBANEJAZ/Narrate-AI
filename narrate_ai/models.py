@@ -1,28 +1,13 @@
-"""Model type definitions using TypedDict (functional programming style).
+"""Model type definitions using plain dictionaries (functional programming style).
 
-This module defines all data structures as TypedDict types instead of dataclasses,
+This module defines all data structures as plain dictionary types instead of dataclasses,
 allowing for a functional programming approach throughout the codebase.
 """
 
-from __future__ import annotations
-
 from pathlib import Path
-from typing import NotRequired, TypedDict
 
 
-class NarrativeSection(TypedDict):
-    """A section within a narrative plan."""
-
-    title: str
-    objective: str
-    duration_seconds: int
-
-
-def create_narrative_section(
-    title: str,
-    objective: str,
-    duration_seconds: int,
-) -> NarrativeSection:
+def create_narrative_section(title, objective, duration_seconds):
     """Create a NarrativeSection instance."""
     return {
         "title": title,
@@ -31,23 +16,7 @@ def create_narrative_section(
     }
 
 
-class NarrativePlan(TypedDict):
-    """Complete narrative plan for a documentary."""
-
-    topic: str
-    tone: str
-    pacing: str
-    target_duration_seconds: int
-    sections: list[NarrativeSection]
-
-
-def create_narrative_plan(
-    topic: str,
-    tone: str,
-    pacing: str,
-    target_duration_seconds: int,
-    sections: list[NarrativeSection],
-) -> NarrativePlan:
+def create_narrative_plan(topic, tone, pacing, target_duration_seconds, sections):
     """Create a NarrativePlan instance."""
     return {
         "topic": topic,
@@ -58,21 +27,9 @@ def create_narrative_plan(
     }
 
 
-class ResearchSource(TypedDict):
-    """A source discovered during research."""
-
-    url: str
-    title: str
-    snippet: NotRequired[str]
-
-
-def create_research_source(
-    url: str,
-    title: str,
-    snippet: str = "",
-) -> ResearchSource:
+def create_research_source(url, title, snippet=""):
     """Create a ResearchSource instance."""
-    result: ResearchSource = {
+    result = {
         "url": url,
         "title": title,
     }
@@ -81,19 +38,7 @@ def create_research_source(
     return result
 
 
-class ResearchNote(TypedDict):
-    """A note extracted from a research source."""
-
-    source_url: str
-    chunk_id: int
-    text: str
-
-
-def create_research_note(
-    source_url: str,
-    chunk_id: int,
-    text: str,
-) -> ResearchNote:
+def create_research_note(source_url, chunk_id, text):
     """Create a ResearchNote instance."""
     return {
         "source_url": source_url,
@@ -102,25 +47,9 @@ def create_research_note(
     }
 
 
-class ImageCandidate(TypedDict):
-    """A candidate image for a script segment."""
-
-    url: str
-    title: str
-    source: str
-    local_path: NotRequired[Path | None]
-    score: NotRequired[float]
-
-
-def create_image_candidate(
-    url: str,
-    title: str,
-    source: str,
-    local_path: Path | None = None,
-    score: float = 0.0,
-) -> ImageCandidate:
+def create_image_candidate(url, title, source, local_path=None, score=0.0):
     """Create an ImageCandidate instance."""
-    result: ImageCandidate = {
+    result = {
         "url": url,
         "title": title,
         "source": source,
@@ -132,35 +61,20 @@ def create_image_candidate(
     return result
 
 
-class ScriptSegment(TypedDict):
-    """A segment of the script with associated metadata."""
-
-    segment_id: int
-    text: str
-    start_sentence: int
-    end_sentence: int
-    search_queries: NotRequired[list[str]]
-    visual_description: NotRequired[str]
-    candidate_images: NotRequired[list[ImageCandidate]]
-    selected_image_path: NotRequired[Path | None]
-    narration_audio_path: NotRequired[Path | None]
-    duration_seconds: NotRequired[float]
-
-
 def create_script_segment(
-    segment_id: int,
-    text: str,
-    start_sentence: int,
-    end_sentence: int,
-    search_queries: list[str] | None = None,
-    visual_description: str = "",
-    candidate_images: list[ImageCandidate] | None = None,
-    selected_image_path: Path | None = None,
-    narration_audio_path: Path | None = None,
-    duration_seconds: float = 0.0,
-) -> ScriptSegment:
+    segment_id,
+    text,
+    start_sentence,
+    end_sentence,
+    search_queries=None,
+    visual_description="",
+    candidate_images=None,
+    selected_image_path=None,
+    narration_audio_path=None,
+    duration_seconds=0.0,
+):
     """Create a ScriptSegment instance."""
-    result: ScriptSegment = {
+    result = {
         "segment_id": segment_id,
         "text": text,
         "start_sentence": start_sentence,
@@ -181,27 +95,15 @@ def create_script_segment(
     return result
 
 
-class TimelineItem(TypedDict):
-    """An item in the video timeline."""
-
-    segment_id: int
-    text: str
-    start_seconds: float
-    end_seconds: float
-    duration_seconds: float
-    image_path: Path
-    audio_path: Path
-
-
 def create_timeline_item(
-    segment_id: int,
-    text: str,
-    start_seconds: float,
-    end_seconds: float,
-    duration_seconds: float,
-    image_path: Path,
-    audio_path: Path,
-) -> TimelineItem:
+    segment_id,
+    text,
+    start_seconds,
+    end_seconds,
+    duration_seconds,
+    image_path,
+    audio_path,
+):
     """Create a TimelineItem instance."""
     return {
         "segment_id": segment_id,
