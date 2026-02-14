@@ -21,9 +21,9 @@ class PipelineConfig:
     request_timeout_seconds: int = 20
     cache_dir_name: str = "cache"
     groq_api_key: str | None = None
-    groq_model: str = "llama-3.3-70b-versatile"
+    groq_model: str = "openai/gpt-oss-120b"
     cerebras_api_key: str | None = None
-    cerebras_model: str = "llama-3.1-70b"
+    cerebras_model: str = "gpt-oss-120b"
     elevenlabs_api_key: str | None = None
     elevenlabs_voice_id: str = "JBFqnCBsd6RMkjVDRZzb"
     elevenlabs_model_id: str = "eleven_multilingual_v2"
@@ -36,9 +36,9 @@ class PipelineConfig:
     def from_env(cls) -> "PipelineConfig":
         return cls(
             groq_api_key=os.getenv("GROQ_API_KEY"),
-            groq_model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
+            groq_model=os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"),
             cerebras_api_key=os.getenv("CEREBRAS_API_KEY"),
-            cerebras_model=os.getenv("CEREBRAS_MODEL", "llama-3.1-70b"),
+            cerebras_model=os.getenv("CEREBRAS_MODEL", "gpt-oss-120b"),
             elevenlabs_api_key=os.getenv("ELEVENLABS_API_KEY"),
             elevenlabs_voice_id=os.getenv("ELEVENLABS_VOICE_ID", "JBFqnCBsd6RMkjVDRZzb"),
             elevenlabs_model_id=os.getenv("ELEVENLABS_MODEL_ID", "eleven_multilingual_v2"),

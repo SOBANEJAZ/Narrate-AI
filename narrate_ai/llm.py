@@ -22,12 +22,11 @@ class LLMError(RuntimeError):
     pass
 
 
-@dataclass(slots=True)
+@dataclass
 class LLMClient:
     config: PipelineConfig
 
     def __post_init__(self):
-        # Initialize SDK clients lazily
         self._cerebras_client = None
         self._groq_client = None
 
