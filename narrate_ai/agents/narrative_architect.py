@@ -12,29 +12,24 @@ def build_narrative_plan(client, topic):
         create_narrative_section(
             title="Introduction",
             objective=f"Introduce {topic} and set historical context.",
-            duration_seconds=35,
+            duration_seconds=30,
         ),
         create_narrative_section(
-            title="Origins",
-            objective=f"Explain how {topic} began and key early milestones.",
-            duration_seconds=55,
+            title="Main Content",
+            objective=f"Explain key aspects and developments of {topic}.",
+            duration_seconds=60,
         ),
         create_narrative_section(
-            title="Turning Points",
-            objective=f"Describe major shifts in {topic}.",
-            duration_seconds=65,
-        ),
-        create_narrative_section(
-            title="Legacy",
-            objective=f"Conclude with long-term impact of {topic}.",
-            duration_seconds=45,
+            title="Conclusion",
+            objective=f"Conclude with summary and legacy of {topic}.",
+            duration_seconds=30,
         ),
     ]
 
     fallback = {
         "tone": "documentary",
         "pacing": "steady",
-        "target_duration_seconds": 200,
+        "target_duration_seconds": 120,
         "sections": [
             {
                 "title": section["title"],
@@ -57,7 +52,7 @@ Return strict JSON with keys:
 
 Constraints:
 - Build a clear story arc with introduction, core sections, transitions, and conclusion.
-- Durations should total around 3 to 6 minutes.
+- Durations should total around 2 minutes (120 seconds).
 """
     plan_json = generate_json(
         client,
