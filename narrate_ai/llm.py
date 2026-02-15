@@ -6,6 +6,9 @@ following functional programming principles.
 
 import json
 import re
+from typing import Type
+
+from pydantic import BaseModel
 
 
 try:
@@ -138,3 +141,30 @@ def _extract_json(text):
     if not match:
         raise LLMError("LLM did not return JSON.")
     return json.loads(match.group(0))
+
+
+def generate_pydantic(
+    client,
+    prompt,
+    provider,
+    model: Type[BaseModel],
+    temperature: float = 0.2,
+    max_tokens: int = 600,
+):
+    """Generate Pydantic model using the specified LLM provider.
+
+    Uses JSON mode for better structure enforcement.
+    """
+    try:
+        raw_text = _chat_completion(
+            client,
+            provider=provider,
+            prompt=prompt,
+            temperature=temperature,
+            max_tokens=max_tokens,
+        )
+        json_data = _extract_json(raw_text)
+        return model.model_validate(json_data)
+    except Exception as e:
+        print(f"[LLM] Error generating pydantic model with {provider}: {e}")
+        return None

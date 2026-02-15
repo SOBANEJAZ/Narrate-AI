@@ -33,6 +33,9 @@ def create_default_config():
         "elevenlabs_model_id": "eleven_multilingual_v2",
         "edge_tts_voice": "en-US-AriaNeural",
         "tts_provider": "elevenlabs",
+        "pinecone_api_key": None,
+        "pinecone_environment": "us-east-1",
+        "gemini_api_key": None,
     }
 
 
@@ -55,6 +58,11 @@ def create_config_from_env():
             "edge_tts_voice": os.getenv("EDGE_TTS_VOICE", config["edge_tts_voice"]),
             "background_mode": os.getenv("BACKGROUND_MODE", config["background_mode"]),
             "tts_provider": os.getenv("TTS_PROVIDER", config["tts_provider"]),
+            "pinecone_api_key": os.getenv("PINECONE_API"),
+            "pinecone_environment": os.getenv(
+                "PINECONE_ENV", config["pinecone_environment"]
+            ),
+            "gemini_api_key": os.getenv("GEMINI_API_KEY"),
         }
     )
     return config

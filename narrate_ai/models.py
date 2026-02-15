@@ -2,9 +2,61 @@
 
 This module defines all data structures as plain dictionary types instead of dataclasses,
 allowing for a functional programming approach throughout the codebase.
+
+Also provides Pydantic models for structured LLM outputs with better validation.
 """
 
 from pathlib import Path
+
+from pydantic import BaseModel
+
+
+class NarrativeSection(BaseModel):
+    """Pydantic model for narrative section."""
+
+    title: str
+    objective: str
+    duration_seconds: int
+
+
+class NarrativePlan(BaseModel):
+    """Pydantic model for narrative plan."""
+
+    topic: str
+    tone: str
+    pacing: str
+    target_duration_seconds: int
+    sections: list[NarrativeSection]
+
+
+class VisualIntelligence(BaseModel):
+    """Pydantic model for visual intelligence output."""
+
+    search_queries: list[str]
+    visual_description: str
+
+
+class SectionQuery(BaseModel):
+    """Pydantic model for section query in RAG."""
+
+    section_title: str
+    section_objective: str
+    search_query: str
+
+
+class PlanQueries(BaseModel):
+    """Pydantic model for all section queries."""
+
+    queries: list[SectionQuery]
+
+
+class ResearchNote(BaseModel):
+    """Pydantic model for research note with metadata."""
+
+    source_url: str
+    chunk_id: int
+    text: str
+    score: float = 0.0
 
 
 def create_narrative_section(title, objective, duration_seconds):
