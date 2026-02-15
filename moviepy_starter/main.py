@@ -39,8 +39,12 @@ def process_folders(folder_path: str | Path) -> Path:
         key=lambda path: int(path.name) if path.name.isdigit() else path.name,
     )
     for index, folder in enumerate(segment_folders, start=1):
-        images = sorted([p for p in folder.iterdir() if p.suffix.lower() in IMAGE_EXTENSIONS])
-        audios = sorted([p for p in folder.iterdir() if p.suffix.lower() in AUDIO_EXTENSIONS])
+        images = sorted(
+            [p for p in folder.iterdir() if p.suffix.lower() in IMAGE_EXTENSIONS]
+        )
+        audios = sorted(
+            [p for p in folder.iterdir() if p.suffix.lower() in AUDIO_EXTENSIONS]
+        )
         if not images or not audios:
             continue
 
@@ -64,9 +68,9 @@ def process_folders(folder_path: str | Path) -> Path:
         timeline,
         output_path,
         resolution=(1280, 720),
-        fps=24,
+        fps=15,
         transition_seconds=0.3,
-        zoom_strength=0.04,
+        zoom_strength=0.08,
         background_mode="black",
     )
     return output_path
