@@ -7,6 +7,12 @@ from .config import (
     update_config,
 )
 from .models import (
+    NarrativePlan,
+    NarrativeSection,
+    PlanQueries,
+    ResearchNote,
+    SectionQuery,
+    VisualIntelligence,
     create_image_candidate,
     create_narrative_plan,
     create_narrative_section,
@@ -30,4 +36,10 @@ __all__ = [
     "create_script_segment",
     "create_timeline_item",
     "run_pipeline",
+    "NarrativePlan",
+    "NarrativeSection",
+    "VisualIntelligence",
+    "PlanQueries",
+    "SectionQuery",
+    "ResearchNote",
 ]
