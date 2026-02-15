@@ -20,7 +20,7 @@ except Exception:
     Image = None
 
 
-def create_ranking_state(model_name="ViT-L-14", pretrained_name="laion2b_s32b_b82k"):
+def create_ranking_state(model_name="ViT-B-16", pretrained_name="laion2b_s34b_b88k"):
     """Create image ranking state and initialize CLIP if available."""
     state = {
         "model_name": model_name,
