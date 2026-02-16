@@ -29,10 +29,26 @@ except Exception:
 AUTHORITATIVE_HINTS = (
     ".gov",
     ".edu",
+    "wikipedia.org",
     "britannica.com",
+    "britannica.org",
     "history.com",
     "nationalgeographic.com",
-    "wikipedia.org",
+    "bbc.com",
+    "bbc.co.uk",
+    "reuters.com",
+    "aljazeera.com",
+    "aljazeera.net",
+    "jstor.org",
+    "loc.gov",
+    "si.edu",
+    "metmuseum.org",
+    "britishmuseum.org",
+    "cia.gov",
+    "worldbank.org",
+    "un.org",
+    "nasa.gov",
+    "esa.int",
 )
 
 
@@ -97,7 +113,22 @@ def discover_sources(config, cache, topic):
         deduped[source["url"]] = source
 
     ranked = sorted(deduped.values(), key=_source_score, reverse=True)
-    selected = ranked[: config["max_websites"]]
+
+    authoritative = [s for s in ranked if _is_authoritative(s)]
+    non_authoritative = [s for s in ranked if not _is_authoritative(s)]
+
+    if authoritative:
+        selected = authoritative[: config["max_websites"]]
+        print(
+            f"[RESEARCH] Selected {len(selected)} authoritative sources (filtered from {len(ranked)} total)",
+            flush=True,
+        )
+    else:
+        selected = ranked[: config["max_websites"]]
+        print(
+            f"[RESEARCH] No authoritative sources found. Using {len(selected)} fallback sources from DuckDuckGo",
+            flush=True,
+        )
     cache.set(
         "research",
         cache_key,
@@ -144,6 +175,13 @@ def crawl_and_build_notes(config, cache, sources):
         )
     print(f"[RESEARCH] Total notes built: {len(notes)}", flush=True)
     return notes
+
+
+def _is_authoritative(source):
+    """Check if source matches authoritative hints."""
+    parsed = urlparse(source["url"])
+    domain = parsed.netloc.lower()
+    return any(hint in domain for hint in AUTHORITATIVE_HINTS)
 
 
 def _source_score(source):
