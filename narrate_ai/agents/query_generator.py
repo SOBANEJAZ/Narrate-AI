@@ -24,8 +24,14 @@ def generate_section_queries(client, plan):
     )
 
     prompt = f"""
-You are a query generation agent for a documentary RAG system.
-Given the narrative plan, generate semantic search queries to retrieve relevant research notes.
+You are a query generation agent for Narrate-AI, a documentary generator that creates slideshow-style educational videos. Your role is to generate semantic search queries that will retrieve the most relevant research notes from a vector database to support each section of the documentary.
+
+Context:
+- Narrate-AI produces documentary videos by combining narration audio with relevant images
+- Research notes retrieved by your queries will be used to enrich the script with factual details
+- Each section will be illustrated with images retrieved and ranked using OpenCLIP
+- The final video displays images centered on screen with subtle zoom effects over time
+- Target audience expects historically accurate and visually compelling content
 
 Topic: {plan.topic}
 Tone: {plan.tone}
@@ -33,11 +39,12 @@ Tone: {plan.tone}
 Sections:
 {sections_brief}
 
-For each section, generate a search query that will help retrieve the most relevant 
+For each section, generate a search query that will help retrieve the most relevant
 research notes from a vector database. The query should be:
 - Concise (2-6 keywords)
 - Focused on the specific aspect of the topic covered in that section
 - Optimized for semantic search
+- Aligned with the documentary's educational and historical accuracy goals
 
 Return JSON with:
 - queries: list of objects with section_title, section_objective, and search_query
@@ -49,7 +56,6 @@ Return JSON with:
         provider="groq",
         model=PlanQueries,
         temperature=0.3,
-        max_tokens=500,
     )
 
     if result is None:
