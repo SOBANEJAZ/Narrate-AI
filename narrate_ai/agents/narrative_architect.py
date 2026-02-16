@@ -67,7 +67,7 @@ Constraints:
     plan = generate_pydantic(
         client,
         prompt=prompt,
-        provider="groq",
+        provider="cerebras",
         model=NarrativePlan,
         temperature=0.2,
     )

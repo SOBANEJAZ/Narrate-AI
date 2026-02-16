@@ -25,7 +25,7 @@ def create_default_config():
         "request_timeout_seconds": 20,
         "cache_dir_name": "cache",
         "groq_api_key": None,
-        "groq_model": "openai/gpt-oss-120b",
+        "groq_model": "moonshotai/kimi-k2-instruct-0905",
         "cerebras_api_key": None,
         "cerebras_model": "gpt-oss-120b",
         "elevenlabs_api_key": None,
