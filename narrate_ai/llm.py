@@ -1,25 +1,15 @@
-"""LLM client module using functional programming style.
+"""LLM client module.
 
-This module provides LLM operations as pure functions instead of a class,
-following functional programming principles.
+This module provides LLM operations as pure functions instead of a class.
 """
 
 import json
 import re
 from typing import Type
 
+from cerebras.cloud.sdk import Cerebras
+from groq import Groq
 from pydantic import BaseModel
-
-
-try:
-    from cerebras.cloud.sdk import Cerebras
-except Exception:
-    Cerebras = None
-
-try:
-    from groq import Groq
-except Exception:
-    Groq = None
 
 
 class LLMError(RuntimeError):
@@ -40,10 +30,6 @@ def create_llm_client(config):
 def _get_cerebras_client(client):
     """Get or create the Cerebras client (mutates state for caching)."""
     if client["_cerebras_client"] is None:
-        if Cerebras is None:
-            raise LLMError(
-                "Cerebras SDK not installed. Run: pip install cerebras-cloud-sdk"
-            )
         if not client["config"]["cerebras_api_key"]:
             raise LLMError("Missing CEREBRAS_API_KEY")
         client["_cerebras_client"] = Cerebras(
@@ -55,8 +41,6 @@ def _get_cerebras_client(client):
 def _get_groq_client(client):
     """Get or create the Groq client (mutates state for caching)."""
     if client["_groq_client"] is None:
-        if Groq is None:
-            raise LLMError("Groq SDK not installed. Run: pip install groq")
         if not client["config"]["groq_api_key"]:
             raise LLMError("Missing GROQ_API_KEY")
         client["_groq_client"] = Groq(api_key=client["config"]["groq_api_key"])
@@ -96,39 +80,27 @@ def _chat_completion(client, provider, prompt, temperature, max_tokens):
         raise LLMError(f"Unsupported provider: {provider}")
 
 
-def generate_text(
-    client, prompt, provider, fallback_text, temperature=0.4, max_tokens=1200
-):
+def generate_text(client, prompt, provider, temperature=0.4, max_tokens=1200):
     """Generate text using the specified LLM provider."""
-    try:
-        return _chat_completion(
-            client,
-            provider=provider,
-            prompt=prompt,
-            temperature=temperature,
-            max_tokens=max_tokens,
-        )
-    except Exception as e:
-        print(f"[LLM] Error generating text with {provider}: {e}")
-        return fallback_text
+    return _chat_completion(
+        client,
+        provider=provider,
+        prompt=prompt,
+        temperature=temperature,
+        max_tokens=max_tokens,
+    )
 
 
-def generate_json(
-    client, prompt, provider, fallback_json, temperature=0.2, max_tokens=600
-):
+def generate_json(client, prompt, provider, temperature=0.2, max_tokens=600):
     """Generate JSON using the specified LLM provider."""
-    try:
-        raw_text = _chat_completion(
-            client,
-            provider=provider,
-            prompt=prompt,
-            temperature=temperature,
-            max_tokens=max_tokens,
-        )
-        return _extract_json(raw_text)
-    except Exception as e:
-        print(f"[LLM] Error generating JSON with {provider}: {e}")
-        return fallback_json
+    raw_text = _chat_completion(
+        client,
+        provider=provider,
+        prompt=prompt,
+        temperature=temperature,
+        max_tokens=max_tokens,
+    )
+    return _extract_json(raw_text)
 
 
 def _extract_json(text):
@@ -155,16 +127,12 @@ def generate_pydantic(
 
     Uses JSON mode for better structure enforcement.
     """
-    try:
-        raw_text = _chat_completion(
-            client,
-            provider=provider,
-            prompt=prompt,
-            temperature=temperature,
-            max_tokens=max_tokens,
-        )
-        json_data = _extract_json(raw_text)
-        return model.model_validate(json_data)
-    except Exception as e:
-        print(f"[LLM] Error generating pydantic model with {provider}: {e}")
-        return None
+    raw_text = _chat_completion(
+        client,
+        provider=provider,
+        prompt=prompt,
+        temperature=temperature,
+        max_tokens=max_tokens,
+    )
+    json_data = _extract_json(raw_text)
+    return model.model_validate(json_data)

@@ -1,7 +1,7 @@
-"""Configuration module using functional programming style.
+"""Configuration module.
 
 This module provides configuration as a dictionary with factory functions
-instead of a dataclass, following functional programming principles.
+instead of a dataclass.
 """
 
 import os

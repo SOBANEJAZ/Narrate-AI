@@ -1,4 +1,4 @@
-"""Narrate-AI package (functional programming style)."""
+"""Narrate-AI package."""
 
 from .config import (
     create_config_from_env,
