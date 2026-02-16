@@ -92,6 +92,10 @@ def run_pipeline(config, topic):
     print("[PIPELINE] Step 4: Generating section queries for RAG", flush=True)
     section_queries = generate_section_queries(llm_client, plan)
 
+    print(f"[RAG] Semantic search queries generated:", flush=True)
+    for sq in section_queries.queries:
+        print(f"  - Section: {sq.section_title} | Query: {sq.search_query}", flush=True)
+
     print("[PIPELINE] Step 5: Retrieving relevant notes from vector DB", flush=True)
     all_retrieved_notes = []
     if pinecone_manager:
