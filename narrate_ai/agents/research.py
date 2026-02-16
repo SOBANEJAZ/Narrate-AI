@@ -157,7 +157,7 @@ def crawl_and_build_notes(config, cache, sources):
             continue
         source_note_count = 0
         for index, chunk in enumerate(
-            chunk_text(raw, chunk_size_words=170, overlap_words=25), start=1
+            chunk_text(raw, chunk_size_words=500, overlap_words=100), start=1
         ):
             notes.append(
                 create_research_note(
