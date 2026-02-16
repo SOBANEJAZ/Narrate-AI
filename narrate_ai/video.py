@@ -78,7 +78,7 @@ def assemble_video(
     resolution=(1280, 720),
     fps=15,
     transition_seconds=0.3,
-    zoom_strength=0.08,
+    zoom_strength=1,
     background_mode="black",
 ):
     """Assemble video from timeline items."""

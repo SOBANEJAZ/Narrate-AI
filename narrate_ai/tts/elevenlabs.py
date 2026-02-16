@@ -48,7 +48,15 @@ def synthesize_with_elevenlabs(text, out_path, config):
                 "error_message": "API returned JSON instead of audio",
             }
 
-        _write_pcm_as_wav(out_path, response.content, sample_rate=44100)
+        audio_content = response.content
+        # Check if the response already contains a WAV header (starts with RIFF)
+        # or if it's potentially another format like MP3 (starts with ID3 or 0xFF)
+        if audio_content.startswith(b"RIFF") or audio_content.startswith(b"ID3"):
+            print(f"[TTS] ElevenLabs returned containerized audio ({len(audio_content)} bytes), saving directly.")
+            out_path.write_bytes(audio_content)
+        else:
+            print(f"[TTS] ElevenLabs returned raw PCM, wrapping in WAV container.")
+            _write_pcm_as_wav(out_path, audio_content, sample_rate=44100)
 
         return {
             "success": True,
