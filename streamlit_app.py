@@ -213,7 +213,7 @@ def main():
     assert process.stdout is not None
     for line in process.stdout:
         logs.append(line.rstrip("\n"))
-        log_box.code("\n".join(logs[-250:]), language="text")
+        log_box.code("\n".join(logs), language="text")
 
     return_code = process.wait()
     if return_code != 0:
