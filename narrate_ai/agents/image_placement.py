@@ -1,4 +1,4 @@
-"""Image placement agent using functional programming style."""
+"""Image placement agent."""
 
 from ..models import create_script_segment
 from ..text_utils import split_sentences

@@ -1,4 +1,4 @@
-"""Documentary pipeline using functional programming style."""
+"""Documentary pipeline."""
 
 import json
 from datetime import datetime, timezone
@@ -24,12 +24,6 @@ from .models import create_script_segment, create_timeline_item
 from .rag import create_pinecone_manager
 from .text_utils import slugify
 from .video import assemble_video, build_timeline
-
-try:
-    from PIL import Image, ImageDraw
-except Exception:
-    Image = None
-    ImageDraw = None
 
 
 class PipelineResult(dict):
@@ -154,12 +148,9 @@ def run_pipeline(config, topic):
     ranking_state = create_ranking_state()
     segments = rank_images(ranking_state, segments)
 
-    placeholder_count = _ensure_images_for_segments(
-        config, segments, run_dir / "placeholders"
-    )
-    print(
-        f"[PIPELINE] Image fallback placeholders used: {placeholder_count}", flush=True
-    )
+    for segment in segments:
+        if not segment.get("selected_image_path"):
+            raise RuntimeError(f"No image selected for segment {segment['segment_id']}")
 
     print("[PIPELINE] Step 11: Narration generation", flush=True)
     segments = synthesize_audio(
@@ -235,78 +226,6 @@ def _write_json(path, payload):
         json.dumps(payload, ensure_ascii=True, indent=2, default=str),
         encoding="utf-8",
     )
-
-
-def _ensure_images_for_segments(config, segments, output_dir):
-    """Ensure all segments have images, creating placeholders if needed."""
-    output_dir.mkdir(parents=True, exist_ok=True)
-    placeholder_count = 0
-    for segment in segments:
-        selected = segment.get("selected_image_path")
-        if selected and selected.exists():
-            continue
-
-        candidates = segment.get("candidate_images", [])
-        for candidate in candidates:
-            local_path = candidate.get("local_path")
-            if local_path and local_path.exists():
-                segment["selected_image_path"] = local_path
-                break
-
-        selected = segment.get("selected_image_path")
-        if selected and selected.exists():
-            continue
-
-        segment["selected_image_path"] = _make_placeholder_image(
-            config,
-            output_dir / f"segment_{segment['segment_id']:03d}.jpg",
-            text=segment["text"],
-        )
-        placeholder_count += 1
-        print(
-            f"[PIPELINE] Segment {segment['segment_id']}: created placeholder image",
-            flush=True,
-        )
-    return placeholder_count
-
-
-def _make_placeholder_image(config, output_path, text):
-    """Create a placeholder image with text."""
-    if Image is None or ImageDraw is None:
-        raise RuntimeError(
-            "Pillow is required for fallback placeholder image generation."
-        )
-
-    width, height = get_resolution(config)
-    image = Image.new("RGB", (width, height), color=(15, 18, 23))
-    draw = ImageDraw.Draw(image)
-    draw.rectangle((40, 40, width - 40, height - 40), outline=(95, 105, 122), width=2)
-    snippet = text.strip().replace("\n", " ")[:320]
-    wrapped = _wrap_text(snippet, 52)
-    draw.text((70, 90), "Narrate-AI Placeholder Visual", fill=(220, 220, 220))
-    draw.text((70, 150), wrapped, fill=(200, 200, 200))
-    image.save(output_path, format="JPEG", quality=90)
-    return output_path
-
-
-def _wrap_text(text, max_chars_per_line):
-    """Wrap text to fit within a character limit per line."""
-    words = text.split()
-    lines = []
-    current = []
-    current_len = 0
-    for word in words:
-        next_len = current_len + len(word) + (1 if current else 0)
-        if next_len > max_chars_per_line and current:
-            lines.append(" ".join(current))
-            current = [word]
-            current_len = len(word)
-        else:
-            current.append(word)
-            current_len = next_len
-    if current:
-        lines.append(" ".join(current))
-    return "\n".join(lines)
 
 
 def _segment_manifest_entry(segment):

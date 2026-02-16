@@ -1,7 +1,6 @@
-"""Model type definitions using plain dictionaries (functional programming style).
+"""Model type definitions using plain dictionaries.
 
-This module defines all data structures as plain dictionary types instead of dataclasses,
-allowing for a functional programming approach throughout the codebase.
+This module defines all data structures as plain dictionary types instead of dataclasses.
 
 Also provides Pydantic models for structured LLM outputs with better validation.
 """

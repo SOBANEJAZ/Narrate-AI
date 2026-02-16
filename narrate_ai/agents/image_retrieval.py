@@ -1,18 +1,14 @@
-"""Image retrieval agent using functional programming style."""
+"""Image retrieval agent."""
 
 from pathlib import Path
 from urllib.parse import urlparse
 
 import requests
+from ddgs import DDGS
 
 from ..cache import MultiLayerCache
 from ..models import create_image_candidate
 from ..text_utils import safe_filename
-
-try:
-    from ddgs import DDGS
-except Exception:
-    DDGS = None
 
 
 def retrieve_images(config, cache, segments, images_root):
@@ -71,16 +67,10 @@ def _search_images(config, cache, query, max_results):
     if isinstance(cached, list):
         return [item for item in cached if isinstance(item, dict)]
 
-    if DDGS is None:
-        return []
-
-    try:
-        with DDGS() as ddgs:
-            results = list(ddgs.images(query, max_results=max_results))
-        cache.set("images", cache_key, results)
-        return results
-    except Exception:
-        return []
+    with DDGS() as ddgs:
+        results = list(ddgs.images(query, max_results=max_results))
+    cache.set("images", cache_key, results)
+    return results
 
 
 def _download_image(config, url, output_dir):
@@ -90,20 +80,17 @@ def _download_image(config, url, output_dir):
     if path.exists():
         return path
 
-    try:
-        response = requests.get(
-            url,
-            timeout=config["request_timeout_seconds"],
-            headers={"User-Agent": "Narrate-AI/1.0"},
-        )
-        response.raise_for_status()
-        content_type = response.headers.get("Content-Type", "")
-        if "image" not in content_type:
-            return None
-        path.write_bytes(response.content)
-        return path
-    except Exception:
-        return None
+    response = requests.get(
+        url,
+        timeout=config["request_timeout_seconds"],
+        headers={"User-Agent": "Narrate-AI/1.0"},
+    )
+    response.raise_for_status()
+    content_type = response.headers.get("Content-Type", "")
+    if "image" not in content_type:
+        raise ValueError(f"URL did not return an image: {url}")
+    path.write_bytes(response.content)
+    return path
 
 
 def _filename_from_url(url, prefix):

@@ -5,17 +5,9 @@ import os
 from pathlib import Path
 from typing import Any
 
+from google import genai
+from pinecone import Pinecone, ServerlessSpec
 from pydantic import BaseModel
-
-try:
-    from google import genai
-except ImportError:
-    genai = None
-
-try:
-    from pinecone import Pinecone, ServerlessSpec
-except ImportError:
-    Pinecone = None
 
 
 PINECONE_INDEX_NAME = "narrate-ai"
@@ -27,8 +19,6 @@ class PineconeManager:
     """Manager for Pinecone vector database operations."""
 
     def __init__(self, api_key: str, environment: str = "us-east-1"):
-        if Pinecone is None:
-            raise ImportError("pinecone package not installed")
         self.api_key = api_key
         self.environment = environment
         self.pc = Pinecone(api_key=api_key)
@@ -144,25 +134,16 @@ class PineconeManager:
 
 def embed_text(text: str, task_type: str = "RETRIEVAL_DOCUMENT") -> list[float] | None:
     """Embed text using Gemini embedding model."""
-    if genai is None:
-        print("[RAG] google-genai not installed, using fallback")
-        return None
-
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
-        print("[RAG] GEMINI_API_KEY not set, using fallback")
-        return None
+        raise ValueError("GEMINI_API_KEY not set")
 
-    try:
-        client = genai.Client(api_key=api_key)
-        result = client.models.embed_content(
-            model=EMBEDDING_MODEL,
-            contents=text,
-        )
-        return result.embeddings[0].values
-    except Exception as e:
-        print(f"[RAG] Error embedding text: {e}")
-        return None
+    client = genai.Client(api_key=api_key)
+    result = client.models.embed_content(
+        model=EMBEDDING_MODEL,
+        contents=text,
+    )
+    return result.embeddings[0].values
 
 
 def create_pinecone_manager(config: dict) -> PineconeManager | None:

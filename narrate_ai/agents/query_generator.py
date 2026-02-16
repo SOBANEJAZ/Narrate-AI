@@ -58,23 +58,5 @@ Return JSON with:
         temperature=0.3,
     )
 
-    if result is None:
-        print("[QUERY] Failed to generate queries, using fallback", flush=True)
-        return _fallback_queries(plan)
-
     print(f"[QUERY] Generated {len(result.queries)} search queries", flush=True)
     return result
-
-
-def _fallback_queries(plan):
-    """Create fallback queries when LLM fails."""
-    queries = []
-    for section in plan.sections:
-        queries.append(
-            SectionQuery(
-                section_title=section.title,
-                section_objective=section.objective,
-                search_query=f"{plan.topic} {section.title}".lower(),
-            )
-        )
-    return PlanQueries(queries=queries)

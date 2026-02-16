@@ -125,7 +125,7 @@ Artifacts write to `runs/<timestamp>-<topic>/`:
 
 ## Architecture
 
-The codebase uses functional programming with Pydantic models for structured data. Agents are pure functions that accept configuration and return Pydantic-validated results. This approach ensures type safety and makes the code easier to test and reason about.
+The codebase uses Pydantic models for structured data. Agents are functions that accept configuration and return Pydantic-validated results. This approach ensures type safety and makes the code easier to test and reason about.
 
 ```python
 from narrate_ai import create_config_from_env, run_pipeline

@@ -1,29 +1,17 @@
-"""Research pipeline using functional programming style."""
+"""Research pipeline."""
 
 import asyncio
 import re
 from urllib.parse import urlparse
 
 import requests
+from bs4 import BeautifulSoup
+from crawl4ai import AsyncWebCrawler
+from ddgs import DDGS
 
 from ..cache import MultiLayerCache
 from ..models import create_research_note, create_research_source
 from ..text_utils import chunk_text
-
-try:
-    from bs4 import BeautifulSoup
-except Exception:
-    BeautifulSoup = None
-
-try:
-    from ddgs import DDGS
-except Exception:
-    DDGS = None
-
-try:
-    from crawl4ai import AsyncWebCrawler
-except Exception:
-    AsyncWebCrawler = None
 
 
 AUTHORITATIVE_HINTS = (
@@ -73,40 +61,19 @@ def discover_sources(config, cache, topic):
     query = f"{topic} history timeline facts"
     sources = []
 
-    if DDGS is not None:
-        try:
-            with DDGS() as ddgs:
-                results = list(ddgs.text(query, max_results=config["max_websites"] * 4))
-            print(
-                f"[RESEARCH] DDGS returned {len(results)} candidate links", flush=True
-            )
-            for item in results:
-                url = str(item.get("href") or item.get("url") or "").strip()
-                if not url:
-                    continue
-                title = str(item.get("title", "")).strip() or url
-                snippet = str(item.get("body", "")).strip()
-                sources.append(
-                    create_research_source(url=url, title=title, snippet=snippet)
-                )
-        except Exception:
-            print("[RESEARCH] DDGS lookup failed; using fallback sources", flush=True)
-            pass
+    with DDGS() as ddgs:
+        results = list(ddgs.text(query, max_results=config["max_websites"] * 4))
+    print(f"[RESEARCH] DDGS returned {len(results)} candidate links", flush=True)
+    for item in results:
+        url = str(item.get("href") or item.get("url") or "").strip()
+        if not url:
+            continue
+        title = str(item.get("title", "")).strip() or url
+        snippet = str(item.get("body", "")).strip()
+        sources.append(create_research_source(url=url, title=title, snippet=snippet))
 
     if not sources:
-        print(
-            "[RESEARCH] No web sources found; using fallback static sources", flush=True
-        )
-        sources = [
-            create_research_source(
-                url=f"https://en.wikipedia.org/wiki/{topic.replace(' ', '_')}",
-                title=f"{topic} - Wikipedia",
-            ),
-            create_research_source(
-                url=f"https://www.britannica.com/search?query={topic.replace(' ', '+')}",
-                title=f"{topic} - Britannica Search",
-            ),
-        ]
+        raise RuntimeError(f"No web sources found for topic: {topic}")
 
     deduped = {}
     for source in sources:
@@ -205,16 +172,8 @@ def _crawl_url(config, cache, url):
         print(f"[RESEARCH] Using cached crawl for: {url}", flush=True)
         return str(cached["text"])
 
-    text = ""
-    if AsyncWebCrawler is not None:
-        print(f"[RESEARCH] Trying crawl4ai for: {url}", flush=True)
-        text = _crawl_with_crawl4ai(url)
-    if not text:
-        print(f"[RESEARCH] Falling back to requests crawl for: {url}", flush=True)
-        text = _crawl_with_requests(config, url)
-    if not text:
-        text = f"Background note: no direct crawl output was available for {url}."
-        print(f"[RESEARCH] Crawl failed for: {url}; using placeholder note", flush=True)
+    print(f"[RESEARCH] Crawling: {url}", flush=True)
+    text = _crawl_with_crawl4ai(url)
 
     cache.set("crawl", cache_key, {"text": text})
     return text
@@ -230,30 +189,4 @@ def _crawl_with_crawl4ai(url):
             cleaned = getattr(result, "cleaned_html", "") or ""
             return str(markdown or cleaned)
 
-    try:
-        return asyncio.run(_run())
-    except Exception:
-        return ""
-
-
-def _crawl_with_requests(config, url):
-    """Crawl URL using requests as fallback."""
-    try:
-        response = requests.get(
-            url,
-            timeout=config["request_timeout_seconds"],
-            headers={"User-Agent": "Narrate-AI/1.0"},
-        )
-        response.raise_for_status()
-        html = response.text
-    except Exception:
-        return ""
-
-    if BeautifulSoup is None:
-        cleaned = re.sub(r"<[^>]+>", " ", html)
-        return re.sub(r"\s+", " ", cleaned).strip()
-
-    soup = BeautifulSoup(html, "html.parser")
-    for tag in soup(["script", "style", "noscript"]):
-        tag.decompose()
-    return re.sub(r"\s+", " ", soup.get_text(" ")).strip()
+    return asyncio.run(_run())

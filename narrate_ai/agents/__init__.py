@@ -1,4 +1,4 @@
-"""Agents module exports (functional programming style)."""
+"""Agents module exports."""
 
 from .image_placement import build_segments
 from .image_ranking import create_ranking_state, rank_images

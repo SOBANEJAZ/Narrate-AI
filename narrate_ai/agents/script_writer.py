@@ -1,4 +1,4 @@
-"""Script writer agent using functional programming style."""
+"""Script writer agent."""
 
 from ..llm import generate_text
 from ..models import NarrativePlan
@@ -75,7 +75,6 @@ Now write the complete documentary narration script:
         client,
         prompt,
         provider="cerebras",
-        fallback_text=_fallback_script(topic, plan),
         temperature=0.55,
     )
     print(
@@ -83,15 +82,3 @@ Now write the complete documentary narration script:
         flush=True,
     )
     return script
-
-
-def _fallback_script(topic: str, plan: NarrativePlan) -> str:
-    """Fallback script when LLM fails."""
-    sections = "\n".join(
-        f"## {section.title}\n\n{section.objective}" for section in plan.sections
-    )
-    return f"""Welcome to this documentary about {topic}.
-
-{sections}
-
-This concludes our documentary on {topic}. Thank you for watching."""

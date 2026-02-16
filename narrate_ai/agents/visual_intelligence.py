@@ -1,4 +1,4 @@
-"""Visual intelligence agent using functional programming style."""
+"""Visual intelligence agent."""
 
 from ..llm import generate_pydantic
 from ..models import VisualIntelligence
@@ -12,7 +12,6 @@ def enrich_segments(client, topic, segments, max_queries_per_segment=5):
         flush=True,
     )
     for segment in segments:
-        fallback = _fallback(topic, segment["text"], max_queries_per_segment)
         prompt = f"""
 You are a visual intelligence module for Narrate-AI, a documentary generator that creates slideshow-style educational videos. Your role is to generate image search queries and visual descriptions that will be used to find and rank relevant images for each script segment.
 
@@ -46,9 +45,6 @@ Requirements:
             temperature=0.25,
         )
 
-        if generated is None:
-            generated = fallback
-
         clean_queries = []
         for query in generated.search_queries:
             query_str = str(query).strip()
@@ -62,21 +58,3 @@ Requirements:
             flush=True,
         )
     return segments
-
-
-def _fallback(topic, text, max_queries_per_segment):
-    """Create fallback search queries and description."""
-    keywords = extract_keywords(text, limit=10)
-    query_base = " ".join(keywords[:4]) if keywords else topic
-    queries = [
-        f"{topic} {query_base} historical photograph",
-        f"{topic} {query_base} archive image",
-        f"{topic} timeline event illustration",
-        f"{topic} documentary still",
-        f"{topic} black and white photo",
-    ]
-    description = f"A historically grounded documentary image about {topic}, showing {text[:220].strip()}."
-    return VisualIntelligence(
-        search_queries=queries[:max_queries_per_segment],
-        visual_description=description,
-    )

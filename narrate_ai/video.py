@@ -1,4 +1,4 @@
-"""Video assembly module using functional programming style."""
+"""Video assembly module."""
 
 from pathlib import Path
 
@@ -9,16 +9,10 @@ from moviepy import (
     ImageClip,
     concatenate_videoclips,
 )
+from PIL import Image, ImageFilter, ImageOps
 
 from .models import create_timeline_item
 from .text_utils import safe_filename
-
-try:
-    from PIL import Image, ImageFilter, ImageOps
-except Exception:
-    Image = None
-    ImageFilter = None
-    ImageOps = None
 
 
 def build_timeline(segments):
@@ -48,8 +42,8 @@ def build_timeline(segments):
         try:
             with AudioFileClip(str(narration_audio)) as audio_clip:
                 duration = float(audio_clip.duration)
-        except Exception:
-            duration = max(3.0, segment.get("duration_seconds", 3.0))
+        except Exception as e:
+            raise RuntimeError(f"Failed to load audio file: {narration_audio}: {e}")
 
         segment["duration_seconds"] = duration
         timeline.append(
@@ -76,9 +70,9 @@ def assemble_video(
     timeline,
     output_path,
     resolution=(1280, 720),
-    fps=15,
+    fps=10,
     transition_seconds=0.3,
-    zoom_strength=1,
+    zoom_strength=0.8,
     background_mode="black",
 ):
     """Assemble video from timeline items."""
@@ -190,19 +184,13 @@ def _build_blurred_image(
     render_cache_dir,
 ):
     """Build a blurred background image."""
-    if Image is None or ImageOps is None or ImageFilter is None:
-        return None
-
     safe_stem = safe_filename(source_image_path.stem, max_length=80)
     out_path = render_cache_dir / f"blur_{safe_stem}.jpg"
     if out_path.exists():
         return out_path
 
-    try:
-        with Image.open(source_image_path).convert("RGB") as source:
-            fitted = ImageOps.fit(source, resolution, method=Image.Resampling.LANCZOS)
-            blurred = fitted.filter(ImageFilter.GaussianBlur(28))
-            blurred.save(out_path, format="JPEG", quality=90)
-        return out_path
-    except Exception:
-        return None
+    with Image.open(source_image_path).convert("RGB") as source:
+        fitted = ImageOps.fit(source, resolution, method=Image.Resampling.LANCZOS)
+        blurred = fitted.filter(ImageFilter.GaussianBlur(28))
+        blurred.save(out_path, format="JPEG", quality=90)
+    return out_path
