@@ -7,13 +7,13 @@ from typing import Any
 from pydantic import BaseModel
 
 try:
-    import google.generativeai as genai
-except Exception:
+    from google import genai
+except ImportError:
     genai = None
 
 try:
     from pinecone import Pinecone, ServerlessSpec
-except Exception:
+except ImportError:
     Pinecone = None
 
 
@@ -149,7 +149,7 @@ class PineconeManager:
 def embed_text(text: str, task_type: str = "RETRIEVAL_DOCUMENT") -> list[float] | None:
     """Embed text using Gemini embedding model."""
     if genai is None:
-        print("[RAG] google-generativeai not installed, using fallback")
+        print("[RAG] google-genai not installed, using fallback")
         return None
 
     api_key = os.getenv("GEMINI_API_KEY")
@@ -158,13 +158,12 @@ def embed_text(text: str, task_type: str = "RETRIEVAL_DOCUMENT") -> list[float] 
         return None
 
     try:
-        genai.configure(api_key=api_key)
-        result = genai.embed_content(
+        client = genai.Client(api_key=api_key)
+        result = client.models.embed_content(
             model=EMBEDDING_MODEL,
-            content=text,
-            task_type=task_type,
+            contents=text,
         )
-        return result["embedding"]
+        return result.embeddings[0].values
     except Exception as e:
         print(f"[RAG] Error embedding text: {e}")
         return None
