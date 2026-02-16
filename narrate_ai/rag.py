@@ -32,26 +32,26 @@ class PineconeManager:
         self.environment = environment
         self.pc = Pinecone(api_key=api_key)
 
-    def create_index_if_not_exists(self, namespace: str) -> str:
-        """Create a new index for the given namespace."""
-        index_name = f"{PINECONE_INDEX_NAME}-{namespace}"
-
-        if index_name not in self.pc.list_indexes().names():
+    def create_index_if_not_exists(self, namespace: str = None) -> str:
+        """Create the single index if it doesn't exist."""
+        if PINECONE_INDEX_NAME not in self.pc.list_indexes().names():
             self.pc.create_index(
-                name=index_name,
+                name=PINECONE_INDEX_NAME,
                 dimension=EMBEDDING_DIMENSION,
                 spec=ServerlessSpec(cloud="aws", region=self.environment),
             )
-            print(f"[RAG] Created new Pinecone index: {index_name}")
+            print(f"[RAG] Created Pinecone index: {PINECONE_INDEX_NAME}")
 
-        return index_name
+        return PINECONE_INDEX_NAME
 
-    def delete_index(self, namespace: str):
-        """Delete the index for the given namespace."""
-        index_name = f"{PINECONE_INDEX_NAME}-{namespace}"
-        if index_name in self.pc.list_indexes().names():
-            self.pc.delete_index(index_name)
-            print(f"[RAG] Deleted Pinecone index: {index_name}")
+    def clear_namespace(self, namespace: str):
+        """Delete all vectors in a namespace."""
+        index = self.pc.Index(PINECONE_INDEX_NAME)
+        try:
+            index.delete(delete_all=True, namespace=namespace)
+            print(f"[RAG] Cleared namespace: {namespace}")
+        except Exception as e:
+            print(f"[RAG] Warning: Could not clear namespace {namespace}: {e}")
 
     def index_notes(
         self,
@@ -64,10 +64,7 @@ class PineconeManager:
             print("[RAG] No notes to index")
             return ""
 
-        index_name = f"{PINECONE_INDEX_NAME}-{namespace}"
-        if index_name not in self.pc.list_indexes().names():
-            index_name = self.create_index_if_not_exists(namespace)
-
+        index_name = self.create_index_if_not_exists()
         index = self.pc.Index(index_name)
 
         vectors = []
@@ -109,7 +106,7 @@ class PineconeManager:
         top_k: int = 5,
     ) -> list[dict[str, Any]]:
         """Retrieve relevant notes for a query."""
-        index_name = f"{PINECONE_INDEX_NAME}-{namespace}"
+        index_name = self.create_index_if_not_exists()
 
         if index_name not in self.pc.list_indexes().names():
             print(f"[RAG] Index {index_name} does not exist")
