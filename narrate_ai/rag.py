@@ -1,5 +1,6 @@
 """RAG (Retrieval-Augmented Generation) module using Pinecone and Gemini embeddings."""
 
+import hashlib
 import os
 from pathlib import Path
 from typing import Any
@@ -77,7 +78,7 @@ class PineconeManager:
             if embedding is None:
                 continue
 
-            vector_id = f"{note.get('source_url', 'unknown')}-{note.get('chunk_id', 0)}"
+            vector_id = f"{note.get('source_url', 'unknown')}-{hashlib.md5(text.encode()).hexdigest()[:8]}"
 
             vectors.append(
                 {
@@ -85,7 +86,6 @@ class PineconeManager:
                     "values": embedding,
                     "metadata": {
                         "source_url": note.get("source_url", ""),
-                        "chunk_id": note.get("chunk_id", 0),
                         "text": text,
                         "topic": topic,
                     },
@@ -131,7 +131,6 @@ class PineconeManager:
             retrieved_notes.append(
                 {
                     "source_url": match.metadata.get("source_url", ""),
-                    "chunk_id": match.metadata.get("chunk_id", 0),
                     "text": match.metadata.get("text", ""),
                     "score": match.score,
                 }

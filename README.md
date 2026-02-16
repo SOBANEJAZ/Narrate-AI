@@ -4,18 +4,21 @@ Narrate-AI turns a single topic into a narrated documentary video. It researches
 
 ## How It Works
 
-The pipeline runs ten steps:
+The pipeline runs eleven steps:
 
 1. **Narrative Architect**: Builds documentary structure
 2. **Website Discovery**: Finds authoritative sources with DDGS
-3. **Crawl + RAG Notes**: Crawls pages and chunks notes
-4. **Script Writer**: Generates spoken narration script
-5. **Image Placement**: Splits script into visual segments
-6. **Visual Intelligence**: Generates search queries and CLIP-ready descriptions
-7. **Image Retrieval**: Downloads candidates from DDGS image search
-8. **Image Ranking**: Ranks images with OpenCLIP (falls back to keyword matching)
-9. **Narration**: Synthesizes audio with ElevenLabs or Edge TTS
-10. **Timeline + Assembly**: Produces `1280x720` MP4 with centered images
+3. **Crawl + RAG Notes**: Crawls pages and chunks notes (500 words, 100 word overlap)
+4. **Index to Pinecone**: Embeds notes with Gemini for semantic search
+5. **Generate RAG Queries**: Creates semantic search queries for each section
+6. **Semantic Retrieval**: Retrieves relevant notes from vector DB using similarity search
+7. **Script Writer**: Generates spoken narration script using retrieved context
+8. **Image Placement**: Splits script into visual segments
+9. **Visual Intelligence**: Generates search queries and CLIP-ready descriptions
+10. **Image Retrieval**: Downloads candidates from DDGS image search
+11. **Image Ranking**: Ranks images with OpenCLIP (falls back to keyword matching)
+12. **Narration**: Synthesizes audio with ElevenLabs or Edge TTS
+13. **Timeline + Assembly**: Produces `1280x720` MP4 with centered images at 15fps
 
 ## Quick Start
 
@@ -31,17 +34,25 @@ Optional extras:
 uv sync --extra clip --extra crawl --extra crewai
 ```
 
-### Configure Environment (Optional)
+### Configure Environment
 
 Set any available providers:
 
 ```bash
+# LLM Providers (at least one required)
 export GROQ_API_KEY="..."
 export CEREBRAS_API_KEY="..."
+
+# Text-to-Speech
 export ELEVENLABS_API_KEY="..."
 export ELEVENLABS_VOICE_ID="JBFqnCBsd6RMkjVDRZzb"
 export ELEVENLABS_MODEL_ID="eleven_multilingual_v2"
 export EDGE_TTS_VOICE="en-US-AriaNeural"
+
+# Vector Search (RAG)
+export PINECONE_API="..."
+export PINECONE_ENV="us-east-1"
+export GEMINI_API_KEY="..."
 ```
 
 The pipeline runs without API keys using fallback options.
@@ -107,15 +118,14 @@ Artifacts write to `runs/<timestamp>-<topic>/`:
 - `narrative_plan.json` — Documentary structure
 - `sources.json` — Research sources
 - `notes.json` — Extracted research notes
+- `retrieved_notes.json` — Notes retrieved via semantic search
 - `timeline.json` — Video timeline
 - `manifest.json` — Complete run metadata
 - `final_output.mp4` — Completed documentary
 
 ## Architecture
 
-The codebase uses functional programming. Data structures are TypedDicts with factory functions. Agents are pure functions that accept configuration and return results. This approach makes the code easier to test and reason about.
-
-Example:
+The codebase uses functional programming with Pydantic models for structured data. Agents are pure functions that accept configuration and return Pydantic-validated results. This approach ensures type safety and makes the code easier to test and reason about.
 
 ```python
 from narrate_ai import create_config_from_env, run_pipeline
@@ -124,6 +134,15 @@ config = create_config_from_env()
 result = run_pipeline(config, "Your Topic")
 print(f"Video saved to: {result.final_video_path}")
 ```
+
+### RAG Pipeline
+
+Narrate-AI uses Retrieval-Augmented Generation to produce more accurate scripts:
+
+1. Research notes are embedded with Gemini and stored in Pinecone
+2. Each script section generates semantic search queries
+3. Similarity search retrieves the most relevant context
+4. The LLM uses this context to generate accurate narration
 
 ## Starter Timeline Module
 

@@ -162,7 +162,6 @@ def crawl_and_build_notes(config, cache, sources):
             notes.append(
                 create_research_note(
                     source_url=source["url"],
-                    chunk_id=index,
                     text=chunk,
                 )
             )

@@ -54,7 +54,6 @@ class ResearchNote(BaseModel):
     """Pydantic model for research note with metadata."""
 
     source_url: str
-    chunk_id: int
     text: str
     score: float = 0.0
 
@@ -90,11 +89,10 @@ def create_research_source(url, title, snippet=""):
     return result
 
 
-def create_research_note(source_url, chunk_id, text):
+def create_research_note(source_url, text):
     """Create a ResearchNote instance."""
     return {
         "source_url": source_url,
-        "chunk_id": chunk_id,
         "text": text,
     }
 
