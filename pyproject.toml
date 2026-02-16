@@ -1,0 +1,22 @@
+[project]
+name = "narrate-ai"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "cerebras-cloud-sdk>=1.67.0",
+    "crawl4ai>=0.8.0",
+    "ddgs>=9.10.0",
+    "edge-tts>=7.2.7",
+    "elevenlabs>=2.36.0",
+    "google-genai>=1.63.0",
+    "groq>=1.0.0",
+    "moviepy>=2.2.1",
+    "open-clip-torch>=3.2.0",
+    "pinecone>=8.0.1",
+    "pydantic>=2.12.5",
+    "requests>=2.32.5",
+    "streamlit>=1.54.0",
+    "torch>=2.10.0",
+]

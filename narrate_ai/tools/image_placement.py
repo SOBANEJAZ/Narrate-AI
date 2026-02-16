@@ -1,7 +1,7 @@
 """Image placement agent."""
 
-from ..models import create_script_segment
-from ..text_utils import split_sentences
+from ..core.models import create_script_segment
+from ..core.text_utils import split_sentences
 
 
 def build_segments(script, sentence_span=3):

@@ -1,7 +1,7 @@
 """Script writer agent."""
 
-from ..llm import generate_text
-from ..models import NarrativePlan
+from ..core.llm import generate_text
+from ..core.models import NarrativePlan
 
 
 def write_script(client, topic: str, plan: NarrativePlan, retrieved_notes: list[dict]):

@@ -11,8 +11,8 @@ from moviepy import (
 )
 from PIL import Image, ImageFilter, ImageOps
 
-from .models import create_timeline_item
-from .text_utils import safe_filename
+from ..core.models import create_timeline_item
+from ..core.text_utils import safe_filename
 
 
 def build_timeline(segments):

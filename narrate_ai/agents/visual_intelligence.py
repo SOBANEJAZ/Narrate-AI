@@ -1,8 +1,8 @@
 """Visual intelligence agent."""
 
-from ..llm import generate_pydantic
-from ..models import VisualIntelligence
-from ..text_utils import extract_keywords
+from ..core.llm import generate_pydantic
+from ..core.models import VisualIntelligence
+from ..core.text_utils import extract_keywords
 
 
 def enrich_segments(client, topic, segments, max_queries_per_segment=5):

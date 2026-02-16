@@ -17,13 +17,13 @@ from .agents import (
     synthesize_audio,
     write_script,
 )
-from .cache import MultiLayerCache
-from .config import get_resolution
-from .llm import create_llm_client
-from .models import create_script_segment, create_timeline_item
-from .rag import create_pinecone_manager
-from .text_utils import slugify
-from .video import assemble_video, build_timeline
+from .core.cache import MultiLayerCache
+from .core.config import get_resolution
+from .core.llm import create_llm_client
+from .core.models import create_script_segment, create_timeline_item
+from .core.text_utils import slugify
+from .tools.rag import create_pinecone_manager
+from .tools.video import assemble_video, build_timeline
 
 
 class PipelineResult(dict):

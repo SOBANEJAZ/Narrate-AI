@@ -1,12 +1,12 @@
 """Narrate-AI package."""
 
-from .config import (
+from .core.config import (
     create_config_from_env,
     create_default_config,
     get_resolution,
     update_config,
 )
-from .models import (
+from .core.models import (
     NarrativePlan,
     NarrativeSection,
     PlanQueries,

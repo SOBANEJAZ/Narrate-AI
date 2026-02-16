@@ -7,8 +7,8 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from narrate_ai.models import ScriptSegment
-from narrate_ai.video import assemble_video, build_timeline
+from narrate_ai.core.models import ScriptSegment
+from narrate_ai.tools.video import assemble_video, build_timeline
 
 
 IMAGE_EXTENSIONS = {".webp", ".png", ".jpg", ".jpeg"}

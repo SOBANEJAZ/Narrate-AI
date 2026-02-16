@@ -9,9 +9,9 @@ from bs4 import BeautifulSoup
 from crawl4ai import AsyncWebCrawler
 from ddgs import DDGS
 
-from ..cache import MultiLayerCache
-from ..models import create_research_note, create_research_source
-from ..text_utils import chunk_text
+from ..core.cache import MultiLayerCache
+from ..core.models import create_research_note, create_research_source
+from ..core.text_utils import chunk_text
 
 
 AUTHORITATIVE_HINTS = (

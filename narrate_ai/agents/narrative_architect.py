@@ -1,7 +1,7 @@
 """Narrative architect agent."""
 
-from ..llm import generate_pydantic
-from ..models import NarrativePlan, NarrativeSection
+from ..core.llm import generate_pydantic
+from ..core.models import NarrativePlan, NarrativeSection
 
 
 def build_narrative_plan(client, topic):
