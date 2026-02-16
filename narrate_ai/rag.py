@@ -19,7 +19,7 @@ except ImportError:
 
 PINECONE_INDEX_NAME = "narrate-ai"
 EMBEDDING_MODEL = "gemini-embedding-001"
-EMBEDDING_DIMENSION = 768
+EMBEDDING_DIMENSION = 3072
 
 
 class PineconeManager:
