@@ -3,12 +3,12 @@
 import argparse
 from pathlib import Path
 
-from narrate_ai import (
+from core.config import (
     create_config_from_env,
     get_resolution,
-    run_pipeline,
     update_config,
 )
+from pipeline import run_pipeline
 
 
 def build_parser():

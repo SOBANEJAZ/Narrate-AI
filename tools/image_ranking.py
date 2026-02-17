@@ -6,7 +6,7 @@ import open_clip
 import torch
 from PIL import Image
 
-from ..core.text_utils import extract_keywords
+from core.text_utils import extract_keywords
 
 
 def create_ranking_state(model_name="ViT-B-16", pretrained_name="laion2b_s34b_b88k"):

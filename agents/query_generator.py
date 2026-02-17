@@ -1,7 +1,7 @@
 """Query generator agent for RAG - generates search queries from narrative plan."""
 
-from ..core.llm import generate_pydantic
-from ..core.models import PlanQueries, SectionQuery
+from core.llm import generate_pydantic
+from core.models import PlanQueries, SectionQuery
 
 
 def generate_section_queries(client, plan):

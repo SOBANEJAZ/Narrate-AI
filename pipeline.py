@@ -4,7 +4,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .agents import (
+from agents import (
     build_narrative_plan,
     build_segments,
     crawl_and_build_notes,
@@ -17,13 +17,13 @@ from .agents import (
     synthesize_audio,
     write_script,
 )
-from .core.cache import MultiLayerCache
-from .core.config import get_resolution
-from .core.llm import create_llm_client
-from .core.models import create_script_segment, create_timeline_item
-from .core.text_utils import slugify
-from .tools.rag import create_pinecone_manager
-from .tools.video import assemble_video, build_timeline
+from core.cache import MultiLayerCache
+from core.config import get_resolution
+from core.llm import create_llm_client
+from core.models import create_script_segment, create_timeline_item
+from core.text_utils import slugify
+from tools.rag import create_pinecone_manager
+from tools.video import assemble_video, build_timeline
 
 
 class PipelineResult(dict):

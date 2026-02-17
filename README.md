@@ -128,7 +128,8 @@ Artifacts write to `runs/<timestamp>-<topic>/`:
 The codebase uses Pydantic models for structured data. Agents are functions that accept configuration and return Pydantic-validated results. This approach ensures type safety and makes the code easier to test and reason about.
 
 ```python
-from narrate_ai import create_config_from_env, run_pipeline
+from core.config import create_config_from_env
+from pipeline import run_pipeline
 
 config = create_config_from_env()
 result = run_pipeline(config, "Your Topic")
@@ -143,13 +144,3 @@ Narrate-AI uses Retrieval-Augmented Generation to produce more accurate scripts:
 2. Each script section generates semantic search queries
 3. Similarity search retrieves the most relevant context
 4. The LLM uses this context to generate accurate narration
-
-## Starter Timeline Module
-
-The `moviepy_starter/` folder contains a standalone script for assembling pre-existing image/audio pairs:
-
-```bash
-python moviepy_starter/main.py moviepy_starter/files
-```
-
-Outputs `moviepy_starter/files/final_output.mp4` at `1280x720`.

@@ -6,9 +6,9 @@ from urllib.parse import urlparse
 import requests
 from ddgs import DDGS
 
-from ..core.cache import MultiLayerCache
-from ..core.models import create_image_candidate
-from ..core.text_utils import safe_filename
+from core.cache import MultiLayerCache
+from core.models import create_image_candidate
+from core.text_utils import safe_filename
 
 
 def retrieve_images(config, cache, segments, images_root):
