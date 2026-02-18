@@ -25,6 +25,7 @@ Context:
 Topic: {topic}
 
 Return strict JSON with:
+- topic: the documentary topic string
 - tone: short string describing the documentary tone (e.g., "educational", "historical", "informative", "narrative")
 - pacing: short string describing the pacing style (e.g., "steady", "methodical", "dynamic", "thoughtful")
 - target_duration_seconds: integer representing total video duration
