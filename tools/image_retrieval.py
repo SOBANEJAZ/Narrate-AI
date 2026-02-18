@@ -1,6 +1,7 @@
 """Image retrieval agent."""
 
 from pathlib import Path
+import time
 from urllib.parse import urlparse
 
 import requests
@@ -36,6 +37,9 @@ def retrieve_images(config, cache, segments, images_root):
                 f"[IMAGES] Segment {segment['segment_id']}: query '{query}' returned {len(results)} results",
                 flush=True,
             )
+            delay = config.get("image_search_delay_seconds", 3)
+            print(f"[IMAGES] Sleeping {delay}s to avoid rate limiting...", flush=True)
+            time.sleep(delay)
             for item in results:
                 image_url = str(item.get("image") or item.get("url") or "").strip()
                 if not image_url or image_url in seen_urls:

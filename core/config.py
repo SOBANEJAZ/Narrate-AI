@@ -23,6 +23,7 @@ def create_default_config():
         "zoom_strength": 0.08,
         "background_mode": "black",
         "request_timeout_seconds": 20,
+        "image_search_delay_seconds": 3,
         "cache_dir_name": "cache",
         "groq_api_key": None,
         "groq_model": "moonshotai/kimi-k2-instruct-0905",
