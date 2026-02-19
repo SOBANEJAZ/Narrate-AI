@@ -74,7 +74,7 @@ Now write the complete documentary narration script:
     script = generate_text(
         client,
         prompt,
-        provider="cerebras",
+        provider="groq",
         temperature=0.55,
     )
     print(

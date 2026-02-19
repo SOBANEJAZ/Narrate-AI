@@ -56,6 +56,7 @@ Return JSON with:
         provider="groq",
         model=PlanQueries,
         temperature=0.3,
+        model_override=client["config"]["groq_narrative_model"],
     )
 
     print(f"[QUERY] Generated {len(result.queries)} search queries", flush=True)

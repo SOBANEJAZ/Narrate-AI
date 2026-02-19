@@ -43,6 +43,7 @@ Requirements:
             provider="groq",
             model=VisualIntelligence,
             temperature=0.25,
+            model_override=client["config"]["groq_compound_model"],
         )
 
         clean_queries = []

@@ -98,7 +98,7 @@ def run_pipeline(config, topic):
                 namespace=namespace,
                 query=sq.search_query,
                 topic=topic,
-                top_k=5,
+                top_k=3,
             )
             all_retrieved_notes.extend(retrieved)
     else:

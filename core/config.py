@@ -27,6 +27,8 @@ def create_default_config():
         "cache_dir_name": "cache",
         "groq_api_key": None,
         "groq_model": "moonshotai/kimi-k2-instruct-0905",
+        "groq_compound_model": "groq/compound",
+        "groq_narrative_model": "openai/gpt-oss-120b",
         "cerebras_api_key": None,
         "cerebras_model": "gpt-oss-120b",
         "elevenlabs_api_key": None,
@@ -47,6 +49,12 @@ def create_config_from_env():
         {
             "groq_api_key": os.getenv("GROQ_API_KEY"),
             "groq_model": os.getenv("GROQ_MODEL", config["groq_model"]),
+            "groq_compound_model": os.getenv(
+                "GROQ_COMPOUND_MODEL", config["groq_compound_model"]
+            ),
+            "groq_narrative_model": os.getenv(
+                "GROQ_NARRATIVE_MODEL", config["groq_narrative_model"]
+            ),
             "cerebras_api_key": os.getenv("CEREBRAS_API_KEY"),
             "cerebras_model": os.getenv("CEREBRAS_MODEL", config["cerebras_model"]),
             "elevenlabs_api_key": os.getenv("ELEVENLABS_API_KEY"),

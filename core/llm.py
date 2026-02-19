@@ -47,7 +47,7 @@ def _get_groq_client(client):
     return client["_groq_client"]
 
 
-def _chat_completion(client, provider, prompt, temperature, max_tokens):
+def _chat_completion(client, provider, prompt, temperature, model=None):
     """Make a chat completion request to the specified provider."""
     messages = [
         {"role": "system", "content": "You are a documentary writing assistant."},
@@ -58,9 +58,8 @@ def _chat_completion(client, provider, prompt, temperature, max_tokens):
         cerebras_client = _get_cerebras_client(client)
         response = cerebras_client.chat.completions.create(
             messages=messages,
-            model=client["config"]["cerebras_model"],
+            model=model or client["config"]["cerebras_model"],
             temperature=temperature,
-            max_tokens=max_tokens,
         )
         content = response.choices[0].message.content
         return content if content is not None else ""
@@ -69,9 +68,8 @@ def _chat_completion(client, provider, prompt, temperature, max_tokens):
         groq_client = _get_groq_client(client)
         response = groq_client.chat.completions.create(
             messages=messages,
-            model=client["config"]["groq_model"],
+            model=model or client["config"]["groq_model"],
             temperature=temperature,
-            max_tokens=max_tokens,
         )
         content = response.choices[0].message.content
         return content if content is not None else ""
@@ -80,39 +78,56 @@ def _chat_completion(client, provider, prompt, temperature, max_tokens):
         raise LLMError(f"Unsupported provider: {provider}")
 
 
-def generate_text(client, prompt, provider, temperature=0.4, max_tokens=1200):
+def generate_text(client, prompt, provider, temperature=0.4, model=None):
     """Generate text using the specified LLM provider."""
     return _chat_completion(
         client,
         provider=provider,
         prompt=prompt,
         temperature=temperature,
-        max_tokens=max_tokens,
+        model=model,
     )
 
 
-def generate_json(client, prompt, provider, temperature=0.2, max_tokens=600):
+def generate_json(client, prompt, provider, temperature=0.2):
     """Generate JSON using the specified LLM provider."""
     raw_text = _chat_completion(
         client,
         provider=provider,
         prompt=prompt,
         temperature=temperature,
-        max_tokens=max_tokens,
     )
     return _extract_json(raw_text)
 
 
 def _extract_json(text):
-    """Extract JSON from text response."""
+    """Extract JSON from text response using brace matching."""
     text = text.strip()
-    if text.startswith("{") and text.endswith("}"):
-        return json.loads(text)
 
-    match = re.search(r"\{.*\}", text, flags=re.DOTALL)
-    if not match:
+    if text.startswith("{") and text.endswith("}"):
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            pass
+
+    start = text.find("{")
+    if start == -1:
         raise LLMError("LLM did not return JSON.")
-    return json.loads(match.group(0))
+
+    depth = 0
+    for i, char in enumerate(text[start:], start):
+        if char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+            if depth == 0:
+                json_str = text[start : i + 1]
+                try:
+                    return json.loads(json_str)
+                except json.JSONDecodeError:
+                    raise LLMError(f"Invalid JSON: {json_str[:100]}...")
+
+    raise LLMError("LLM did not return valid JSON.")
 
 
 def generate_pydantic(
@@ -121,7 +136,7 @@ def generate_pydantic(
     provider,
     model: Type[BaseModel],
     temperature: float = 0.2,
-    max_tokens: int = 600,
+    model_override: str = None,
 ):
     """Generate Pydantic model using the specified LLM provider.
 
@@ -132,7 +147,7 @@ def generate_pydantic(
         provider=provider,
         prompt=prompt,
         temperature=temperature,
-        max_tokens=max_tokens,
+        model=model_override,
     )
     json_data = _extract_json(raw_text)
     return model.model_validate(json_data)

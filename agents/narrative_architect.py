@@ -42,9 +42,10 @@ Constraints:
     plan = generate_pydantic(
         client,
         prompt=prompt,
-        provider="cerebras",
+        provider="groq",
         model=NarrativePlan,
         temperature=0.2,
+        model_override=client["config"]["groq_narrative_model"],
     )
 
     for section in plan.sections:
