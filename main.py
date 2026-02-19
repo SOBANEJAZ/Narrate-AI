@@ -8,7 +8,7 @@ from core.config import (
     get_resolution,
     update_config,
 )
-from pipeline import run_pipeline
+from core.pipeline import run_pipeline
 
 
 def build_parser():
