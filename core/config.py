@@ -26,11 +26,7 @@ def create_default_config():
         "image_search_delay_seconds": 3,
         "cache_dir_name": "cache",
         "groq_api_key": None,
-        "groq_model": "moonshotai/kimi-k2-instruct-0905",
-        "groq_compound_model": "groq/compound",
-        "groq_narrative_model": "openai/gpt-oss-120b",
-        "cerebras_api_key": None,
-        "cerebras_model": "gpt-oss-120b",
+        "groq_model": "groq/mixtral-8x7b-32768",
         "elevenlabs_api_key": None,
         "elevenlabs_voice_id": "JBFqnCBsd6RMkjVDRZzb",
         "elevenlabs_model_id": "eleven_multilingual_v2",
@@ -49,14 +45,6 @@ def create_config_from_env():
         {
             "groq_api_key": os.getenv("GROQ_API_KEY"),
             "groq_model": os.getenv("GROQ_MODEL", config["groq_model"]),
-            "groq_compound_model": os.getenv(
-                "GROQ_COMPOUND_MODEL", config["groq_compound_model"]
-            ),
-            "groq_narrative_model": os.getenv(
-                "GROQ_NARRATIVE_MODEL", config["groq_narrative_model"]
-            ),
-            "cerebras_api_key": os.getenv("CEREBRAS_API_KEY"),
-            "cerebras_model": os.getenv("CEREBRAS_MODEL", config["cerebras_model"]),
             "elevenlabs_api_key": os.getenv("ELEVENLABS_API_KEY"),
             "elevenlabs_voice_id": os.getenv(
                 "ELEVENLABS_VOICE_ID", config["elevenlabs_voice_id"]

@@ -1,13 +1,11 @@
 """LLM client module.
 
-This module provides LLM operations as pure functions instead of a class.
+This module provides LLM operations using Groq SDK exclusively.
 """
 
 import json
-import re
 from typing import Type
 
-from cerebras.cloud.sdk import Cerebras
 from groq import Groq
 from pydantic import BaseModel
 
@@ -22,20 +20,8 @@ def create_llm_client(config):
     """Create an LLM client state dictionary."""
     return {
         "config": config,
-        "_cerebras_client": None,
         "_groq_client": None,
     }
-
-
-def _get_cerebras_client(client):
-    """Get or create the Cerebras client (mutates state for caching)."""
-    if client["_cerebras_client"] is None:
-        if not client["config"]["cerebras_api_key"]:
-            raise LLMError("Missing CEREBRAS_API_KEY")
-        client["_cerebras_client"] = Cerebras(
-            api_key=client["config"]["cerebras_api_key"]
-        )
-    return client["_cerebras_client"]
 
 
 def _get_groq_client(client):
@@ -47,53 +33,37 @@ def _get_groq_client(client):
     return client["_groq_client"]
 
 
-def _chat_completion(client, provider, prompt, temperature, model=None):
-    """Make a chat completion request to the specified provider."""
+def _chat_completion(client, prompt, temperature, model=None):
+    """Make a chat completion request to Groq."""
     messages = [
         {"role": "system", "content": "You are a documentary writing assistant."},
         {"role": "user", "content": prompt},
     ]
 
-    if provider == "cerebras":
-        cerebras_client = _get_cerebras_client(client)
-        response = cerebras_client.chat.completions.create(
-            messages=messages,
-            model=model or client["config"]["cerebras_model"],
-            temperature=temperature,
-        )
-        content = response.choices[0].message.content
-        return content if content is not None else ""
-
-    elif provider == "groq":
-        groq_client = _get_groq_client(client)
-        response = groq_client.chat.completions.create(
-            messages=messages,
-            model=model or client["config"]["groq_model"],
-            temperature=temperature,
-        )
-        content = response.choices[0].message.content
-        return content if content is not None else ""
-
-    else:
-        raise LLMError(f"Unsupported provider: {provider}")
+    groq_client = _get_groq_client(client)
+    response = groq_client.chat.completions.create(
+        messages=messages,
+        model=model or client["config"]["groq_model"],
+        temperature=temperature,
+    )
+    content = response.choices[0].message.content
+    return content if content is not None else ""
 
 
-def generate_text(client, prompt, provider, temperature=0.4, model=None):
-    """Generate text using the specified LLM provider."""
+def generate_text(client, prompt, temperature=0.4, model=None):
+    """Generate text using Groq."""
     return _chat_completion(
         client,
-        provider=provider,
         prompt=prompt,
         temperature=temperature,
         model=model,
     )
 
 
-def generate_json(client, prompt, provider, temperature=0.2):
-    """Generate JSON using the specified LLM provider."""
+def generate_json(client, prompt, temperature=0.2):
+    """Generate JSON using Groq."""
     raw_text = _chat_completion(
         client,
-        provider=provider,
         prompt=prompt,
         temperature=temperature,
     )
@@ -133,18 +103,16 @@ def _extract_json(text):
 def generate_pydantic(
     client,
     prompt,
-    provider,
     model: Type[BaseModel],
     temperature: float = 0.2,
-    model_override: str = None,
+    model_override: str | None = None,
 ):
-    """Generate Pydantic model using the specified LLM provider.
+    """Generate Pydantic model using Groq.
 
     Uses JSON mode for better structure enforcement.
     """
     raw_text = _chat_completion(
         client,
-        provider=provider,
         prompt=prompt,
         temperature=temperature,
         model=model_override,

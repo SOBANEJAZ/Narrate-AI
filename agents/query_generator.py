@@ -53,10 +53,9 @@ Return JSON with:
     result = generate_pydantic(
         client,
         prompt=prompt,
-        provider="groq",
         model=PlanQueries,
         temperature=0.3,
-        model_override=client["config"]["groq_narrative_model"],
+        model_override=client["config"]["groq_model"],
     )
 
     print(f"[QUERY] Generated {len(result.queries)} search queries", flush=True)

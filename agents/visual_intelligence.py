@@ -40,10 +40,9 @@ Requirements:
         generated = generate_pydantic(
             client,
             prompt=prompt,
-            provider="groq",
             model=VisualIntelligence,
             temperature=0.25,
-            model_override=client["config"]["groq_compound_model"],
+            model_override=client["config"]["groq_model"],
         )
 
         clean_queries = []
