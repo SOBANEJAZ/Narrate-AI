@@ -2,6 +2,7 @@
 
 import asyncio
 import re
+import time
 from urllib.parse import urlparse
 
 import requests
@@ -60,6 +61,11 @@ def discover_sources(config, cache, topic):
 
     query = f"{topic} history timeline facts"
     sources = []
+
+    print(
+        f"[RESEARCH] REST TIME: Pausing 5 seconds before research search...", flush=True
+    )
+    time.sleep(5)
 
     with DDGS() as ddgs:
         results = list(ddgs.text(query, max_results=config["max_websites"] * 4))
