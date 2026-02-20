@@ -1,5 +1,6 @@
 """Video assembly module."""
 
+import os
 from pathlib import Path
 
 from moviepy import (
@@ -111,6 +112,7 @@ def assemble_video(
             fps=fps,
             codec="libx264",
             audio_codec="aac",
+            threads=os.cpu_count()
         )
         final_clip.close()
         print(f"[VIDEO] Render complete: {output_path}", flush=True)
