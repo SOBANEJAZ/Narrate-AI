@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from services.media import create_tts_config, create_tts_synthesizer
+from services.audio import create_tts_config, create_tts_synthesizer
 
 
 def synthesize_audio(config, segments, audio_root, provider="elevenlabs"):

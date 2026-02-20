@@ -22,8 +22,8 @@ from core.config import get_resolution
 from core.llm import create_llm_client
 from core.models import create_script_segment, create_timeline_item
 from core.text_utils import slugify
-from services.media import assemble_video, build_timeline
 from services.rag import create_pinecone_manager
+from services.video import assemble_video, build_timeline
 
 
 class PipelineResult(dict):

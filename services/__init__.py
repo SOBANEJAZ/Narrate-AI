@@ -2,7 +2,8 @@
 
 This package contains service modules for different domains:
 - rag: Vector database and semantic search via Pinecone
-- media: TTS, narration, and video assembly
+- audio: TTS and narration synthesis
+- video: Video assembly and timeline building
 - research: Web discovery and content crawling
 - images: Image retrieval, ranking, and placement
 """
@@ -10,7 +11,8 @@ This package contains service modules for different domains:
 __all__ = [
     # Import submodules on-demand to avoid circular dependencies
     "rag",
-    "media",
+    "audio",
+    "video",
     "research",
     "images",
 ]

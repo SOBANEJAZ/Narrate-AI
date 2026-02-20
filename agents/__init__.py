@@ -10,7 +10,7 @@ from services.images import (
     rank_images,
     retrieve_images,
 )
-from services.media import synthesize_audio
+from services.audio import synthesize_audio
 from services.research import crawl_and_build_notes, discover_sources
 
 __all__ = [
