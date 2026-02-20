@@ -83,12 +83,6 @@ Narrate-AI/
 uv sync
 ```
 
-Optional extras:
-
-```bash
-uv sync --extra clip --extra crawl --extra crewai
-```
-
 ### Configure Environment
 
 Set any available providers:
@@ -110,27 +104,9 @@ export GEMINI_API_KEY="..." #only used for Embeddings Model
 
 The pipeline runs without API keys using fallback options.
 
-### Generate a Documentary
-
-```bash
-python main.py "History of the Wright Brothers"
-```
-
-With options:
-
-```bash
-python main.py "Apollo Program" \
-  --background blur \
-  --max-websites 4 \
-  --max-queries 5 \
-  --images-per-query 5 \
-  --sentence-span 3 \
-  --tts-provider edge_tts
-```
-
 ## Configuration
 
-**CLI Options:**
+**Options:**
 
 | Option | Default | Description |
 |--------|---------|-------------|
