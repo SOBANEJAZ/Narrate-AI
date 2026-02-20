@@ -1,12 +1,12 @@
-"""LLM client module.
+"""LLM utilities module.
 
-This module provides LLM operations using Groq SDK exclusively.
+This module provides utilities for working with LLM responses.
+Actual LLM client creation and Groq API calls are handled directly in agents.
 """
 
 import json
 from typing import Type
 
-from groq import Groq
 from pydantic import BaseModel
 
 
@@ -16,62 +16,21 @@ class LLMError(RuntimeError):
     pass
 
 
-def create_llm_client(config):
-    """Create an LLM client state dictionary."""
-    return {
-        "config": config,
-        "_groq_client": None,
-    }
+def extract_json(text: str) -> dict:
+    """Extract JSON from text response using brace matching.
 
+    Attempts to parse JSON from LLM output, handling cases where JSON
+    is embedded in additional text.
 
-def _get_groq_client(client):
-    """Get or create the Groq client (mutates state for caching)."""
-    if client["_groq_client"] is None:
-        if not client["config"]["groq_api_key"]:
-            raise LLMError("Missing GROQ_API_KEY")
-        client["_groq_client"] = Groq(api_key=client["config"]["groq_api_key"])
-    return client["_groq_client"]
+    Args:
+        text: Raw text response from LLM
 
+    Returns:
+        Parsed JSON as dictionary
 
-def _chat_completion(client, prompt, temperature, model=None):
-    """Make a chat completion request to Groq."""
-    messages = [
-        {"role": "system", "content": "You are a documentary writing assistant."},
-        {"role": "user", "content": prompt},
-    ]
-
-    groq_client = _get_groq_client(client)
-    response = groq_client.chat.completions.create(
-        messages=messages,
-        model=model or client["config"]["groq_model"],
-        temperature=temperature,
-    )
-    content = response.choices[0].message.content
-    return content if content is not None else ""
-
-
-def generate_text(client, prompt, temperature=0.4, model=None):
-    """Generate text using Groq."""
-    return _chat_completion(
-        client,
-        prompt=prompt,
-        temperature=temperature,
-        model=model,
-    )
-
-
-def generate_json(client, prompt, temperature=0.2):
-    """Generate JSON using Groq."""
-    raw_text = _chat_completion(
-        client,
-        prompt=prompt,
-        temperature=temperature,
-    )
-    return _extract_json(raw_text)
-
-
-def _extract_json(text):
-    """Extract JSON from text response using brace matching."""
+    Raises:
+        LLMError: If no valid JSON found in response
+    """
     text = text.strip()
 
     if text.startswith("{") and text.endswith("}"):
@@ -100,22 +59,17 @@ def _extract_json(text):
     raise LLMError("LLM did not return valid JSON.")
 
 
-def generate_pydantic(
-    client,
-    prompt,
+def validate_pydantic(
+    json_data: dict,
     model: Type[BaseModel],
-    temperature: float = 0.2,
-    model_override: str | None = None,
-):
-    """Generate Pydantic model using Groq.
+) -> BaseModel:
+    """Validate JSON data against a Pydantic model.
 
-    Uses JSON mode for better structure enforcement.
+    Args:
+        json_data: Parsed JSON dictionary
+        model: Pydantic model class to validate against
+
+    Returns:
+        Validated Pydantic model instance
     """
-    raw_text = _chat_completion(
-        client,
-        prompt=prompt,
-        temperature=temperature,
-        model=model_override,
-    )
-    json_data = _extract_json(raw_text)
     return model.model_validate(json_data)

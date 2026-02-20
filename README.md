@@ -2,9 +2,21 @@
 
 Narrate-AI turns a single topic into a narrated documentary video. It researches the topic, writes a script, finds matching images, generates narration, and assembles everything into a video.
 
+## Table of Contents
+
+- [How It Works](#how-it-works)
+- [Project Structure](#project-structure)
+- [Quick Start](#quick-start)
+- [Configuration](#configuration)
+- [CLI Usage](#cli-usage)
+- [Output Files](#output-files)
+- [Architecture](#architecture)
+- [Services](#services)
+- [Extending the System](#extending-the-system)
+
 ## How It Works
 
-The pipeline runs eleven steps:
+The pipeline runs thirteen steps:
 
 1. **Narrative Architect**: Builds documentary structure
 2. **Website Discovery**: Finds authoritative sources with DDGS
@@ -19,6 +31,47 @@ The pipeline runs eleven steps:
 11. **Image Ranking**: Ranks images with OpenCLIP (falls back to keyword matching)
 12. **Narration**: Synthesizes audio with ElevenLabs or Edge TTS
 13. **Timeline + Assembly**: Produces `1280x720` MP4 with centered images at 15fps
+
+## Project Structure
+
+```
+Narrate-AI/
+├── agents/                    # Agent functions that perform core tasks
+│   ├── __init__.py
+│   ├── narrative_architect.py # Structures documentary outline
+│   ├── query_generator.py     # Generates semantic search queries
+│   ├── script_writer.py       # Writes narration script
+│   └── visual_intelligence.py # Generates image descriptions
+├── services/                  # Domain-specific service modules
+│   ├── audio/                 # Audio synthesis (TTS)
+│   │   ├── base.py
+│   │   ├── elevenlabs.py
+│   │   ├── edge_tts_client.py
+│   │   ├── factory.py
+│   │   └── narration.py
+│   ├── images/                # Image retrieval and ranking
+│   │   ├── retrieval.py
+│   │   ├── ranking.py
+│   │   └── placement.py
+│   ├── video/                 # Video assembly
+│   │   └── video.py
+│   ├── rag/                   # Vector database management
+│   │   └── manager.py
+│   ├── research/              # Web research and crawling
+│   │   └── crawler.py
+│   └── __init__.py
+├── core/                      # Core utilities and models
+│   ├── __init__.py
+│   ├── cache.py               # Multi-layer caching system
+│   ├── config.py              # Configuration and Groq client management
+│   ├── llm.py                 # LLM utility functions
+│   ├── models.py              # Pydantic data models
+│   ├── pipeline.py            # Main documentary generation pipeline
+│   └── text_utils.py          # Text processing utilities
+├── main.py                    # CLI entry point
+├── streamlit_app.py           # Web UI
+└── README.md                  # This file
+```
 
 ## Quick Start
 
@@ -75,6 +128,8 @@ python main.py "Apollo Program" \
   --tts-provider edge_tts
 ```
 
+## Configuration
+
 **CLI Options:**
 
 | Option | Default | Description |
@@ -95,7 +150,9 @@ python main.py "Apollo Program" \
 
 Set the provider via CLI (`--tts-provider`) or environment variable (`TTS_PROVIDER`).
 
-## Streamlit UI
+## CLI Usage
+
+### Streamlit UI
 
 Launch the web interface:
 
@@ -106,7 +163,7 @@ streamlit run streamlit_app.py
 The UI lets you:
 - Enter a documentary topic
 - Configure all pipeline options
-- **Select TTS provider** (ElevenLabs or Edge TTS)
+- Select TTS provider (ElevenLabs or Edge TTS)
 - Watch live logs during generation
 - View the completed video
 
@@ -125,18 +182,157 @@ Artifacts write to `runs/<timestamp>-<topic>/`:
 
 ## Architecture
 
-The codebase uses Pydantic models for structured data. Agents are functions that accept configuration and return Pydantic-validated results. This approach ensures type safety and makes the code easier to test and reason about.
+### Design Principles
+
+Narrate-AI uses:
+
+- **Pydantic models** for structured data validation
+- **Service modules** organized by domain (audio, video, images, RAG, research)
+- **Agent functions** that operate on config and Groq client context
+- **Multi-layer caching** to avoid redundant API calls
+- **Composition over inheritance** for flexibility
+
+### Pipeline Flow
 
 ```python
-from core.config import create_config_from_env
-from pipeline import run_pipeline
+from core.config import create_config_from_env, get_groq_client
+from core.pipeline import run_pipeline
 
 config = create_config_from_env()
 result = run_pipeline(config, "Your Topic")
 print(f"Video saved to: {result.final_video_path}")
 ```
 
-### RAG Pipeline
+The pipeline passes an `agent_context` dict to all agents:
+
+```python
+agent_context = {
+    "groq_client": groq_client,
+    "config": config,
+}
+```
+
+Agents call Groq directly and use utility functions for JSON parsing:
+
+```python
+from core.llm import extract_json, validate_pydantic
+
+response = groq_client.chat.completions.create(
+    messages=[{"role": "user", "content": prompt}],
+    model=config["groq_model"],
+    temperature=0.2,
+)
+
+json_data = extract_json(response.choices[0].message.content)
+result = validate_pydantic(json_data, MyPydanticModel)
+```
+
+## Services
+
+### Audio Service (`services/audio/`)
+
+Synthesizes narration audio using pluggable TTS providers:
+
+- **ElevenLabs**: High-quality multilingual voices
+- **Edge TTS**: Free Microsoft-powered alternative
+
+### Video Service (`services/video/`)
+
+Assembles the final MP4 with:
+
+- Centered image display with subtle zoom effects
+- Synchronized audio and image transitions
+- Configurable resolution and frame rate
+
+### Images Service (`services/images/`)
+
+Retrieves and ranks images for each script segment:
+
+- **Retrieval**: Downloads candidates from DuckDuckGo image search
+- **Ranking**: Uses OpenCLIP semantic matching (with keyword fallback)
+- **Placement**: Segments script for optimal visual pacing
+
+### RAG Service (`services/rag/`)
+
+Manages vector database operations with Pinecone:
+
+- Embeds research notes with Gemini
+- Stores notes with metadata (topic, source, text)
+- Retrieves notes via semantic similarity search
+
+### Research Service (`services/research/`)
+
+Crawls the web and builds research context:
+
+- Discovers authoritative sources with DuckDuckGo
+- Crawls pages and chunks content (500 words, 100 word overlap)
+- Extracts text without boilerplate
+
+## Extending the System
+
+### Adding a New Agent
+
+Create a new file in `agents/`:
+
+```python
+"""My custom agent."""
+
+from groq import Groq
+from core.llm import extract_json, validate_pydantic
+from core.models import MyModel
+
+def my_agent(context, data):
+    """Agent function signature.
+    
+    Args:
+        context: Dict with 'groq_client' and 'config' keys
+        data: Input data
+        
+    Returns:
+        Pydantic-validated result
+    """
+    groq_client = context["groq_client"]
+    config = context["config"]
+    
+    response = groq_client.chat.completions.create(
+        messages=[{"role": "user", "content": "Your prompt"}],
+        model=config["groq_model"],
+        temperature=0.2,
+    )
+    
+    json_data = extract_json(response.choices[0].message.content)
+    return validate_pydantic(json_data, MyModel)
+```
+
+Export it in `agents/__init__.py`:
+
+```python
+from agents.my_agent import my_agent
+
+__all__ = ["my_agent"]
+```
+
+Use it in the pipeline:
+
+```python
+from agents import my_agent
+
+result = my_agent(agent_context, input_data)
+```
+
+### Adding a New Service
+
+Create a new module in `services/`:
+
+```
+services/my_service/
+├── __init__.py
+└── handler.py
+```
+
+Implement your service following the same pattern as existing services, then use it in the pipeline or agents as needed.
+
+## RAG Pipeline
 
 Narrate-AI uses Retrieval-Augmented Generation to produce more accurate scripts:
 

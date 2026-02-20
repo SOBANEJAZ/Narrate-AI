@@ -18,8 +18,7 @@ from agents import (
     write_script,
 )
 from core.cache import MultiLayerCache
-from core.config import get_resolution
-from core.llm import create_llm_client
+from core.config import get_resolution, get_groq_client
 from core.models import create_script_segment, create_timeline_item
 from core.text_utils import slugify
 from services.rag import create_pinecone_manager
@@ -60,10 +59,16 @@ def run_pipeline(config, topic):
     run_dir = _create_run_dir(config, topic)
     print(f"[PIPELINE] Run directory: {run_dir}", flush=True)
     cache = MultiLayerCache(run_dir / config["cache_dir_name"])
-    llm_client = create_llm_client(config)
+
+    # Initialize Groq client and create agent context
+    groq_client = get_groq_client(config["groq_api_key"])
+    agent_context = {
+        "groq_client": groq_client,
+        "config": config,
+    }
 
     print("[PIPELINE] Step 1: Narrative planning", flush=True)
-    plan = build_narrative_plan(llm_client, topic)
+    plan = build_narrative_plan(agent_context, topic)
 
     print("[PIPELINE] Step 2: Research discovery", flush=True)
     sources = discover_sources(config, cache, topic)
@@ -84,7 +89,7 @@ def run_pipeline(config, topic):
         print("[PIPELINE] Pinecone not available, using notes directly", flush=True)
 
     print("[PIPELINE] Step 4: Generating section queries for RAG", flush=True)
-    section_queries = generate_section_queries(llm_client, plan)
+    section_queries = generate_section_queries(agent_context, plan)
 
     print(f"[RAG] Semantic search queries generated:", flush=True)
     for sq in section_queries.queries:
@@ -107,7 +112,7 @@ def run_pipeline(config, topic):
     print(f"[PIPELINE] Retrieved {len(all_retrieved_notes)} relevant notes", flush=True)
 
     print("[PIPELINE] Step 6: Script generation", flush=True)
-    script = write_script(llm_client, topic, plan, all_retrieved_notes)
+    script = write_script(agent_context, topic, plan, all_retrieved_notes)
 
     script_path = run_dir / "script.txt"
     script_path.write_text(script, encoding="utf-8")
@@ -135,7 +140,7 @@ def run_pipeline(config, topic):
 
     print("[PIPELINE] Step 8: Visual intelligence prompts", flush=True)
     segments = enrich_segments(
-        llm_client,
+        agent_context,
         topic,
         segments,
         config["max_queries_per_segment"],

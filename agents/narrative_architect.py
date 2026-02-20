@@ -1,15 +1,24 @@
 """Narrative architect agent."""
 
-from core.llm import generate_pydantic
+from groq import Groq
+
+from core.llm import extract_json, validate_pydantic, LLMError
 from core.models import NarrativePlan, NarrativeSection
 
 
-def build_narrative_plan(client, topic):
+def build_narrative_plan(context, topic):
     """Build a narrative plan for the given topic.
+
+    Args:
+        context: Dict with 'groq_client' and 'config' keys
+        topic: Documentary topic string
 
     Returns a NarrativePlan Pydantic model.
     """
     print(f"[NARRATIVE] Building narrative plan for topic: {topic}", flush=True)
+
+    groq_client = context["groq_client"]
+    config = context["config"]
 
     prompt = f"""
 You are the Narrative Architect for Narrate-AI, a documentary generator that creates slideshow-style educational videos. Your role is to structure the documentary content into a compelling narrative flow.
@@ -39,13 +48,14 @@ Constraints:
 - Consider how each section will translate to visual content for the audience
 """
 
-    plan = generate_pydantic(
-        client,
-        prompt=prompt,
-        model=NarrativePlan,
+    response = groq_client.chat.completions.create(
+        messages=[{"role": "user", "content": prompt}],
+        model=config["groq_model"],
         temperature=0.2,
-        model_override=client["config"]["groq_model"],
     )
+
+    json_data = extract_json(response.choices[0].message.content)
+    plan = validate_pydantic(json_data, NarrativePlan)
 
     for section in plan.sections:
         section.duration_seconds = max(15, section.duration_seconds)

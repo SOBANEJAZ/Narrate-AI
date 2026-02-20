@@ -1,16 +1,29 @@
 """Visual intelligence agent."""
 
-from core.llm import generate_pydantic
+from groq import Groq
+
+from core.llm import extract_json, validate_pydantic
 from core.models import VisualIntelligence
 from core.text_utils import extract_keywords
 
 
-def enrich_segments(client, topic, segments, max_queries_per_segment=5):
-    """Enrich segments with search queries and visual descriptions."""
+def enrich_segments(context, topic, segments, max_queries_per_segment=5):
+    """Enrich segments with search queries and visual descriptions.
+
+    Args:
+        context: Dict with 'groq_client' and 'config' keys
+        topic: Documentary topic
+        segments: List of segment dicts to enrich
+        max_queries_per_segment: Max number of search queries per segment
+    """
     print(
         f"[VISUAL] Generating search queries + descriptions for {len(segments)} segments",
         flush=True,
     )
+
+    groq_client = context["groq_client"]
+    config = context["config"]
+
     for segment in segments:
         prompt = f"""
 You are a visual intelligence module for Narrate-AI, a documentary generator that creates slideshow-style educational videos. Your role is to generate image search queries and visual descriptions that will be used to find and rank relevant images for each script segment.
@@ -37,13 +50,14 @@ Requirements:
 - Both search queries and visual descriptions should align with the documentary tone and historical accuracy
 - Prioritize historically significant visual elements that would engage viewers
 """
-        generated = generate_pydantic(
-            client,
-            prompt=prompt,
-            model=VisualIntelligence,
+        response = groq_client.chat.completions.create(
+            messages=[{"role": "user", "content": prompt}],
+            model=config["groq_model"],
             temperature=0.25,
-            model_override=client["config"]["groq_model"],
         )
+
+        json_data = extract_json(response.choices[0].message.content)
+        generated = validate_pydantic(json_data, VisualIntelligence)
 
         clean_queries = []
         for query in generated.search_queries:

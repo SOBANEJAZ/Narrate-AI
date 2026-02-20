@@ -1,14 +1,16 @@
 """Query generator agent for RAG - generates search queries from narrative plan."""
 
-from core.llm import generate_pydantic
+from groq import Groq
+
+from core.llm import extract_json, validate_pydantic
 from core.models import PlanQueries, SectionQuery
 
 
-def generate_section_queries(client, plan):
+def generate_section_queries(context, plan):
     """Generate semantic search queries for each section of the narrative plan.
 
     Args:
-        client: LLM client
+        context: Dict with 'groq_client' and 'config' keys
         plan: NarrativePlan Pydantic model
 
     Returns:
@@ -18,6 +20,9 @@ def generate_section_queries(client, plan):
         f"[QUERY] Generating search queries for {len(plan.sections)} sections",
         flush=True,
     )
+
+    groq_client = context["groq_client"]
+    config = context["config"]
 
     sections_brief = "\n".join(
         f"- {section.title}: {section.objective}" for section in plan.sections
@@ -50,13 +55,14 @@ Return JSON with:
 - queries: list of objects with section_title, section_objective, and search_query
 """
 
-    result = generate_pydantic(
-        client,
-        prompt=prompt,
-        model=PlanQueries,
+    response = groq_client.chat.completions.create(
+        messages=[{"role": "user", "content": prompt}],
+        model=config["groq_model"],
         temperature=0.3,
-        model_override=client["config"]["groq_model"],
     )
+
+    json_data = extract_json(response.choices[0].message.content)
+    result = validate_pydantic(json_data, PlanQueries)
 
     print(f"[QUERY] Generated {len(result.queries)} search queries", flush=True)
     return result

@@ -1,11 +1,40 @@
 """Configuration module.
 
 This module provides configuration as a dictionary with factory functions
-instead of a dataclass.
+instead of a dataclass. It also manages singleton Groq client caching.
 """
 
 import os
 from pathlib import Path
+
+from groq import Groq
+
+
+# Singleton Groq client cache
+_groq_client_cache = None
+
+
+def get_groq_client(api_key: str, model: str = None) -> Groq:
+    """Get or create a Groq client (cached singleton).
+
+    Args:
+        api_key: Groq API key
+        model: Optional model name (stored in client for reference)
+
+    Returns:
+        Groq client instance
+
+    Raises:
+        ValueError: If API key is missing
+    """
+    global _groq_client_cache
+
+    if _groq_client_cache is None:
+        if not api_key:
+            raise ValueError("Missing GROQ_API_KEY")
+        _groq_client_cache = Groq(api_key=api_key)
+
+    return _groq_client_cache
 
 
 def create_default_config():

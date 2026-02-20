@@ -1,17 +1,19 @@
 """Script writer agent."""
 
-from core.llm import generate_text
+from groq import Groq
+
+from core.llm import extract_json
 from core.models import NarrativePlan
 
 
-def write_script(client, topic: str, plan: NarrativePlan, retrieved_notes: list[dict]):
+def write_script(context, topic: str, plan: NarrativePlan, retrieved_notes: list[dict]):
     """Write a documentary script based on the plan and retrieved research notes.
 
     The script is generated using the LLM's own knowledge as the primary source,
     with research notes as supplementary context for verification and enrichment.
 
     Args:
-        client: LLM client
+        context: Dict with 'groq_client' and 'config' keys
         topic: Documentary topic
         plan: NarrativePlan Pydantic model
         retrieved_notes: List of retrieved notes from RAG (already filtered/relevant)
@@ -23,6 +25,9 @@ def write_script(client, topic: str, plan: NarrativePlan, retrieved_notes: list[
         f"[SCRIPT] Writing script for '{topic}' using {len(retrieved_notes)} retrieved notes",
         flush=True,
     )
+
+    groq_client = context["groq_client"]
+    config = context["config"]
 
     section_brief = "\n".join(
         f"- {section.title} ({section.duration_seconds}s): {section.objective}"
@@ -71,11 +76,13 @@ RESEARCH NOTES (supplementary):
 Now write the complete documentary narration script:
 """
 
-    script = generate_text(
-        client,
-        prompt,
+    response = groq_client.chat.completions.create(
+        messages=[{"role": "user", "content": prompt}],
+        model=config["groq_model"],
         temperature=0.55,
     )
+
+    script = response.choices[0].message.content
     print(
         f"[SCRIPT] Script ready: {len(script.split())} words",
         flush=True,
