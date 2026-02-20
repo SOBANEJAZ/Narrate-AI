@@ -1,0 +1,363 @@
+# AI Application Structure Template
+
+Use this prompt as a blueprint for structuring any multi-step AI application.
+
+## Core Structure Principles
+
+Your AI application should follow a **pipeline + services + agents** architecture:
+
+```
+project-root/
+├── agents/                    # Agent functions (one per step)
+│   ├── __init__.py
+│   ├── agent_1.py            # Function: agent_1(context, input_data)
+│   ├── agent_2.py            # Function: agent_2(context, input_data)
+│   └── agent_N.py            # Function: agent_N(context, input_data)
+├── tools/                     # Functions and tools passed to agents
+│   ├── __init__.py
+│   ├── tool_1.py              # Utility: helper_function(args)
+│   ├── tool_2.py              # Utility: process_function(args)
+│   └── tool_N.py              # Utility: fetch_function(args)
+├── services/                  # Domain-specific service modules
+│   ├── feature_1/             # Feature 1 (e.g., audio, video, search)
+│   │   ├── __init__.py
+│   │   ├── handler.py
+│   │   └── utils.py
+│   ├── feature_2/             # Feature 2
+│   │   ├── __init__.py
+│   │   └── handler.py
+│   └── __init__.py
+├── core/                      # Core utilities (no business logic)
+│   ├── __init__.py
+│   ├── cache.py               # Caching system
+│   ├── config.py              # Configuration + client creation
+│   ├── llm.py                 # LLM utility functions ONLY
+│   ├── models.py              # Pydantic data models
+│   ├── pipeline.py            # Main orchestration logic
+│   └── utils.py               # General utilities
+├── main.py                    # CLI entry point
+├── streamlit_app.py           # (Optional) Web UI
+└── README.md                  # Comprehensive documentation
+```
+
+## Design Principles
+
+### 1. Agent Pattern
+- Agents are **functions**, not classes
+- Signature: `def agent_name(context, input_data) -> PydanticModel`
+- Agents receive `context` dict: `{"client": llm_client, "config": config}`
+- One agent per distinct task/step
+- Agents are pure functions with minimal side effects
+
+### 2. Direct Client Calls
+- Agents call LLM client **directly** (not through wrapper functions)
+- Example:
+  ```python
+  response = context["client"].chat.completions.create(
+      messages=[{"role": "user", "content": prompt}],
+      model=context["config"]["model"],
+      temperature=0.2,
+  )
+  ```
+- No unnecessary abstraction layers
+
+### 3. LLM Module (Utilities Only)
+- Keep ONLY utility functions: `extract_json()`, `validate_pydantic()`
+- Remove: wrapper functions like `generate_text()`, `generate_pydantic()`
+- Client creation/caching belongs in `config.py`, not `llm.py`
+
+### 4. Configuration Management
+- Single `get_client()` function returns singleton cached client
+- Config is dict (not dataclass) for simplicity
+- Environment variables loaded in `create_config_from_env()`
+
+### 5. Pipeline Orchestration
+- Pipeline in `core/pipeline.py` orchestrates agent calls
+- Creates agent context once: `{"client": get_client(...), "config": config}`
+- Passes context to all agents (not individual client/config)
+- Agents are stateless functions
+
+### 6. Services as Functionality, Not Structure
+- Services handle **specific features** (not generic wrappers)
+- Examples: audio synthesis, image retrieval, video assembly, database queries
+- Services are imported and used by agents/pipeline
+- One service per domain concern
+
+### 7. Data Models with Pydantic
+- All structured data validated with Pydantic
+- Models defined in `core/models.py`
+- Agents return Pydantic models or strings
+- JSON extracted with `extract_json()`, validated with `validate_pydantic()`
+
+### 8. Caching and Performance
+- Multi-layer cache system in `core/cache.py`
+- Cache API responses, intermediate results, downloaded assets
+- Avoid redundant API calls during re-runs
+
+### 9. Tools and Helpers (tools/ Directory)
+- `tools/` contains utility functions that agents use
+- Tools are **not** agents—they're helper functions agents call
+- Examples: data parsing, API calls, calculations, validation
+- Tools receive config and input data, return results (sync functions)
+- Tools are composable and reusable across multiple agents
+- Tools can also be passed to LLM as function calling capabilities
+
+**Tool vs Agent:**
+- **Agent**: LLM-driven decision maker, calls tools to achieve goals
+- **Tool**: Pure function that performs specific work, called by agents or pipeline
+
+## Tools Directory
+
+The `tools/` directory contains reusable utility functions that agents call:
+
+```
+tools/
+├── __init__.py
+├── parsing.py         # JSON parsing, text extraction
+├── validation.py      # Data validation helpers
+├── api_helpers.py     # Common API patterns
+├── processing.py      # Data transformation
+└── external.py        # External service calls
+```
+
+### Tool Template
+
+```python
+# tools/my_tool.py
+"""Tool description and use cases."""
+
+def extract_data(input_text: str) -> dict:
+    """Extract structured data from text.
+    
+    Args:
+        input_text: Raw input text
+        
+    Returns:
+        Extracted data dict
+    """
+    # Implementation here
+    return {"key": "value"}
+
+def validate_and_transform(data: dict, config: dict) -> dict:
+    """Validate and transform data based on config.
+    
+    Args:
+        data: Input data to validate
+        config: Configuration dict
+        
+    Returns:
+        Transformed data
+    """
+    # Implementation here
+    return transformed_data
+```
+
+### Using Tools in Agents
+
+Agents import and call tools as needed:
+
+```python
+"""Agent that uses tools."""
+
+from tools.parsing import extract_data
+from tools.validation import validate_input
+from core.llm import extract_json, validate_pydantic
+from core.models import OutputModel
+
+def my_agent(context, input_data):
+    """Agent that leverages tools."""
+    client = context["client"]
+    config = context["config"]
+    
+    # Use tools for pre/post-processing
+    validated_input = validate_input(input_data, config)
+    
+    # Call LLM
+    response = client.chat.completions.create(
+        messages=[{"role": "user", "content": f"Process: {validated_input}"}],
+        model=config["model"],
+        temperature=0.2,
+    )
+    
+    # Use tool to extract and validate response
+    json_data = extract_json(response.choices[0].message.content)
+    return validate_pydantic(json_data, OutputModel)
+```
+
+### Tool Organization Guidelines
+
+- **parsing.py**: JSON extraction, text chunking, format conversion
+- **validation.py**: Input validation, type checking, data integrity
+- **api_helpers.py**: Common HTTP patterns, retry logic, rate limiting
+- **processing.py**: Data transformation, filtering, aggregation
+- **external.py**: Calls to external services (not LLM)
+
+Keep tools **pure functions** (no side effects) for maximum testability and reusability.
+
+```python
+"""Agent description."""
+
+from groq import Groq
+from core.llm import extract_json, validate_pydantic, LLMError
+from core.models import InputModel, OutputModel
+
+def agent_name(context, input_data):
+    """One-sentence description.
+    
+    Args:
+        context: Dict with 'client' and 'config' keys
+        input_data: Input data (can be Pydantic model or primitive)
+        
+    Returns:
+        Pydantic model instance or string
+    """
+    client = context["client"]
+    config = context["config"]
+    
+    # Prepare prompt
+    prompt = f"""Your prompt here using {input_data}"""
+    
+    # Call LLM directly
+    response = client.chat.completions.create(
+        messages=[{"role": "user", "content": prompt}],
+        model=config["model"],
+        temperature=0.2,
+    )
+    
+    # Extract and validate
+    json_data = extract_json(response.choices[0].message.content)
+    return validate_pydantic(json_data, OutputModel)
+```
+
+## Service Template
+
+```
+services/my_feature/
+├── __init__.py
+└── handler.py
+```
+
+```python
+# services/my_feature/handler.py
+"""My feature functionality."""
+
+def do_something(config, input_data):
+    """Feature description.
+    
+    Args:
+        config: Configuration dict
+        input_data: Input data
+        
+    Returns:
+        Result dict or data
+    """
+    # Implementation here
+    pass
+```
+
+## Pipeline Template
+
+```python
+"""Main application pipeline."""
+
+from agents import agent_1, agent_2, agent_N
+from core.config import get_client, create_config_from_env
+from core.pipeline import cache_layer
+
+def run_pipeline(config, input_topic):
+    """Run the main pipeline."""
+    client = get_client(config["api_key"])
+    context = {
+        "client": client,
+        "config": config,
+    }
+    
+    # Step 1
+    print("[PIPELINE] Step 1: Agent 1", flush=True)
+    result_1 = agent_1(context, input_topic)
+    
+    # Step 2
+    print("[PIPELINE] Step 2: Agent 2", flush=True)
+    result_2 = agent_2(context, result_1)
+    
+    # ... continue for all steps
+    
+    return final_result
+```
+
+## Configuration Template
+
+```python
+# core/config.py
+
+import os
+from pathlib import Path
+
+_client_cache = None
+
+def get_client(api_key: str):
+    """Get or create singleton client."""
+    global _client_cache
+    if _client_cache is None:
+        if not api_key:
+            raise ValueError("Missing API key")
+        _client_cache = YourLLMClient(api_key=api_key)
+    return _client_cache
+
+def create_default_config():
+    """Default configuration."""
+    return {
+        "run_root": Path("runs"),
+        "api_key": None,
+        "model": "your-model-id",
+        # ... other config
+    }
+
+def create_config_from_env():
+    """Load config from environment."""
+    config = create_default_config()
+    config.update({
+        "api_key": os.getenv("API_KEY"),
+        "model": os.getenv("MODEL", config["model"]),
+        # ... other env vars
+    })
+    return config
+```
+
+## Key Takeaways
+
+1. **Agents = Functions**: Simple, testable, composable
+2. **One Context Dict**: Pass around one context object, not multiple params
+3. **Direct LLM Calls**: Agents call client directly, no wrappers
+4. **Services by Domain**: Organize services by feature, not by type
+5. **Pydantic for Structure**: All structured data validated
+6. **Pipeline Orchestrates**: Single pipeline file controls the flow
+7. **Caching Built-in**: Avoid redundant API calls
+8. **Environment-based Config**: Load from env, defaults fallback
+
+## Expanding the System
+
+**Adding a New Agent:**
+1. Create `agents/new_agent.py` with `def new_agent(context, input_data)`
+2. Export in `agents/__init__.py`
+3. Call in pipeline: `result = new_agent(context, input_data)`
+
+**Adding a New Tool:**
+1. Create `tools/my_tool.py` with helper functions
+2. Export in `tools/__init__.py`
+3. Import in agents: `from tools.my_tool import my_function`
+4. Call as needed: `result = my_function(input_data, config)`
+
+**Adding a New Service:**
+1. Create `services/new_feature/handler.py`
+2. Implement functions taking `config` as first param
+3. Import and use in agents/pipeline as needed
+
+**Changing LLM Providers:**
+1. Update `core/config.py` `get_client()` to create new client
+2. All agents automatically work with new provider
+3. No agent code changes needed
+
+---
+
+This template creates maintainable, scalable AI applications with clear separation of concerns and minimal abstraction overhead.
