@@ -55,10 +55,9 @@ def create_default_config():
         "image_search_delay_seconds": 3,
         "cache_dir_name": "cache",
         "groq_api_key": None,
-        "groq_model": "groq/mixtral-8x7b-32768",
         "elevenlabs_api_key": None,
-        "elevenlabs_voice_id": "JBFqnCBsd6RMkjVDRZzb",
-        "elevenlabs_model_id": "eleven_multilingual_v2",
+        "elevenlabs_voice_id": None,
+        "elevenlabs_model_id": None,
         "edge_tts_voice": "en-US-AriaNeural",
         "tts_provider": "elevenlabs",
         "pinecone_api_key": None,
@@ -73,7 +72,6 @@ def create_config_from_env():
     config.update(
         {
             "groq_api_key": os.getenv("GROQ_API_KEY"),
-            "groq_model": os.getenv("GROQ_MODEL", config["groq_model"]),
             "elevenlabs_api_key": os.getenv("ELEVENLABS_API_KEY"),
             "elevenlabs_voice_id": os.getenv(
                 "ELEVENLABS_VOICE_ID", config["elevenlabs_voice_id"]
