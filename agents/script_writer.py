@@ -78,7 +78,7 @@ Now write the complete documentary narration script:
 
     response = groq_client.chat.completions.create(
         messages=[{"role": "user", "content": prompt}],
-        model=config["groq_model"],
+        model="meta-llama/llama-4-scout-17b-16e-instruct",
         temperature=0.55,
     )
 

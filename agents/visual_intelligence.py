@@ -52,7 +52,7 @@ Requirements:
 """
         response = groq_client.chat.completions.create(
             messages=[{"role": "user", "content": prompt}],
-            model=config["groq_model"],
+            model="groq/compound",
             temperature=0.25,
         )
 

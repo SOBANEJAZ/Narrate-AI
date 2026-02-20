@@ -57,7 +57,7 @@ Return JSON with:
 
     response = groq_client.chat.completions.create(
         messages=[{"role": "user", "content": prompt}],
-        model=config["groq_model"],
+        model="openai/gpt-oss-20b",
         temperature=0.3,
     )
 
