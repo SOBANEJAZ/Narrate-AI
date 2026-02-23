@@ -61,7 +61,6 @@ def create_default_config():
         "tts_provider": "elevenlabs",
         "pinecone_api_key": None,
         "pinecone_environment": "us-east-1",
-        "gemini_api_key": None,
     }
 
 
@@ -85,7 +84,6 @@ def create_config_from_env():
             "pinecone_environment": os.getenv(
                 "PINECONE_ENV", config["pinecone_environment"]
             ),
-            "gemini_api_key": os.getenv("GEMINI_API_KEY"),
         }
     )
     return config
