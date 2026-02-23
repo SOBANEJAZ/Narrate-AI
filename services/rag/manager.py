@@ -12,6 +12,7 @@ from pydantic import BaseModel
 PINECONE_INDEX_NAME = "narrate-ai"
 EMBEDDING_MODEL = "Qwen/Qwen3-Embedding-0.6B"
 EMBEDDING_DIMENSION = 1024
+_model = None
 
 
 class PineconeManager:
@@ -146,9 +147,13 @@ class PineconeManager:
 
 def embed_text(text: str, task_type: str = "RETRIEVAL_QUERY") -> list[float] | None:
     """Embed text using Qwen3 local embedding model."""
-    print("[RAG] Loading Qwen3 embedding model (first run - downloading if needed)...")
-    model = SentenceTransformer(EMBEDDING_MODEL)
-    embedding = model.encode(text, normalize_embeddings=True)
+    global _model
+    if _model is None:
+        print(
+            "[RAG] Loading Qwen3 embedding model (first run - downloading if needed)..."
+        )
+        _model = SentenceTransformer(EMBEDDING_MODEL)
+    embedding = _model.encode(text, normalize_embeddings=True, show_progress_bar=False)
     return embedding.tolist()
 
 

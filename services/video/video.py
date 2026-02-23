@@ -112,7 +112,9 @@ def assemble_video(
             fps=fps,
             codec="libx264",
             audio_codec="aac",
-            threads=os.cpu_count()
+            threads=os.cpu_count(),
+            verbose=False,
+            logger="bar",
         )
         final_clip.close()
         print(f"[VIDEO] Render complete: {output_path}", flush=True)
