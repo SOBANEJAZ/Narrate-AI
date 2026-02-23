@@ -146,6 +146,7 @@ class PineconeManager:
 
 def embed_text(text: str, task_type: str = "RETRIEVAL_QUERY") -> list[float] | None:
     """Embed text using Qwen3 local embedding model."""
+    print("[RAG] Loading Qwen3 embedding model (first run - downloading if needed)...")
     model = SentenceTransformer(EMBEDDING_MODEL)
     embedding = model.encode(text, normalize_embeddings=True)
     return embedding.tolist()
