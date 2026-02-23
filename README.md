@@ -26,7 +26,7 @@ The pipeline runs in four phases: Research, Generation, Retrieval, and Productio
 
 3. **Crawl + RAG Notes** — Crawls each discovered website and extracts the main content. The extracted text is then chunked into 500-word segments with 100-word overlap between chunks to preserve context at segment boundaries. These chunks become the knowledge base for the documentary.
 
-4. **Index to Pinecone** — Converts all text chunks into vector embeddings using Qwen3's local embedding model. These embeddings are stored in Pinecone, a vector database that enables semantic similarity search—finding content based on meaning rather than exact keyword matches.
+4. **Index to Pinecone** — Converts all text chunks into vector embeddings using MiniLM-L12-v2's local embedding model. These embeddings are stored in Pinecone, a vector database that enables semantic similarity search—finding content based on meaning rather than exact keyword matches.
 
 5. **Generate RAG Queries** — For each section of the documentary outline, the system uses an LLM to generate 3-5 semantic search queries. These queries are designed to retrieve the most relevant information from the vector database for that specific section.
 
@@ -129,7 +129,7 @@ Then edit `.env` and fill in your API keys. The pipeline runs without API keys u
 - **LLM**: `GROQ_API_KEY` (recommended for script generation)
 - **Search**: `SERPER_API_KEY` for image and web search (recommended)
 - **Text-to-Speech**: `ELEVENLABS_API_KEY` for premium voices, or use free `EDGE_TTS_VOICE`
-- **Vector Search**: `PINECONE_API` for RAG embeddings (uses local Qwen3 model)
+- **Vector Search**: `PINECONE_API` for RAG embeddings (uses local MiniLM-L12-v2 model)
 
 ### Streamlit UI
 

@@ -1,4 +1,4 @@
-"""RAG (Retrieval-Augmented Generation) service using Pinecone and Gemini embeddings."""
+"""RAG (Retrieval-Augmented Generation) service using Pinecone and MiniLM embeddings."""
 
 from services.rag.manager import PineconeManager, create_pinecone_manager
 

@@ -1,4 +1,4 @@
-"""RAG (Retrieval-Augmented Generation) module using Pinecone and Qwen3 embeddings."""
+"""RAG (Retrieval-Augmented Generation) module using Pinecone and MiniLM embeddings."""
 
 import hashlib
 import logging
@@ -10,11 +10,12 @@ from pinecone import Pinecone, ServerlessSpec
 from pydantic import BaseModel
 
 logging.getLogger("transformers").setLevel(logging.ERROR)
+logging.getLogger("safetensors").setLevel(logging.ERROR)
 
 
 PINECONE_INDEX_NAME = "narrate-ai"
-EMBEDDING_MODEL = "Qwen/Qwen3-Embedding-0.6B"
-EMBEDDING_DIMENSION = 1024
+EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L12-v2"
+EMBEDDING_DIMENSION = 384
 _model = None
 
 
@@ -149,11 +150,11 @@ class PineconeManager:
 
 
 def embed_text(text: str, task_type: str = "RETRIEVAL_QUERY") -> list[float] | None:
-    """Embed text using Qwen3 local embedding model."""
+    """Embed text using MiniLM local embedding model."""
     global _model
     if _model is None:
         print(
-            "[RAG] Loading Qwen3 embedding model (first run - downloading if needed)..."
+            "[RAG] Loading MiniLM embedding model (first run - downloading if needed)..."
         )
         _model = SentenceTransformer(EMBEDDING_MODEL)
     embedding = _model.encode(text, normalize_embeddings=True, show_progress_bar=False)
