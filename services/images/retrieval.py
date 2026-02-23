@@ -1,15 +1,18 @@
 """Image retrieval agent."""
 
+import os
 from pathlib import Path
-import time
 from urllib.parse import urlparse
 
 import requests
-from ddgs import DDGS
 
 from core.cache import MultiLayerCache
 from core.models import create_image_candidate
 from core.text_utils import safe_filename
+
+
+SERPER_API_KEY = os.getenv("SERPER_API_KEY")
+SERPER_IMAGES_URL = "https://google.serper.dev/images"
 
 
 def retrieve_images(config, cache, segments, images_root):
@@ -22,12 +25,6 @@ def retrieve_images(config, cache, segments, images_root):
     seen_urls = set()
 
     for segment in segments:
-        print(
-            f"[IMAGES] REST TIME: Cooling down for 5 seconds before segment {segment['segment_id']}...",
-            flush=True,
-        )
-        time.sleep(5)
-
         segment_dir = images_root / f"segment_{segment['segment_id']:03d}"
         segment_dir.mkdir(parents=True, exist_ok=True)
         print(
@@ -38,40 +35,29 @@ def retrieve_images(config, cache, segments, images_root):
         candidates = []
         queries = segment.get("search_queries", [])[: config["max_queries_per_segment"]]
 
-        with DDGS() as ddgs:
-            for query in queries:
-                print(
-                    f"[IMAGES] REST TIME: Pausing 5 seconds before query '{query}'...",
-                    flush=True,
-                )
-                time.sleep(5)
+        for query in queries:
+            results = _search_images_with_client(config, cache, query)
+            print(
+                f"[IMAGES] Segment {segment['segment_id']}: query '{query}' returned {len(results)} results",
+                flush=True,
+            )
 
-                results = _search_images_with_client(
-                    config, cache, ddgs, query, config["images_per_query"]
+            for item in results:
+                image_url = str(item.get("image") or item.get("url") or "").strip()
+                if not image_url or image_url in seen_urls:
+                    continue
+                seen_urls.add(image_url)
+                title = str(item.get("title") or item.get("source") or "image").strip()
+                source = str(item.get("source") or item.get("url") or "").strip()
+                candidate = create_image_candidate(
+                    url=image_url,
+                    title=title,
+                    source=source,
                 )
-                print(
-                    f"[IMAGES] Segment {segment['segment_id']}: query '{query}' returned {len(results)} results",
-                    flush=True,
-                )
-
-                for item in results:
-                    image_url = str(item.get("image") or item.get("url") or "").strip()
-                    if not image_url or image_url in seen_urls:
-                        continue
-                    seen_urls.add(image_url)
-                    title = str(
-                        item.get("title") or item.get("source") or "image"
-                    ).strip()
-                    source = str(item.get("source") or item.get("url") or "").strip()
-                    candidate = create_image_candidate(
-                        url=image_url,
-                        title=title,
-                        source=source,
-                    )
-                    local_path = _download_image(config, candidate["url"], segment_dir)
-                    if local_path is not None:
-                        candidate["local_path"] = local_path
-                        candidates.append(candidate)
+                local_path = _download_image(config, candidate["url"], segment_dir)
+                if local_path is not None:
+                    candidate["local_path"] = local_path
+                    candidates.append(candidate)
 
         segment["candidate_images"] = candidates
         print(
@@ -81,29 +67,28 @@ def retrieve_images(config, cache, segments, images_root):
     return segments
 
 
-def _search_images(config, cache, query, max_results):
-    """Search for images using DDGS."""
-    cache_key = f"images::{query.lower()}::{max_results}"
+def _search_images(config, cache, query):
+    """Search for images using Serper.dev."""
+    cache_key = f"images::{query.lower()}"
     cached = cache.get("images", cache_key)
     if isinstance(cached, list):
         return [item for item in cached if isinstance(item, dict)]
 
-    with DDGS() as ddgs:
-        results = list(ddgs.images(query, max_results=max_results))
+    headers = {
+        "X-API-KEY": SERPER_API_KEY,
+        "Content-Type": "application/json",
+    }
+    payload = {"q": query}
+    response = requests.post(SERPER_IMAGES_URL, headers=headers, json=payload)
+    response.raise_for_status()
+    results = response.json().get("imageResults", [])
     cache.set("images", cache_key, results)
     return results
 
 
-def _search_images_with_client(config, cache, ddgs, query, max_results):
-    """Search for images using an existing DDGS client."""
-    cache_key = f"images::{query.lower()}::{max_results}"
-    cached = cache.get("images", cache_key)
-    if isinstance(cached, list):
-        return [item for item in cached if isinstance(item, dict)]
-
-    results = list(ddgs.images(query, max_results=max_results))
-    cache.set("images", cache_key, results)
-    return results
+def _search_images_with_client(config, cache, query):
+    """Search for images using Serper.dev."""
+    return _search_images(config, cache, query)
 
 
 def _download_image(config, url, output_dir):

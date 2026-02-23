@@ -1,18 +1,21 @@
 """Research pipeline."""
 
 import asyncio
+import os
 import re
-import time
 from urllib.parse import urlparse
 
 import requests
 from bs4 import BeautifulSoup
 from crawl4ai import AsyncWebCrawler
-from ddgs import DDGS
 
 from core.cache import MultiLayerCache
 from core.models import create_research_note, create_research_source
 from core.text_utils import chunk_text
+
+
+SERPER_API_KEY = os.getenv("SERPER_API_KEY")
+SERPER_SEARCH_URL = "https://google.serper.dev/search"
 
 
 AUTHORITATIVE_HINTS = (
@@ -62,20 +65,21 @@ def discover_sources(config, cache, topic):
     query = f"{topic} history timeline facts"
     sources = []
 
-    print(
-        f"[RESEARCH] REST TIME: Pausing 5 seconds before research search...", flush=True
-    )
-    time.sleep(5)
-
-    with DDGS() as ddgs:
-        results = list(ddgs.text(query, max_results=config["max_websites"] * 4))
-    print(f"[RESEARCH] DDGS returned {len(results)} candidate links", flush=True)
+    headers = {
+        "X-API-KEY": SERPER_API_KEY,
+        "Content-Type": "application/json",
+    }
+    payload = {"q": query}
+    response = requests.post(SERPER_SEARCH_URL, headers=headers, json=payload)
+    response.raise_for_status()
+    results = response.json().get("organicResults", [])
+    print(f"[RESEARCH] Serper.dev returned {len(results)} candidate links", flush=True)
     for item in results:
-        url = str(item.get("href") or item.get("url") or "").strip()
+        url = str(item.get("link") or item.get("url") or "").strip()
         if not url:
             continue
         title = str(item.get("title", "")).strip() or url
-        snippet = str(item.get("body", "")).strip()
+        snippet = str(item.get("snippet", "")).strip()
         sources.append(create_research_source(url=url, title=title, snippet=snippet))
 
     if not sources:
@@ -99,7 +103,7 @@ def discover_sources(config, cache, topic):
     else:
         selected = ranked[: config["max_websites"]]
         print(
-            f"[RESEARCH] No authoritative sources found. Using {len(selected)} fallback sources from DuckDuckGo",
+            f"[RESEARCH] No authoritative sources found. Using {len(selected)} fallback sources from Serper.dev",
             flush=True,
         )
     cache.set(
