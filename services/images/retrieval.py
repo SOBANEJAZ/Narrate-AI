@@ -12,7 +12,7 @@ from core.text_utils import safe_filename
 
 
 SERPER_API_KEY = os.getenv("SERPER_API_KEY")
-SERPER_IMAGES_URL = "https://google.serper.dev/images"
+SERPER_SEARCH_URL = "https://google.serper.dev/search"
 
 
 def retrieve_images(config, cache, segments, images_root):
@@ -80,8 +80,8 @@ def _search_images(config, cache, query):
         "X-API-KEY": SERPER_API_KEY,
         "Content-Type": "application/json",
     }
-    payload = {"q": query}
-    response = requests.post(SERPER_IMAGES_URL, headers=headers, json=payload)
+    payload = {"q": query, "type": "images"}
+    response = requests.post(SERPER_SEARCH_URL, headers=headers, json=payload)
     response.raise_for_status()
     results = response.json().get("images", [])
     cache.set("images", cache_key, results)
