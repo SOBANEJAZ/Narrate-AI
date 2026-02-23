@@ -15,7 +15,6 @@ MAIN_SCRIPT = APP_ROOT / "main.py"
 DEFAULT_BACKGROUND = "black"
 DEFAULT_MAX_WEBSITES = 4
 DEFAULT_MAX_QUERIES = 5
-DEFAULT_IMAGES_PER_QUERY = 5
 DEFAULT_SENTENCE_SPAN = 3
 DEFAULT_TTS_PROVIDER = "elevenlabs"
 
@@ -25,11 +24,10 @@ def _build_command(
     background,
     max_websites,
     max_queries,
-    images_per_query,
     sentence_span,
     tts_provider,
 ):
-    """Build the command to run the pipeline."""
+    """Build the command."""
     return [
         sys.executable,
         str(MAIN_SCRIPT),
@@ -40,8 +38,6 @@ def _build_command(
         str(max_websites),
         "--max-queries",
         str(max_queries),
-        "--images-per-query",
-        str(images_per_query),
         "--sentence-span",
         str(sentence_span),
         "--tts-provider",
@@ -82,7 +78,7 @@ def main():
         - **blur**: Blurs and stretches the image to fill the entire screen
         
         ### **--max-websites** `4`
-        Maximum number of websites to crawl for research. The system searches Google/DuckDuckGo 
+        Maximum number of websites to crawl for research. The system searches Google/Serper.dev 
         and picks the top authoritative sources (Wikipedia, .edu, .gov sites, etc.) to gather 
         information for the script. More = better research but slower processing.
         
@@ -133,13 +129,6 @@ def main():
             value=DEFAULT_MAX_QUERIES,
             help="Image search queries per video segment",
         )
-        images_per_query = st.number_input(
-            "Images Per Query",
-            min_value=1,
-            step=1,
-            value=DEFAULT_IMAGES_PER_QUERY,
-            help="Images to download per search query",
-        )
         sentence_span = st.number_input(
             "Sentence Span",
             min_value=1,
@@ -188,7 +177,6 @@ def main():
         background=background,
         max_websites=int(max_websites),
         max_queries=int(max_queries),
-        images_per_query=int(images_per_query),
         sentence_span=int(sentence_span),
         tts_provider=tts_provider,
     )

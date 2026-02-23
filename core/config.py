@@ -43,7 +43,6 @@ def create_default_config():
         "run_root": Path("runs"),
         "max_websites": 4,
         "max_queries_per_segment": 5,
-        "images_per_query": 5,
         "sentence_span_per_segment": 3,
         "resolution_width": 1280,
         "resolution_height": 720,
