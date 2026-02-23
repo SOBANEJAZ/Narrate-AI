@@ -1,18 +1,17 @@
-"""RAG (Retrieval-Augmented Generation) module using Pinecone and Gemini embeddings."""
+"""RAG (Retrieval-Augmented Generation) module using Pinecone and Qwen3 embeddings."""
 
 import hashlib
-import os
 from pathlib import Path
 from typing import Any
 
-from google import genai
+from sentence_transformers import SentenceTransformer
 from pinecone import Pinecone, ServerlessSpec
 from pydantic import BaseModel
 
 
 PINECONE_INDEX_NAME = "narrate-ai"
-EMBEDDING_MODEL = "gemini-embedding-001"
-EMBEDDING_DIMENSION = 3072
+EMBEDDING_MODEL = "Qwen/Qwen3-Embedding-0.6B"
+EMBEDDING_DIMENSION = 1024
 
 
 class PineconeManager:
@@ -24,14 +23,27 @@ class PineconeManager:
         self.pc = Pinecone(api_key=api_key)
 
     def create_index_if_not_exists(self, namespace: str = None) -> str:
-        """Create the single index if it doesn't exist."""
-        if PINECONE_INDEX_NAME not in self.pc.list_indexes().names():
-            self.pc.create_index(
-                name=PINECONE_INDEX_NAME,
-                dimension=EMBEDDING_DIMENSION,
-                spec=ServerlessSpec(cloud="aws", region=self.environment),
-            )
-            print(f"[RAG] Created Pinecone index: {PINECONE_INDEX_NAME}")
+        """Create the single index if it doesn't exist, or recreate if dimension mismatch."""
+        indexes = self.pc.list_indexes()
+
+        if PINECONE_INDEX_NAME in indexes.names():
+            existing_index = indexes.describe_index(PINECONE_INDEX_NAME)
+            if existing_index.dimension != EMBEDDING_DIMENSION:
+                print(
+                    f"[RAG] Dimension mismatch: existing={existing_index.dimension}, expected={EMBEDDING_DIMENSION}. Deleting and recreating index..."
+                )
+                self.pc.delete_index(PINECONE_INDEX_NAME)
+            else:
+                return PINECONE_INDEX_NAME
+
+        self.pc.create_index(
+            name=PINECONE_INDEX_NAME,
+            dimension=EMBEDDING_DIMENSION,
+            spec=ServerlessSpec(cloud="aws", region=self.environment),
+        )
+        print(
+            f"[RAG] Created Pinecone index: {PINECONE_INDEX_NAME} (dim={EMBEDDING_DIMENSION})"
+        )
 
         return PINECONE_INDEX_NAME
 
@@ -132,18 +144,11 @@ class PineconeManager:
         return retrieved_notes
 
 
-def embed_text(text: str, task_type: str = "RETRIEVAL_DOCUMENT") -> list[float] | None:
-    """Embed text using Gemini embedding model."""
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise ValueError("GEMINI_API_KEY not set")
-
-    client = genai.Client(api_key=api_key)
-    result = client.models.embed_content(
-        model=EMBEDDING_MODEL,
-        contents=text,
-    )
-    return result.embeddings[0].values
+def embed_text(text: str, task_type: str = "RETRIEVAL_QUERY") -> list[float] | None:
+    """Embed text using Qwen3 local embedding model."""
+    model = SentenceTransformer(EMBEDDING_MODEL)
+    embedding = model.encode(text, normalize_embeddings=True)
+    return embedding.tolist()
 
 
 def create_pinecone_manager(config: dict) -> PineconeManager | None:
