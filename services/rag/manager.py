@@ -1,12 +1,15 @@
 """RAG (Retrieval-Augmented Generation) module using Pinecone and Qwen3 embeddings."""
 
 import hashlib
+import logging
 from pathlib import Path
 from typing import Any
 
 from sentence_transformers import SentenceTransformer
 from pinecone import Pinecone, ServerlessSpec
 from pydantic import BaseModel
+
+logging.getLogger("transformers").setLevel(logging.ERROR)
 
 
 PINECONE_INDEX_NAME = "narrate-ai"
