@@ -27,7 +27,7 @@ class PineconeManager:
         indexes = self.pc.list_indexes()
 
         if PINECONE_INDEX_NAME in indexes.names():
-            existing_index = indexes.describe_index(PINECONE_INDEX_NAME)
+            existing_index = self.pc.describe_index(PINECONE_INDEX_NAME)
             if existing_index.dimension != EMBEDDING_DIMENSION:
                 print(
                     f"[RAG] Dimension mismatch: existing={existing_index.dimension}, expected={EMBEDDING_DIMENSION}. Deleting and recreating index..."
