@@ -6,7 +6,6 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "crawl4ai>=0.8.0",
-    "ddgs>=9.10.0",
     "edge-tts>=7.2.7",
     "elevenlabs>=2.36.0",
     "google-genai>=1.63.0",
