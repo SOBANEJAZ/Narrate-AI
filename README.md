@@ -22,7 +22,7 @@ The pipeline runs in four phases: Research, Generation, Retrieval, and Productio
 
 1. **Narrative Architect** — Analyzes the topic using an LLM to create a structured documentary outline. It determines key themes, identifies 3-5 main sections, and establishes the narrative arc—deciding what story needs to be told and in what order.
 
-2. **Website Discovery** — Uses DuckDuckGo Search to find authoritative sources on the topic. It prioritizes reliable sources like news articles, academic papers, and established publications. The system collects URLs that will provide factual foundation for the documentary.
+2. **Website Discovery** — Uses Serper.dev (Google Search) to find authoritative sources on the topic. It prioritizes reliable sources like news articles, academic papers, and established publications. The system collects URLs that will provide factual foundation for the documentary.
 
 3. **Crawl + RAG Notes** — Crawls each discovered website and extracts the main content. The extracted text is then chunked into 500-word segments with 100-word overlap between chunks to preserve context at segment boundaries. These chunks become the knowledge base for the documentary.
 
@@ -42,7 +42,7 @@ The pipeline runs in four phases: Research, Generation, Retrieval, and Productio
 
 ### Phase 3: Image Retrieval
 
-10. **Image Retrieval** — Uses DuckDuckGo image search to download candidate images for each segment. It searches using multiple queries per segment (default 5 queries with 5 images each) to ensure a diverse pool of candidates.
+10. **Image Retrieval** — Uses Serper.dev (Google Images) to download candidate images for each segment. It searches using multiple queries per segment (default 5 queries with 10 images each) to ensure a diverse pool of candidates.
 
 11. **Image Ranking** — Evaluates all downloaded candidates using OpenCLIP (a vision-language model). It compares each image against the segment's CLIP descriptions and ranks them by relevance score. Falls back to keyword matching if OpenCLIP fails.
 
@@ -127,6 +127,7 @@ cp .env.example .env
 
 Then edit `.env` and fill in your API keys. The pipeline runs without API keys using fallback options.
 - **LLM**: `GROQ_API_KEY` (recommended for script generation)
+- **Search**: `SERPER_API_KEY` for image and web search (recommended)
 - **Text-to-Speech**: `ELEVENLABS_API_KEY` for premium voices, or use free `EDGE_TTS_VOICE`
 - **Vector Search**: `PINECONE_API` and `GEMINI_API_KEY` for RAG embeddings
 
@@ -155,7 +156,6 @@ The UI lets you:
 | `--background` | `black` | Background mode (`black` or `blur`) |
 | `--max-websites` | `4` | Sources to research |
 | `--max-queries` | `5` | Image searches per segment |
-| `--images-per-query` | `5` | Images to download per search |
 | `--sentence-span` | `3` | Sentences per video segment |
 | `--tts-provider` | `elevenlabs` | Voice provider (`elevenlabs` or `edge_tts`) |
 

@@ -30,7 +30,7 @@ You are a visual intelligence module for Narrate-AI, a documentary generator tha
 
 Context:
 - Narrate-AI produces documentary videos by combining narration audio with relevant images
-- Images are retrieved using DuckDuckGo Search (DDGS) based on your search queries
+- Images are retrieved using Serper.dev (Google Images) based on your search queries
 - Images are ranked using OpenCLIP (semantic similarity between your visual description and the actual image content)
 - The final video displays images centered on screen with subtle zoom effects over time
 - Target audience expects historically accurate and visually compelling content
@@ -39,7 +39,7 @@ Topic: {topic}
 Segment text: {segment["text"]}
 
 Return strict JSON with:
-- search_queries: list of up to {max_queries_per_segment} specific, historically accurate image search queries optimized for DDGS
+- search_queries: list of up to {max_queries_per_segment} specific, historically accurate image search queries optimized for Serper.dev
 - visual_description: one rich, concrete, descriptive sentence that captures the key visual elements for OpenCLIP semantic matching
 
 Requirements:
