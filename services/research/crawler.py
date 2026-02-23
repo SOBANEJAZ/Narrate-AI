@@ -72,7 +72,7 @@ def discover_sources(config, cache, topic):
     payload = {"q": query}
     response = requests.post(SERPER_SEARCH_URL, headers=headers, json=payload)
     response.raise_for_status()
-    results = response.json().get("organicResults", [])
+    results = response.json().get("organic", [])
     print(f"[RESEARCH] Serper.dev returned {len(results)} candidate links", flush=True)
     for item in results:
         url = str(item.get("link") or item.get("url") or "").strip()

@@ -43,7 +43,9 @@ def retrieve_images(config, cache, segments, images_root):
             )
 
             for item in results:
-                image_url = str(item.get("image") or item.get("url") or "").strip()
+                image_url = str(
+                    item.get("imageUrl") or item.get("image") or item.get("url") or ""
+                ).strip()
                 if not image_url or image_url in seen_urls:
                     continue
                 seen_urls.add(image_url)
@@ -81,7 +83,7 @@ def _search_images(config, cache, query):
     payload = {"q": query}
     response = requests.post(SERPER_IMAGES_URL, headers=headers, json=payload)
     response.raise_for_status()
-    results = response.json().get("imageResults", [])
+    results = response.json().get("images", [])
     cache.set("images", cache_key, results)
     return results
 
