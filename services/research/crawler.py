@@ -1,7 +1,6 @@
 """Research pipeline."""
 
 import asyncio
-import os
 import re
 from urllib.parse import urlparse
 
@@ -14,7 +13,6 @@ from core.models import create_research_note, create_research_source
 from core.text_utils import chunk_text
 
 
-SERPER_API_KEY = os.getenv("SERPER_API_KEY")
 SERPER_SEARCH_URL = "https://google.serper.dev/search"
 
 
@@ -65,13 +63,31 @@ def discover_sources(config, cache, topic):
     query = f"{topic} history timeline facts"
     sources = []
 
+    serper_api_key = str(config.get("serper_api_key") or "").strip()
+    if not serper_api_key:
+        raise RuntimeError(
+            "Missing SERPER_API_KEY. Set it in your environment or .env file."
+        )
+
     headers = {
-        "X-API-KEY": SERPER_API_KEY,
+        "X-API-KEY": serper_api_key,
         "Content-Type": "application/json",
     }
     payload = {"q": query}
-    response = requests.post(SERPER_SEARCH_URL, headers=headers, json=payload)
-    response.raise_for_status()
+    response = requests.post(
+        SERPER_SEARCH_URL,
+        headers=headers,
+        json=payload,
+        timeout=config["request_timeout_seconds"],
+    )
+    try:
+        response.raise_for_status()
+    except requests.HTTPError as exc:
+        error_text = response.text.strip()
+        detail = f"Serper web search failed ({response.status_code}) for query '{query}'."
+        if error_text:
+            detail = f"{detail} Response: {error_text[:300]}"
+        raise RuntimeError(detail) from exc
     results = response.json().get("organic", [])
     print(f"[RESEARCH] Serper.dev returned {len(results)} candidate links", flush=True)
     for item in results:

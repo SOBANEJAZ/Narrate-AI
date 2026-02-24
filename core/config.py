@@ -14,6 +14,23 @@ from groq import Groq
 _groq_client_cache = None
 
 
+def _load_dotenv_if_present(path: Path = Path(".env")) -> None:
+    """Load simple KEY=VALUE pairs from .env if file exists."""
+    if not path.exists():
+        return
+
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip("'\"")
+        if not key or key in os.environ:
+            continue
+        os.environ[key] = value
+
+
 def get_groq_client(api_key: str, model: str = None) -> Groq:
     """Get or create a Groq client (cached singleton).
 
@@ -54,6 +71,7 @@ def create_default_config():
         "image_search_delay_seconds": 3,
         "cache_dir_name": "cache",
         "groq_api_key": None,
+        "serper_api_key": None,
         "elevenlabs_api_key": None,
         "elevenlabs_voice_id": None,
         "elevenlabs_model_id": None,
@@ -66,10 +84,12 @@ def create_default_config():
 
 def create_config_from_env():
     """Create a pipeline config from environment variables."""
+    _load_dotenv_if_present()
     config = create_default_config()
     config.update(
         {
             "groq_api_key": os.getenv("GROQ_API_KEY"),
+            "serper_api_key": os.getenv("SERPER_API_KEY"),
             "elevenlabs_api_key": os.getenv("ELEVENLABS_API_KEY"),
             "elevenlabs_voice_id": os.getenv(
                 "ELEVENLABS_VOICE_ID", config["elevenlabs_voice_id"]
