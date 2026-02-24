@@ -106,7 +106,7 @@ def assemble_video(
             clips.append(clip)
 
         final_clip = concatenate_videoclips(
-            clips, method="compose", padding=-max(0.0, transition_seconds)
+            clips, method="compose", padding=-int(max(0.0, transition_seconds))
         )
 
         total_duration = final_clip.duration
@@ -117,7 +117,7 @@ def assemble_video(
             unit_scale=True,
         ) as pbar:
 
-            def progress(log):
+            def progress(**kwargs):
                 pbar.update(1)
 
             final_clip.write_videofile(
