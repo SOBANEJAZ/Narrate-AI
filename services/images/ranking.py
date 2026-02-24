@@ -84,7 +84,7 @@ def _rank_with_clip(state, segment):
 
         for candidate in valid_candidates:
             local_path = candidate["local_path"]
-            if local_path is None:
+            if local_path is None or local_path.suffix.lower() == ".svg":
                 continue
             image = Image.open(local_path).convert("RGB")
             tensor = state["clip_preprocess"](image).unsqueeze(0).to(state["device"])
