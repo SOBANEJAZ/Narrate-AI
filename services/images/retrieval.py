@@ -54,7 +54,18 @@ def retrieve_images(config, cache, segments, images_root):
                     title=title,
                     source=source,
                 )
-                local_path = _download_image(config, candidate["url"], segment_dir)
+                try:
+                    local_path = _download_image(config, candidate["url"], segment_dir)
+                except (
+                    requests.RequestException,
+                    ValueError,
+                    OSError,
+                ) as exc:
+                    print(
+                        f"[IMAGES] Segment {segment['segment_id']}: skipped URL '{candidate['url']}' ({exc})",
+                        flush=True,
+                    )
+                    continue
                 if local_path is not None:
                     candidate["local_path"] = local_path
                     candidates.append(candidate)
