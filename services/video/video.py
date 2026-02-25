@@ -11,7 +11,6 @@ from moviepy import (
     concatenate_videoclips,
 )
 from PIL import Image, ImageFilter, ImageOps
-from tqdm import tqdm
 
 from core.models import create_timeline_item
 from core.text_utils import safe_filename
@@ -74,7 +73,7 @@ def assemble_video(
     resolution=(1280, 720),
     fps=10,
     transition_seconds=0.3,
-    zoom_strength=0.8,
+    zoom_strength=3.0,
     background_mode="black",
 ):
     """Assemble video from timeline items."""
@@ -106,28 +105,21 @@ def assemble_video(
             clips.append(clip)
 
         final_clip = concatenate_videoclips(
-            clips, method="compose", padding=-int(max(0.0, transition_seconds))
+            clips,
+            method="compose",
+            padding=-transition_seconds,  # type: ignore[arg-type]
         )
 
         total_duration = final_clip.duration
-        with tqdm(
-            total=int(total_duration * fps),
-            desc="Rendering video",
-            unit="frames",
-            unit_scale=True,
-        ) as pbar:
 
-            def progress(**kwargs):
-                pbar.update(1)
-
-            final_clip.write_videofile(
-                str(output_path),
-                fps=fps,
-                codec="libx264",
-                audio_codec="aac",
-                threads=os.cpu_count(),
-                logger=progress,
-            )
+        final_clip.write_videofile(
+            str(output_path),
+            fps=fps,
+            codec="libx264",
+            audio_codec="aac",
+            threads=os.cpu_count(),
+            logger="bar",
+        )
         final_clip.close()
         print(f"[VIDEO] Render complete: {output_path}", flush=True)
     finally:
