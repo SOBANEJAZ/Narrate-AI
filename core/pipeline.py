@@ -14,6 +14,7 @@ from agents import (
     generate_section_queries,
     rank_images,
     retrieve_images,
+    segment_for_images,
     synthesize_audio,
     write_script,
 )
@@ -122,8 +123,11 @@ def run_pipeline(config, topic):
     _write_json(run_dir / "retrieved_notes.json", all_retrieved_notes)
     print(f"[PIPELINE] Script saved: {script_path}", flush=True)
 
+    print("[PIPELINE] Step 6.5: Image segmentation", flush=True)
+    segmentation = segment_for_images(agent_context, script)
+
     print("[PIPELINE] Step 7: Image placement segmentation", flush=True)
-    segments = build_segments(script, config["sentence_span_per_segment"])
+    segments = build_segments(script, segmentation)
     if not segments:
         segments = [
             create_script_segment(

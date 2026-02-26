@@ -10,8 +10,10 @@ from moviepy import (
     ColorClip,
     CompositeVideoClip,
     ImageClip,
+    TextClip,
     concatenate_videoclips,
 )
+from moviepy.video.fx import fadein, fadeout
 from PIL import Image, ImageFilter, ImageOps
 
 from core.models import create_timeline_item
@@ -90,6 +92,7 @@ def build_timeline(segments):
                 duration_seconds=duration,
                 image_path=selected_image,
                 audio_path=narration_audio,
+                visual_description=segment.get("visual_description", ""),
             )
         )
         cursor += duration
@@ -194,12 +197,52 @@ def _build_segment_clip(
         foreground = zoom_in_effect(foreground, zoom_ratio=zoom_strength)
 
     foreground = foreground.with_position(("center", "center"))
-    composite = CompositeVideoClip(
-        [background, foreground], size=resolution
-    ).with_duration(duration)
+
+    clips = [background, foreground]
+
+    if item.get("visual_description"):
+        subtitle = _create_subtitle_clip(
+            item["visual_description"],
+            duration=duration,
+            resolution=resolution,
+        )
+        clips.append(subtitle)
+
+    composite = CompositeVideoClip(clips, size=resolution).with_duration(duration)
     audio_clip = AudioFileClip(str(item["audio_path"]))
     composite = composite.with_audio(audio_clip)
     return composite
+
+
+def _create_subtitle_clip(text, duration, resolution):
+    """Create an animated subtitle clip with fade effect."""
+    width, height = resolution
+    font_size = int(height * 0.035)
+    padding = int(width * 0.05)
+
+    subtitle = (
+        TextClip(
+            text=text,
+            font="Arial-Bold",
+            font_size=font_size,
+            color="white",
+            stroke_color="black",
+            stroke_width=1.5,
+            method="caption",
+            size=(width - padding * 2, None),
+        )
+        .with_duration(duration)
+        .with_fps(10)
+    )
+
+    fade_duration = min(0.4, duration * 0.15)
+    subtitle = fadein(subtitle, fade_duration)
+    subtitle = fadeout(subtitle, fade_duration)
+
+    x_pos = "center"
+    y_pos = height - int(height * 0.08)
+
+    return subtitle.with_position((x_pos, y_pos))
 
 
 def _background_clip(

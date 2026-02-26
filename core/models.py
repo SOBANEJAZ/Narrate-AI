@@ -35,6 +35,21 @@ class VisualIntelligence(BaseModel):
     visual_description: str
 
 
+class ImageZone(BaseModel):
+    """Pydantic model for an image zone in the script."""
+
+    zone_id: int
+    start_sentence: int
+    end_sentence: int
+    description: str
+
+
+class ImageSegmentation(BaseModel):
+    """Pydantic model for image segmentation output."""
+
+    zones: list[ImageZone]
+
+
 class SectionQuery(BaseModel):
     """Pydantic model for section query in RAG."""
 
@@ -152,9 +167,10 @@ def create_timeline_item(
     duration_seconds,
     image_path,
     audio_path,
+    visual_description="",
 ):
     """Create a TimelineItem instance."""
-    return {
+    result = {
         "segment_id": segment_id,
         "text": text,
         "start_seconds": start_seconds,
@@ -163,3 +179,6 @@ def create_timeline_item(
         "image_path": image_path,
         "audio_path": audio_path,
     }
+    if visual_description:
+        result["visual_description"] = visual_description
+    return result
