@@ -87,12 +87,8 @@ def create_config_from_env():
             "groq_api_key": os.getenv("GROQ_API_KEY"),
             "serper_api_key": os.getenv("SERPER_API_KEY"),
             "elevenlabs_api_key": os.getenv("ELEVENLABS_API_KEY"),
-            "elevenlabs_voice_id": os.getenv(
-                "ELEVENLABS_VOICE_ID", config["elevenlabs_voice_id"]
-            ),
-            "elevenlabs_model_id": os.getenv(
-                "ELEVENLABS_MODEL_ID", config["elevenlabs_model_id"]
-            ),
+            "elevenlabs_voice_id": os.getenv("ELEVENLABS_VOICE_ID"),
+            "elevenlabs_model_id": os.getenv("ELEVENLABS_MODEL_ID"),
             "edge_tts_voice": os.getenv("EDGE_TTS_VOICE", config["edge_tts_voice"]),
             "background_mode": os.getenv("BACKGROUND_MODE", config["background_mode"]),
             "tts_provider": os.getenv("TTS_PROVIDER", config["tts_provider"]),
