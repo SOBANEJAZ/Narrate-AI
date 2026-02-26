@@ -257,14 +257,15 @@ def _create_subtitle_clip(text, duration, resolution):
         .with_fps(10)
     )
 
-    fade_duration = min(0.4, duration * 0.15)
-    subtitle = fx.FadeIn(subtitle, fade_duration)
-    subtitle = fx.FadeOut(subtitle, fade_duration)
-
     x_pos = "center"
     y_pos = height - int(height * 0.08)
 
-    return subtitle.with_position((x_pos, y_pos))
+    fade_duration = min(0.4, duration * 0.15)
+    subtitle = subtitle.fadein(fade_duration).fadeout(fade_duration)
+
+    subtitle = subtitle.with_position((x_pos, y_pos))
+
+    return subtitle
 
 
 def _background_clip(
