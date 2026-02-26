@@ -44,7 +44,7 @@ The pipeline runs in four phases: Research, Generation, Retrieval, and Productio
 
 10. **Image Retrieval** — Uses Serper.dev (Google Images) to download candidate images for each segment. It searches using multiple queries per segment (default 5 queries with 10 images each) to ensure a diverse pool of candidates.
 
-11. **Image Ranking** — Evaluates all downloaded candidates using OpenCLIP (a vision-language model). It compares each image against the segment's CLIP descriptions and ranks them by relevance score. Falls back to keyword matching if OpenCLIP fails.
+11. **Image Ranking** — Evaluates all downloaded candidates using OpenCLIP (a vision-language model). It compares each image against the segment's CLIP descriptions and ranks them by relevance score, combined with image quality metrics (resolution and sharpness) to prefer high-quality images. Falls back to keyword matching if OpenCLIP fails.
 
 ### Phase 4: Production
 

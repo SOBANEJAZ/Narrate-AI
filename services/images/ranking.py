@@ -2,6 +2,8 @@
 
 import re
 
+import cv2
+import numpy as np
 import open_clip
 import torch
 from PIL import Image
@@ -60,8 +62,40 @@ def rank_images(state, segments):
     return segments
 
 
+def _calculate_quality_score(image):
+    """Calculate quality score for an image (0-1 scale)."""
+    try:
+        width, height = image.size
+        pixel_count = width * height
+
+        # Resolution score (higher = better)
+        max_pixels = 4000 * 4000  # 16MP
+        resolution_score = min(pixel_count / max_pixels, 1.0)
+
+        # Sharpness score using Laplacian variance (lower = blurrier)
+        gray = image.convert("L")
+        np_image = np.array(gray)
+        laplacian_var = (
+            cv2.Laplacian(np_image, cv2.CV_64F).var() if cv2 else np.var(np_image)
+        )
+
+        # Normalize sharpness score (empirical thresholds)
+        sharpness_score = min(max((laplacian_var - 50) / 200, 0), 1.0)  # Clip to 0-1
+
+        # Combined quality score (weight resolution more heavily)
+        quality_score = 0.6 * resolution_score + 0.4 * sharpness_score
+
+        # Penalize very low resolution or extremely blurry images
+        if pixel_count < 160000 or laplacian_var < 50:  # 400x400 = 160000
+            quality_score *= 0.3
+
+        return quality_score
+    except Exception:
+        return 0.1  # Low quality if any error occurs
+
+
 def _rank_with_clip(state, segment):
-    """Rank images using CLIP embeddings."""
+    """Rank images using CLIP embeddings with quality filtering."""
     assert state["clip_model"] is not None
     assert state["clip_preprocess"] is not None
     assert state["clip_tokenizer"] is not None
@@ -86,9 +120,29 @@ def _rank_with_clip(state, segment):
             local_path = candidate["local_path"]
             if local_path is None or local_path.suffix.lower() == ".svg":
                 continue
-            image = Image.open(local_path).convert("RGB")
-            tensor = state["clip_preprocess"](image).unsqueeze(0).to(state["device"])
-            image_features = state["clip_model"].encode_image(tensor)
-            image_features /= image_features.norm(dim=-1, keepdim=True)
-            similarity = float((image_features @ text_features.T).squeeze().item())
-            candidate["score"] = similarity
+
+            try:
+                image = Image.open(local_path).convert("RGB")
+
+                # Calculate quality score
+                quality_score = _calculate_quality_score(image)
+
+                # Skip extremely low quality images
+                if quality_score < 0.1:
+                    candidate["score"] = 0.0
+                    continue
+
+                tensor = (
+                    state["clip_preprocess"](image).unsqueeze(0).to(state["device"])
+                )
+                image_features = state["clip_model"].encode_image(tensor)
+                image_features /= image_features.norm(dim=-1, keepdim=True)
+                similarity = float((image_features @ text_features.T).squeeze().item())
+
+                # Combine CLIP similarity with quality score
+                final_score = similarity * 0.7 + quality_score * 0.3
+                candidate["score"] = final_score
+
+            except Exception as e:
+                print(f"[RANK] Error processing image {local_path}: {e}")
+                candidate["score"] = 0.0
