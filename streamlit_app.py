@@ -15,7 +15,6 @@ MAIN_SCRIPT = APP_ROOT / "main.py"
 DEFAULT_BACKGROUND = "black"
 DEFAULT_MAX_WEBSITES = 4
 DEFAULT_MAX_QUERIES = 5
-DEFAULT_SENTENCE_SPAN = 3
 DEFAULT_TTS_PROVIDER = "elevenlabs"
 
 
@@ -24,7 +23,6 @@ def _build_command(
     background,
     max_websites,
     max_queries,
-    sentence_span,
     tts_provider,
 ):
     """Build the command."""
@@ -38,8 +36,6 @@ def _build_command(
         str(max_websites),
         "--max-queries",
         str(max_queries),
-        "--sentence-span",
-        str(sentence_span),
         "--tts-provider",
         tts_provider,
     ]
@@ -129,13 +125,6 @@ def main():
             value=DEFAULT_MAX_QUERIES,
             help="Image search queries per video segment",
         )
-        sentence_span = st.number_input(
-            "Sentence Span",
-            min_value=1,
-            step=1,
-            value=DEFAULT_SENTENCE_SPAN,
-            help="Sentences grouped per video clip (lower = faster image changes)",
-        )
 
     st.subheader("Text-to-Speech Provider")
 
@@ -177,7 +166,6 @@ def main():
         background=background,
         max_websites=int(max_websites),
         max_queries=int(max_queries),
-        sentence_span=int(sentence_span),
         tts_provider=tts_provider,
     )
     st.markdown("**Running command:**")

@@ -112,6 +112,9 @@ def run_pipeline(config, topic):
 
     print(f"[PIPELINE] Retrieved {len(all_retrieved_notes)} relevant notes", flush=True)
 
+    if pinecone_manager and namespace:
+        pinecone_manager.clear_namespace(namespace)
+
     print("[PIPELINE] Step 6: Script generation", flush=True)
     script = write_script(agent_context, topic, plan, all_retrieved_notes)
 
