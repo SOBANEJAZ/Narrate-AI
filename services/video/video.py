@@ -13,10 +13,32 @@ from moviepy import (
     TextClip,
     concatenate_videoclips,
 )
-from PIL import Image, ImageFilter, ImageOps
+from PIL import Image, ImageFilter, ImageOps, ImageFont
 
 from core.models import create_timeline_item
 from core.text_utils import safe_filename
+
+FONT_CANDIDATES = [
+    "DejaVuSans-Bold",
+    "LiberationSans-Bold",
+    "FreeSans-Bold",
+    "Arial-Bold",
+    "Helvetica-Bold",
+]
+
+
+def _get_available_font():
+    """Try each font in FONT_CANDIDATES until one works."""
+    for font_name in FONT_CANDIDATES:
+        try:
+            ImageFont.truetype(font_name, 12)
+            return font_name
+        except OSError:
+            continue
+    raise RuntimeError(
+        f"No available font found. Tried: {FONT_CANDIDATES}. "
+        "Please install a font like DejaVuSans."
+    )
 
 
 def zoom_in_effect(clip, zoom_ratio=0.04):
@@ -222,7 +244,7 @@ def _create_subtitle_clip(text, duration, resolution):
     subtitle = (
         TextClip(
             text=text,
-            font="Arial-Bold",
+            font=_get_available_font(),
             font_size=font_size,
             color="white",
             stroke_color="black",
