@@ -18,7 +18,7 @@ from agents import (
     write_script,
 )
 from core.cache import MultiLayerCache
-from core.config import get_resolution, get_groq_client
+from core.config import get_resolution, get_groq_client, get_top_k
 from core.models import create_script_segment, create_timeline_item
 from core.text_utils import slugify
 from services.rag import create_pinecone_manager
@@ -103,7 +103,7 @@ def run_pipeline(config, topic):
                 namespace=namespace,
                 query=sq.search_query,
                 topic=topic,
-                top_k=3,
+                top_k=get_top_k(config),
             )
             all_retrieved_notes.extend(retrieved)
     else:

@@ -79,6 +79,7 @@ def create_default_config():
         "tts_provider": "elevenlabs",
         "pinecone_api_key": None,
         "pinecone_environment": "us-east-1",
+        "top_k": 1,
     }
 
 
@@ -104,6 +105,7 @@ def create_config_from_env():
             "pinecone_environment": os.getenv(
                 "PINECONE_ENV", config["pinecone_environment"]
             ),
+            "top_k": int(os.getenv("TOP_K", config["top_k"])),
         }
     )
     return config
@@ -112,6 +114,11 @@ def create_config_from_env():
 def get_resolution(config):
     """Get the video resolution as a tuple."""
     return (config["resolution_width"], config["resolution_height"])
+
+
+def get_top_k(config):
+    """Get the top_k value for RAG retrieval."""
+    return config.get("top_k", 1)
 
 
 def update_config(config, **kwargs):
