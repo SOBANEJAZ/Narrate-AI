@@ -71,7 +71,8 @@ Make sure zones are sequential with no gaps in sentence numbers.
     )
 
     content = response.choices[0].message.content
-    segmentation = extract_json(content, ImageSegmentation)
+    json_data = extract_json(content)
+    segmentation = ImageSegmentation.model_validate(json_data)
 
     print(
         f"[IMAGE SEGMENT] Created {len(segmentation.zones)} image zones",
