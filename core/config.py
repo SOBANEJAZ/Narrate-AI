@@ -65,7 +65,7 @@ def create_default_config():
         "resolution_height": 720,
         "fps": 15,
         "transition_seconds": 0.3,
-        "zoom_strength": 0.08,
+        "zoom_strength": 0.015,
         "background_mode": "black",
         "request_timeout_seconds": 20,
         "image_search_delay_seconds": 3,

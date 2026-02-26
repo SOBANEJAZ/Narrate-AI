@@ -1,8 +1,10 @@
 """Video assembly module."""
 
+import math
 import os
 from pathlib import Path
 
+import numpy as np
 from moviepy import (
     AudioFileClip,
     ColorClip,
@@ -14,6 +16,38 @@ from PIL import Image, ImageFilter, ImageOps
 
 from core.models import create_timeline_item
 from core.text_utils import safe_filename
+
+
+def zoom_in_effect(clip, zoom_ratio=0.04):
+    """Apply smooth zoom-in effect using PIL for high-quality resizing."""
+
+    def effect(get_frame, t):
+        img = Image.fromarray(get_frame(t))
+        base_size = img.size
+
+        new_size = [
+            math.ceil(img.size[0] * (1 + (zoom_ratio * t))),
+            math.ceil(img.size[1] * (1 + (zoom_ratio * t))),
+        ]
+
+        new_size[0] = new_size[0] + (new_size[0] % 2)
+        new_size[1] = new_size[1] + (new_size[1] % 2)
+
+        img = img.resize(new_size, Image.Resampling.LANCZOS)
+
+        x = math.ceil((new_size[0] - base_size[0]) / 2)
+        y = math.ceil((new_size[1] - base_size[1]) / 2)
+
+        img = img.crop((x, y, new_size[0] - x, new_size[1] - y)).resize(
+            base_size, Image.Resampling.LANCZOS
+        )
+
+        result = np.array(img)
+        img.close()
+
+        return result
+
+    return clip.transform(effect)
 
 
 def build_timeline(segments):
@@ -157,9 +191,7 @@ def _build_segment_clip(
         foreground = foreground.resized(width=width)
 
     if zoom_strength > 0:
-        foreground = foreground.resized(
-            lambda t: 1.0 + (zoom_strength * (t / duration))
-        )
+        foreground = zoom_in_effect(foreground, zoom_ratio=zoom_strength)
 
     foreground = foreground.with_position(("center", "center"))
     composite = CompositeVideoClip(
