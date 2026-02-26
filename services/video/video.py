@@ -13,6 +13,7 @@ from moviepy import (
     TextClip,
     concatenate_videoclips,
 )
+import moviepy.video.fx as fx
 from PIL import Image, ImageFilter, ImageOps, ImageFont
 
 from core.models import create_timeline_item
@@ -257,8 +258,8 @@ def _create_subtitle_clip(text, duration, resolution):
     )
 
     fade_duration = min(0.4, duration * 0.15)
-    subtitle = subtitle.fadein(fade_duration)
-    subtitle = subtitle.fadeout(fade_duration)
+    subtitle = fx.FadeIn(subtitle, fade_duration)
+    subtitle = fx.FadeOut(subtitle, fade_duration)
 
     x_pos = "center"
     y_pos = height - int(height * 0.08)
