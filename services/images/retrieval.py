@@ -1,5 +1,6 @@
 """Image retrieval agent."""
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -10,7 +11,9 @@ from core.models import create_image_candidate
 from core.text_utils import safe_filename
 
 
-SERPER_IMAGES_URL = "https://google.serper.dev/images"
+SERPERS_IMAGES_URL = "https://google.serper.dev/images"
+
+MAX_IMAGE_DOWNLOAD_WORKERS = 8
 
 
 def retrieve_images(config, cache, segments, images_root):
@@ -23,20 +26,23 @@ def retrieve_images(config, cache, segments, images_root):
     seen_urls = set()
 
     for segment in segments:
-        segment_dir = images_root / f"segment_{segment['segment_id']:03d}"
+        segment_id = segment["segment_id"]
+        segment_dir = images_root / f"segment_{segment_id:03d}"
         segment_dir.mkdir(parents=True, exist_ok=True)
         print(
-            f"[IMAGES] Segment {segment['segment_id']}: running {len(segment.get('search_queries', []))} queries",
+            f"[IMAGES] Segment {segment_id}: running {len(segment.get('search_queries', []))} queries",
             flush=True,
         )
 
         candidates = []
         queries = segment.get("search_queries", [])[: config["max_queries_per_segment"]]
 
+        urls_to_download = []
+
         for query in queries:
             results = _search_images_with_client(config, cache, query)
             print(
-                f"[IMAGES] Segment {segment['segment_id']}: query '{query}' returned {len(results)} results",
+                f"[IMAGES] Segment {segment_id}: query '{query}' returned {len(results)} results",
                 flush=True,
             )
 
@@ -49,33 +55,79 @@ def retrieve_images(config, cache, segments, images_root):
                 seen_urls.add(image_url)
                 title = str(item.get("title") or item.get("source") or "image").strip()
                 source = str(item.get("source") or item.get("url") or "").strip()
-                candidate = create_image_candidate(
-                    url=image_url,
-                    title=title,
-                    source=source,
+                urls_to_download.append(
+                    {
+                        "url": image_url,
+                        "title": title,
+                        "source": source,
+                    }
                 )
-                try:
-                    local_path = _download_image(config, candidate["url"], segment_dir)
-                except (
-                    requests.RequestException,
-                    ValueError,
-                    OSError,
-                ) as exc:
-                    print(
-                        f"[IMAGES] Segment {segment['segment_id']}: skipped URL '{candidate['url']}' ({exc})",
-                        flush=True,
-                    )
-                    continue
-                if local_path is not None:
-                    candidate["local_path"] = local_path
-                    candidates.append(candidate)
+
+        if urls_to_download:
+            print(
+                f"[IMAGES] Segment {segment_id}: downloading {len(urls_to_download)} images in parallel",
+                flush=True,
+            )
+            with ThreadPoolExecutor(max_workers=MAX_IMAGE_DOWNLOAD_WORKERS) as executor:
+                futures = {
+                    executor.submit(
+                        _download_image_worker,
+                        config,
+                        item["url"],
+                        item["title"],
+                        item["source"],
+                        segment_dir,
+                        segment_id,
+                    ): item
+                    for item in urls_to_download
+                }
+                for future in as_completed(futures):
+                    result = future.result()
+                    if result:
+                        candidates.append(result)
 
         segment["candidate_images"] = candidates
         print(
-            f"[IMAGES] Segment {segment['segment_id']}: downloaded {len(candidates)} candidates",
+            f"[IMAGES] Segment {segment_id}: downloaded {len(candidates)} candidates",
             flush=True,
         )
     return segments
+
+
+def _download_image_worker(config, url, title, source, segment_dir, segment_id):
+    """Download a single image. Returns candidate dict or None on failure."""
+    file_name = _filename_from_url(url, prefix="img")
+    path = segment_dir / file_name
+
+    if path.exists():
+        return create_image_candidate(
+            url=url,
+            title=title,
+            source=source,
+            local_path=path,
+        )
+
+    try:
+        response = requests.get(
+            url,
+            timeout=(3, 10),
+            headers={"User-Agent": "Narrate-AI/1.0"},
+        )
+        response.raise_for_status()
+        content_type = response.headers.get("Content-Type", "")
+        if "image" not in content_type:
+            print(f"[IMAGES] Segment {segment_id}: skipped non-image content: {url}")
+            return None
+        path.write_bytes(response.content)
+        return create_image_candidate(
+            url=url,
+            title=title,
+            source=source,
+            local_path=path,
+        )
+    except requests.RequestException as exc:
+        print(f"[IMAGES] Segment {segment_id}: failed to download {url}: {exc}")
+        return None
 
 
 def _search_images(config, cache, query):
@@ -97,7 +149,7 @@ def _search_images(config, cache, query):
     }
     payload = {"q": query}
     response = requests.post(
-        SERPER_IMAGES_URL,
+        SERPERS_IMAGES_URL,
         headers=headers,
         json=payload,
         timeout=config["request_timeout_seconds"],
@@ -106,7 +158,9 @@ def _search_images(config, cache, query):
         response.raise_for_status()
     except requests.HTTPError as exc:
         error_text = response.text.strip()
-        detail = f"Serper image search failed ({response.status_code}) for query '{query}'."
+        detail = (
+            f"Serper image search failed ({response.status_code}) for query '{query}'."
+        )
         if error_text:
             detail = f"{detail} Response: {error_text[:300]}"
         raise RuntimeError(detail) from exc
