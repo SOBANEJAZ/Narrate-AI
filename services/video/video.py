@@ -53,7 +53,7 @@ def _get_available_font():
 def zoom_in_effect(clip, zoom_ratio=0.04):
     """Apply smooth zoom-in effect using PIL for high-quality resizing.
 
-    Creates aKen Burns effect by slowly zooming into the image over time.
+    Creates a Ken Burns effect by slowly zooming into the image over time.
     Uses PIL for high-quality Lanczos resizing.
 
     Args:
@@ -65,35 +65,57 @@ def zoom_in_effect(clip, zoom_ratio=0.04):
     """
 
     def effect(get_frame, t):
-        img = Image.fromarray(get_frame(t))
-        base_size = img.size
-
-        # Calculate new size with zoom
-        new_size = [
-            math.ceil(img.size[0] * (1 + (zoom_ratio * t))),
-            math.ceil(img.size[1] * (1 + (zoom_ratio * t))),
-        ]
-
-        # Ensure even dimensions for video codec
-        new_size[0] = new_size[0] + (new_size[0] % 2)
-        new_size[1] = new_size[1] + (new_size[1] % 2)
-
-        # High-quality resize up
-        img = img.resize(new_size, Image.Resampling.LANCZOS)
-
-        # Crop back to original size (center)
-        x = math.ceil((new_size[0] - base_size[0]) / 2)
-        y = math.ceil((new_size[1] - base_size[1]) / 2)
-        img = img.crop((x, y, new_size[0] - x, new_size[1] - y)).resize(
-            base_size, Image.Resampling.LANCZOS
-        )
-
-        result = np.array(img)
-        img.close()
-
-        return result
+        return _apply_zoom_frame(get_frame(t), zoom_ratio, t)
 
     return clip.transform(effect)
+
+
+def _apply_zoom_frame(frame, zoom_ratio, time_seconds):
+    """Apply zoom transformation to a single video frame.
+
+    This is the inner function that does the actual zoom processing:
+    1. Convert frame to PIL Image
+    2. Calculate zoomed size based on time
+    3. Resize up (zoom in)
+    4. Crop to original size (pan center)
+    5. Resize back down to maintain frame size
+    6. Convert back to numpy array
+
+    Args:
+        frame: Video frame as numpy array
+        zoom_ratio: Zoom speed
+        time_seconds: Current time in video
+
+    Returns:
+        Transformed frame as numpy array
+    """
+    img = Image.fromarray(frame)
+    base_size = img.size
+
+    # Calculate new size with zoom
+    new_size = [
+        math.ceil(img.size[0] * (1 + (zoom_ratio * time_seconds))),
+        math.ceil(img.size[1] * (1 + (zoom_ratio * time_seconds))),
+    ]
+
+    # Ensure even dimensions for video codec compatibility
+    new_size[0] = new_size[0] + (new_size[0] % 2)
+    new_size[1] = new_size[1] + (new_size[1] % 2)
+
+    # High-quality resize up (zoom in)
+    img = img.resize(new_size, Image.Resampling.LANCZOS)
+
+    # Crop back to original size (center crop for zoom effect)
+    x = math.ceil((new_size[0] - base_size[0]) / 2)
+    y = math.ceil((new_size[1] - base_size[1]) / 2)
+    img = img.crop((x, y, new_size[0] - x, new_size[1] - y)).resize(
+        base_size, Image.Resampling.LANCZOS
+    )
+
+    result = np.array(img)
+    img.close()
+
+    return result
 
 
 def build_timeline(segments):

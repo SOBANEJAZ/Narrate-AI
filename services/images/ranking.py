@@ -21,6 +21,18 @@ from PIL import Image
 
 from core.text_utils import extract_keywords
 
+# Quality scoring constants
+QUALITY_WEIGHT_RESOLUTION = 0.6
+QUALITY_WEIGHT_SHARPNESS = 0.4
+MAX_REFERENCE_PIXELS = 4000 * 4000  # 16MP reference
+MIN_ACCEPTABLE_PIXELS = 400 * 400  # 0.16MP minimum
+MIN_SHARPNESS_THRESHOLD = 50  # Laplacian variance threshold
+
+# Final score blending weights
+CLIP_SCORE_WEIGHT = 0.7
+QUALITY_SCORE_WEIGHT = 0.3
+MIN_QUALITY_THRESHOLD = 0.1  # Skip images below this quality
+
 
 def create_ranking_state(model_name="ViT-B-16", pretrained_name="laion2b_s34b_b88k"):
     """Create ranking state and initialize OpenCLIP model.
@@ -106,7 +118,7 @@ def _calculate_quality_score(image):
     1. Resolution: Higher pixel count = better (up to 16MP)
     2. Sharpness: Higher Laplacian variance = sharper
 
-    Combined with weighting (60% resolution, 40% sharpness).
+    Combined with configurable weighting.
     Penalizes very low resolution or extremely blurry images.
 
     Args:
@@ -120,8 +132,7 @@ def _calculate_quality_score(image):
         pixel_count = width * height
 
         # Resolution score (higher = better)
-        max_pixels = 4000 * 4000  # 16MP reference
-        resolution_score = min(pixel_count / max_pixels, 1.0)
+        resolution_score = min(pixel_count / MAX_REFERENCE_PIXELS, 1.0)
 
         # Sharpness score using Laplacian variance (lower = blurrier)
         gray = image.convert("L")
@@ -130,14 +141,22 @@ def _calculate_quality_score(image):
             cv2.Laplacian(np_image, cv2.CV_64F).var() if cv2 else np.var(np_image)
         )
 
-        # Normalize sharpness score (empirical thresholds)
-        sharpness_score = min(max((laplacian_var - 50) / 200, 0), 1.0)
+        # Normalize sharpness score with empirical thresholds
+        sharpness_score = min(
+            max((laplacian_var - MIN_SHARPNESS_THRESHOLD) / 200, 0), 1.0
+        )
 
-        # Combined quality score (weight resolution more heavily)
-        quality_score = 0.6 * resolution_score + 0.4 * sharpness_score
+        # Combined quality score with configurable weights
+        quality_score = (
+            QUALITY_WEIGHT_RESOLUTION * resolution_score
+            + QUALITY_WEIGHT_SHARPNESS * sharpness_score
+        )
 
         # Penalize very low resolution or extremely blurry images
-        if pixel_count < 160000 or laplacian_var < 50:  # 400x400 = 160000
+        if (
+            pixel_count < MIN_ACCEPTABLE_PIXELS
+            or laplacian_var < MIN_SHARPNESS_THRESHOLD
+        ):
             quality_score *= 0.3
 
         return quality_score
@@ -201,7 +220,7 @@ def _rank_with_clip(state, segment):
                 quality_score = _calculate_quality_score(image)
 
                 # Skip extremely low quality images
-                if quality_score < 0.1:
+                if quality_score < MIN_QUALITY_THRESHOLD:
                     candidate["score"] = 0.0
                     continue
 
@@ -212,11 +231,14 @@ def _rank_with_clip(state, segment):
                 image_features = state["clip_model"].encode_image(tensor)
                 image_features /= image_features.norm(dim=-1, keepdim=True)
 
-                # Cosine similarity
+                # Cosine similarity between text and image embeddings
                 similarity = float((image_features @ text_features.T).squeeze().item())
 
-                # Combine CLIP similarity with quality score
-                final_score = similarity * 0.7 + quality_score * 0.3
+                # Combine CLIP semantic score with quality score
+                final_score = (
+                    CLIP_SCORE_WEIGHT * similarity
+                    + QUALITY_SCORE_WEIGHT * quality_score
+                )
                 candidate["score"] = final_score
 
             except Exception as e:

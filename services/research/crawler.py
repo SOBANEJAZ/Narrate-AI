@@ -25,6 +25,16 @@ from core.text_utils import chunk_text
 
 SERPER_SEARCH_URL = "https://google.serper.dev/search"
 
+# Research note chunking settings
+CHUNK_SIZE_WORDS = 400  # Words per chunk
+CHUNK_OVERLAP_WORDS = 100  # Overlap between chunks
+MAX_CHUNKS_PER_SOURCE = 4  # Limit chunks per source
+
+# Source scoring weights
+SCORE_AUTHORITATIVE_DOMAIN = 10
+SCORE_MAX_SNIPPET = 5
+SCORE_WWW_PREFIX = 1
+SNIPPET_LENGTH_DIVISOR = 40  # Points per 40 chars of snippet
 
 # Domains that indicate authoritative/trustworthy sources
 # Used to prioritize .edu, .gov, Wikipedia, major news, etc.
@@ -202,7 +212,12 @@ def crawl_and_build_notes(config, cache, sources):
         # Create chunks from crawled content
         source_note_count = 0
         for index, chunk in enumerate(
-            chunk_text(raw, chunk_size_words=400, overlap_words=100), start=1
+            chunk_text(
+                raw,
+                chunk_size_words=CHUNK_SIZE_WORDS,
+                overlap_words=CHUNK_OVERLAP_WORDS,
+            ),
+            start=1,
         ):
             notes.append(
                 create_research_note(
@@ -211,7 +226,7 @@ def crawl_and_build_notes(config, cache, sources):
                 )
             )
             source_note_count += 1
-            if index >= 4:  # Limit chunks per source
+            if index >= MAX_CHUNKS_PER_SOURCE:
                 break
         print(
             f"[RESEARCH] Built {source_note_count} notes from {source['url']}",
@@ -239,9 +254,9 @@ def _source_score(source):
     """Calculate authority score for ranking sources.
 
     Scoring factors:
-    - Authoritative domain: +10
-    - Longer snippet: +1 per 40 chars (max +5)
-    - www prefix: +1
+    - Authoritative domain: +10 (from SCORE_AUTHORITATIVE_DOMAIN)
+    - Longer snippet: +1 per 40 chars (from SNIPPET_LENGTH_DIVISOR)
+    - www prefix: +1 (from SCORE_WWW_PREFIX)
 
     Args:
         source: Source dict
@@ -252,12 +267,19 @@ def _source_score(source):
     parsed = urlparse(source["url"])
     domain = parsed.netloc.lower()
     score = 0
+
+    # Check for authoritative domain hints
     if any(hint in domain for hint in AUTHORITATIVE_HINTS):
-        score += 10
+        score += SCORE_AUTHORITATIVE_DOMAIN
+
+    # Score based on snippet length
     snippet = source.get("snippet", "")
-    score += min(len(snippet) // 40, 5)
+    score += min(len(snippet) // SNIPPET_LENGTH_DIVISOR, SCORE_MAX_SNIPPET)
+
+    # Bonus for www prefix
     if domain.startswith("www."):
-        score += 1
+        score += SCORE_WWW_PREFIX
+
     return score
 
 
