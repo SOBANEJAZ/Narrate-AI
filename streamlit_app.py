@@ -26,26 +26,20 @@ import streamlit as st
 APP_ROOT = Path(__file__).resolve().parent
 MAIN_SCRIPT = APP_ROOT / "main.py"
 
-DEFAULT_BACKGROUND = "black"
 DEFAULT_MAX_WEBSITES = 4
-DEFAULT_MAX_QUERIES = 5
 DEFAULT_TTS_PROVIDER = "elevenlabs"
 
 
 def _build_command(
     topic,
-    background,
     max_websites,
-    max_queries,
     tts_provider,
 ):
     """Build the CLI command for the pipeline.
 
     Args:
         topic: Documentary topic
-        background: Background mode (black or blur)
         max_websites: Max websites to research
-        max_queries: Image queries per segment
         tts_provider: TTS provider name
 
     Returns:
@@ -55,12 +49,8 @@ def _build_command(
         sys.executable,
         str(MAIN_SCRIPT),
         topic,
-        "--background",
-        background,
         "--max-websites",
         str(max_websites),
-        "--max-queries",
-        str(max_queries),
         "--tts-provider",
         tts_provider,
     ]
@@ -110,28 +100,10 @@ def main():
     # Configuration help section
     with st.expander("Configuration Options Help", expanded=False):
         st.markdown("""
-        ### **--background** `black` or `blur`
-        How images fill the screen when their aspect ratio doesn't match the video (16:9).
-        - **black**: Puts black bars around images (letterboxing)
-        - **blur**: Blurs and stretches the image to fill the entire screen
-
         ### **--max-websites** `4`
         Maximum number of websites to crawl for research. The system searches Google/Serper.dev
         and picks the top authoritative sources (Wikipedia, .edu, .gov sites, etc.) to gather
         information for the script. More = better research but slower processing.
-
-        ### **--max-queries** `5`
-        Maximum image search queries per video segment. Each segment generates up to 5 different
-        search queries to find relevant images. Higher = more image variety but slower processing.
-
-        ### **--images-per-query** `5`
-        Number of images to download per search query. If searching for "Apollo 11 landing",
-        it will download the top 5 images from that query.
-
-        ### **--sentence-span** `3`
-        How many sentences of the script are grouped together into one video segment.
-        - Lower (1-2): Faster image changes, more dynamic
-        - Higher (4-5): Slower changes, more time per image
 
         ### **--tts-provider** `elevenlabs` or `edge_tts`
         Text-to-speech engine for narration:
@@ -139,34 +111,21 @@ def main():
         - **edge_tts**: Free Microsoft voices (lower quality, no API key needed)
         """)
 
-    # Input section - two columns
+    # Input section
+    topic = st.text_input(
+        "Topic",
+        value="Apollo Program",
+        help="Enter any historical topic, event, person, or concept you want a documentary about",
+    )
+
     col1, col2 = st.columns(2)
     with col1:
-        topic = st.text_input(
-            "Topic",
-            value="Apollo Program",
-            help="Enter any historical topic, event, person, or concept you want a documentary about",
-        )
-        background = st.selectbox(
-            "Background",
-            options=["black", "blur"],
-            index=0 if DEFAULT_BACKGROUND == "black" else 1,
-            help="How to display images: black bars (letterbox) or blur-fill",
-        )
-    with col2:
         max_websites = st.number_input(
             "Max Websites",
             min_value=1,
             step=1,
             value=DEFAULT_MAX_WEBSITES,
             help="Number of websites to research (more = better script but slower)",
-        )
-        max_queries = st.number_input(
-            "Max Queries",
-            min_value=1,
-            step=1,
-            value=DEFAULT_MAX_QUERIES,
-            help="Image search queries per video segment",
         )
 
     # TTS Provider section
@@ -211,9 +170,7 @@ def main():
     # Build and display command
     command = _build_command(
         topic=topic,
-        background=background,
         max_websites=int(max_websites),
-        max_queries=int(max_queries),
         tts_provider=tts_provider,
     )
     st.markdown("**Running command:**")

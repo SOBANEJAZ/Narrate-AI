@@ -90,14 +90,13 @@ def create_default_config():
     return {
         "run_root": Path("runs"),
         "max_websites": 4,
-        "max_queries_per_segment": 5,
+        "max_queries_per_segment": 3,
         "sentence_span_per_segment": 3,
         "resolution_width": 1280,
         "resolution_height": 720,
         "fps": 15,
         "transition_seconds": 0.3,
         "zoom_strength": 0.015,
-        "background_mode": "black",
         "request_timeout_seconds": 20,
         "image_search_delay_seconds": 3,
         "cache_dir_name": "cache",
@@ -128,7 +127,6 @@ def create_config_from_env():
             "elevenlabs_voice_id": os.getenv("ELEVENLABS_VOICE_ID"),
             "elevenlabs_model_id": os.getenv("ELEVENLABS_MODEL_ID"),
             "edge_tts_voice": os.getenv("EDGE_TTS_VOICE", config["edge_tts_voice"]),
-            "background_mode": os.getenv("BACKGROUND_MODE", config["background_mode"]),
             "tts_provider": os.getenv("TTS_PROVIDER", config["tts_provider"]),
             "pinecone_api_key": os.getenv("PINECONE_API"),
             "pinecone_environment": os.getenv(

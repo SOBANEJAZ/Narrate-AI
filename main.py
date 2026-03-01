@@ -44,12 +44,6 @@ def build_parser():
         help="Directory where run artifacts are written.",
     )
     parser.add_argument(
-        "--background",
-        choices=["black", "blur"],
-        default="black",
-        help="Background fill mode for non-matching image aspect ratios.",
-    )
-    parser.add_argument(
         "--max-websites",
         type=int,
         default=4,
@@ -58,7 +52,7 @@ def build_parser():
     parser.add_argument(
         "--max-queries",
         type=int,
-        default=5,
+        default=3,
         help="Image search queries per video segment",
     )
     parser.add_argument(
@@ -83,7 +77,6 @@ def main():
     config = update_config(
         config,
         run_root=args.run_root,
-        background_mode=args.background,
         max_websites=max(1, args.max_websites),
         max_queries_per_segment=max(1, args.max_queries),
         tts_provider=args.tts_provider,
@@ -93,7 +86,6 @@ def main():
     print(
         "[CLI] Config:"
         f" run_root={config['run_root']}"
-        f", background={config['background_mode']}"
         f", max_websites={config['max_websites']}"
         f", max_queries={config['max_queries_per_segment']}"
         f", tts_provider={config['tts_provider']}",

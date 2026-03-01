@@ -3,7 +3,7 @@
 This module handles the final video production:
 1. Timeline building - Creates time-ordered segment list
 2. Video rendering - Assembles images + audio into MP4
-3. Visual effects - Zoom animation and background handling
+3. Visual effects - Zoom animation with black letterboxing
 
 Uses MoviePy for video manipulation with PIL for image processing.
 """
@@ -18,36 +18,11 @@ from moviepy import (
     ColorClip,
     CompositeVideoClip,
     ImageClip,
-    TextClip,
     concatenate_videoclips,
 )
-import moviepy.video.fx as fx
-from PIL import Image, ImageFilter, ImageOps, ImageFont
+from PIL import Image
 
 from core.models import create_timeline_item
-from core.text_utils import safe_filename
-
-FONT_CANDIDATES = [
-    "DejaVuSans-Bold",
-    "LiberationSans-Bold",
-    "FreeSans-Bold",
-    "Arial-Bold",
-    "Helvetica-Bold",
-]
-
-
-def _get_available_font():
-    """Try each font in FONT_CANDIDATES until one works."""
-    for font_name in FONT_CANDIDATES:
-        try:
-            ImageFont.truetype(font_name, 12)
-            return font_name
-        except OSError:
-            continue
-    raise RuntimeError(
-        f"No available font found. Tried: {FONT_CANDIDATES}. "
-        "Please install a font like DejaVuSans."
-    )
 
 
 def zoom_in_effect(clip, zoom_ratio=0.04):
@@ -191,12 +166,11 @@ def assemble_video(
     fps=10,
     transition_seconds=0.3,
     zoom_strength=3.0,
-    background_mode="black",
 ):
     """Assemble final video from timeline items.
 
     For each timeline item:
-    1. Create background (black or blurred image)
+    1. Create black background
     2. Create foreground image (centered, zoom effect)
     3. Composite with audio
     4. Concatenate all clips
@@ -208,7 +182,6 @@ def assemble_video(
         fps: Frames per second
         transition_seconds: Overlap between clips
         zoom_strength: Zoom effect intensity (0 to disable)
-        background_mode: "black" or "blur"
 
     Returns:
         Path to generated video file
@@ -220,8 +193,6 @@ def assemble_video(
         f"[VIDEO] Rendering video with {len(timeline)} clips -> {output_path}",
         flush=True,
     )
-    render_cache_dir = output_path.parent / "_render_cache"
-    render_cache_dir.mkdir(parents=True, exist_ok=True)
 
     clips = []
     try:
@@ -235,8 +206,6 @@ def assemble_video(
                 resolution=resolution,
                 fps=fps,
                 zoom_strength=zoom_strength,
-                background_mode=background_mode,
-                render_cache_dir=render_cache_dir,
             )
             clips.append(clip)
 
@@ -272,13 +241,11 @@ def _build_segment_clip(
     resolution,
     fps,
     zoom_strength,
-    background_mode,
-    render_cache_dir,
 ):
     """Build a single segment video clip.
 
     Creates a composited clip with:
-    - Background (black or blurred image)
+    - Black background (letterboxing)
     - Foreground image (centered, with zoom effect)
     - Audio track
 
@@ -287,8 +254,6 @@ def _build_segment_clip(
         resolution: Video resolution
         fps: Frames per second
         zoom_strength: Zoom intensity
-        background_mode: "black" or "blur"
-        render_cache_dir: Directory for cached blurred images
 
     Returns:
         MoviePy CompositeVideoClip
@@ -296,14 +261,8 @@ def _build_segment_clip(
     width, height = resolution
     duration = max(0.1, item["duration_seconds"])
 
-    # Create background
-    background = _background_clip(
-        item["image_path"],
-        duration=duration,
-        resolution=resolution,
-        background_mode=background_mode,
-        render_cache_dir=render_cache_dir,
-    )
+    # Create black background
+    background = ColorClip(size=resolution, color=(0, 0, 0)).with_duration(duration)
 
     # Create foreground image
     foreground = (
@@ -326,57 +285,6 @@ def _build_segment_clip(
     audio_clip = AudioFileClip(str(item["audio_path"]))
     composite = composite.with_audio(audio_clip)
     return composite
-
-
-def _background_clip(
-    image_path,
-    duration,
-    resolution,
-    background_mode,
-    render_cache_dir,
-):
-    """Create a background clip for a segment.
-
-    Args:
-        image_path: Path to source image
-        duration: Clip duration
-        resolution: Video resolution
-        background_mode: "black" or "blur"
-        render_cache_dir: Cache directory
-
-    Returns:
-        MoviePy clip for background
-    """
-    if background_mode == "blur":
-        blurred_path = _build_blurred_image(image_path, resolution, render_cache_dir)
-        if blurred_path is not None:
-            return ImageClip(str(blurred_path)).with_duration(duration)
-
-    return ColorClip(size=resolution, color=(0, 0, 0)).with_duration(duration)
-
-
-def _build_blurred_image(
-    source_image_path,
-    resolution,
-    render_cache_dir,
-):
-    """Build a blurred background image.
-
-    Creates a blurred and scaled version of the image to fill
-    the background behind the main image.
-
-    Args:
-        source_image_path: Path to source image
-        resolution: Target resolution
-        render_cache_dir: Cache directory
-
-    Returns:
-        Path to blurred image (cached)
-    """
-    safe_stem = safe_filename(source_image_path.stem, max_length=80)
-    out_path = render_cache_dir / f"blur_{safe_stem}.jpg"
-    if out_path.exists():
-        return out_path
 
     with Image.open(source_image_path).convert("RGB"):
         fitted = ImageOps.fit(

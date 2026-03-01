@@ -245,7 +245,6 @@ def run_pipeline(config, topic):
         fps=config["fps"],
         transition_seconds=config["transition_seconds"],
         zoom_strength=config["zoom_strength"],
-        background_mode=config["background_mode"],
     )
 
     # Save complete manifest for debugging/reproducibility
