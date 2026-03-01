@@ -1,4 +1,17 @@
-"""CLI entry point for documentary generation."""
+"""CLI Entry Point for Narrate-AI.
+
+This script provides a command-line interface for generating
+documentary videos. It's the primary way to run the pipeline
+programmatically or in scripts.
+
+Usage:
+    python main.py "Apollo Program"
+    python main.py "World War II" --max-websites 6
+    python main.py "Climate Change" --tts-provider edge_tts
+
+Environment Variables:
+    See .env.example for required API keys
+"""
 
 import argparse
 from pathlib import Path
@@ -12,11 +25,18 @@ from core.pipeline import run_pipeline
 
 
 def build_parser():
-    """Build the argument parser."""
+    """Build and configure the argument parser.
+
+    Returns:
+        Configured ArgumentParser instance
+    """
     parser = argparse.ArgumentParser(
         description="Generate a slideshow-style documentary video from a single topic.",
     )
-    parser.add_argument("topic", help="Documentary topic to generate.")
+    parser.add_argument(
+        "topic",
+        help="Documentary topic to generate (e.g., 'Apollo Program', 'World War II')",
+    )
     parser.add_argument(
         "--run-root",
         type=Path,
@@ -29,21 +49,36 @@ def build_parser():
         default="black",
         help="Background fill mode for non-matching image aspect ratios.",
     )
-    parser.add_argument("--max-websites", type=int, default=4)
-    parser.add_argument("--max-queries", type=int, default=5)
+    parser.add_argument(
+        "--max-websites",
+        type=int,
+        default=4,
+        help="Maximum number of websites to research",
+    )
+    parser.add_argument(
+        "--max-queries",
+        type=int,
+        default=5,
+        help="Image search queries per video segment",
+    )
     parser.add_argument(
         "--tts-provider",
         choices=["elevenlabs", "edge_tts"],
         default="elevenlabs",
-        help="TTS provider to use for narration (elevenlabs requires API key).",
+        help="TTS provider for narration (elevenlabs requires API key)",
     )
     return parser
 
 
 def main():
-    """Main entry point."""
+    """Main CLI entry point.
+
+    Parses arguments, builds config, and runs the pipeline.
+    Returns 0 on success, non-zero on failure.
+    """
     args = build_parser().parse_args()
 
+    # Build configuration from defaults + environment + CLI args
     config = create_config_from_env()
     config = update_config(
         config,
@@ -54,6 +89,7 @@ def main():
         tts_provider=args.tts_provider,
     )
 
+    # Log configuration
     print(
         "[CLI] Config:"
         f" run_root={config['run_root']}"
@@ -64,7 +100,10 @@ def main():
         flush=True,
     )
 
+    # Run the documentary generation pipeline
     result = run_pipeline(config, args.topic)
+
+    # Print output paths
     print(f"Run directory: {result.run_dir}")
     print(f"Script: {result.script_path}")
     print(f"Timeline: {result.timeline_path}")
