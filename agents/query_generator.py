@@ -1,4 +1,17 @@
-"""Query generator agent for RAG - generates search queries from narrative plan."""
+"""Query Generator Agent for RAG.
+
+This agent generates semantic search queries for each narrative section.
+These queries are used to retrieve relevant research notes from the
+vector database (Pinecone) to provide context for script writing.
+
+Why separate from script writer?
+- Allows focused, specific queries per section
+- Enables retrieval of diverse sources
+- Improves RAG accuracy by generating query-specific queries
+
+Agent Type: LLM-based (Groq API)
+Model: openai/gpt-oss-20b
+"""
 
 from groq import Groq
 
@@ -9,12 +22,21 @@ from core.models import PlanQueries, SectionQuery
 def generate_section_queries(context, plan):
     """Generate semantic search queries for each section of the narrative plan.
 
+    Takes the narrative plan (sections with titles and objectives) and
+    generates optimized search queries for each. These queries are designed
+    to retrieve the most relevant context from the vector database.
+
+    The queries should be:
+    - Concise (2-6 keywords) for better semantic matching
+    - Focused on the specific aspect of that section
+    - Different from each other to ensure diverse source retrieval
+
     Args:
         context: Dict with 'groq_client' and 'config' keys
-        plan: NarrativePlan Pydantic model
+        plan: NarrativePlan Pydantic model with sections
 
     Returns:
-        PlanQueries Pydantic model with queries for each section
+        PlanQueries Pydantic model containing queries for each section
     """
     print(
         f"[QUERY] Generating search queries for {len(plan.sections)} sections",
@@ -24,6 +46,7 @@ def generate_section_queries(context, plan):
     groq_client = context["groq_client"]
     config = context["config"]
 
+    # Create brief summary of each section for the prompt
     sections_brief = "\n".join(
         f"- {section.title}: {section.objective}" for section in plan.sections
     )
@@ -58,7 +81,7 @@ Return JSON with:
     response = groq_client.chat.completions.create(
         messages=[{"role": "user", "content": prompt}],
         model="openai/gpt-oss-20b",
-        temperature=0.3,
+        temperature=0.3,  # Moderate temp for creative but focused queries
     )
 
     json_data = extract_json(response.choices[0].message.content)

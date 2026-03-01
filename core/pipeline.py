@@ -1,4 +1,16 @@
-"""Documentary pipeline."""
+"""Documentary generation pipeline.
+
+This is the main orchestration module that coordinates all pipeline steps
+from research to final video output.
+
+Pipeline Phases:
+1. Research - Discover sources, crawl content, index to vector DB
+2. Generation - Write script, segment for images
+3. Retrieval - Find and rank images
+4. Production - Synthesize audio, build timeline, render video
+
+Each step produces intermediate output files for debugging.
+"""
 
 import json
 from datetime import datetime, timezone
@@ -26,7 +38,15 @@ from services.video import assemble_video, build_timeline
 
 
 class PipelineResult(dict):
-    """Pipeline result as a dictionary with property accessors."""
+    """Pipeline result with property accessors for convenient access.
+
+    After pipeline completes, this provides easy access to:
+    - run_dir: Directory with all output files
+    - script_path: Generated narration script
+    - timeline_path: Video timeline JSON
+    - manifest_path: Complete run metadata
+    - final_video_path: Final MP4 video
+    """
 
     @property
     def topic(self):
@@ -54,19 +74,50 @@ class PipelineResult(dict):
 
 
 def run_pipeline(config, topic):
-    """Run the documentary generation pipeline."""
+    """Run the complete documentary generation pipeline.
+
+    This is the main entry point for generating a documentary video.
+    It orchestrates all phases from research to final video assembly.
+
+    Pipeline Steps:
+    1. Create run directory and cache
+    2. Build narrative plan (outline with sections)
+    3. Discover and crawl web sources
+    4. Index research notes to Pinecone (RAG)
+    5. Generate semantic search queries for each section
+    6. Retrieve relevant notes using vector similarity
+    7. Write narration script
+    8. Segment script for image placement
+    9. Retrieve candidate images for each segment
+    10. Rank images using CLIP
+    11. Synthesize audio narration
+    12. Build timeline with synchronized audio/image
+    13. Assemble final video
+
+    Args:
+        config: Pipeline configuration dict
+        topic: Documentary topic string
+
+    Returns:
+        PipelineResult with paths to all output files
+
+    Raises:
+        RuntimeError: If any step fails
+    """
     print(f"[PIPELINE] Starting documentary generation for topic: {topic}", flush=True)
     run_dir = _create_run_dir(config, topic)
     print(f"[PIPELINE] Run directory: {run_dir}", flush=True)
     cache = MultiLayerCache(run_dir / config["cache_dir_name"])
 
     # Initialize Groq client and create agent context
+    # The context is passed to all agents so they can access LLM and config
     groq_client = get_groq_client(config["groq_api_key"])
     agent_context = {
         "groq_client": groq_client,
         "config": config,
     }
 
+    # ========== PHASE 1: Research & Context Building ==========
     print("[PIPELINE] Step 1: Narrative planning", flush=True)
     plan = build_narrative_plan(agent_context, topic)
 
@@ -107,16 +158,20 @@ def run_pipeline(config, topic):
             )
             all_retrieved_notes.extend(retrieved)
     else:
+        # Fallback: use first 15 notes if Pinecone unavailable
         all_retrieved_notes = notes[:15]
 
     print(f"[PIPELINE] Retrieved {len(all_retrieved_notes)} relevant notes", flush=True)
 
+    # Clean up Pinecone namespace to avoid accumulating data
     if pinecone_manager and namespace:
         pinecone_manager.clear_namespace(namespace)
 
+    # ========== PHASE 2: Content Generation ==========
     print("[PIPELINE] Step 6: Script generation", flush=True)
     script = write_script(agent_context, topic, plan, all_retrieved_notes)
 
+    # Save intermediate outputs for debugging
     script_path = run_dir / "script.txt"
     script_path.write_text(script, encoding="utf-8")
     _write_json(run_dir / "narrative_plan.json", plan.model_dump())
@@ -131,6 +186,7 @@ def run_pipeline(config, topic):
     print("[PIPELINE] Step 7: Image placement segmentation", flush=True)
     segments = build_segments(script, segmentation)
     if not segments:
+        # Fallback: single segment covering entire script
         segments = [
             create_script_segment(
                 segment_id=1,
@@ -144,6 +200,7 @@ def run_pipeline(config, topic):
             flush=True,
         )
 
+    # ========== PHASE 3: Image Retrieval ==========
     print("[PIPELINE] Step 8: Image retrieval", flush=True)
     segments = retrieve_images(config, cache, segments, run_dir / "images")
 
@@ -151,10 +208,12 @@ def run_pipeline(config, topic):
     ranking_state = create_ranking_state()
     segments = rank_images(ranking_state, segments)
 
+    # Verify all segments got images
     for segment in segments:
         if not segment.get("selected_image_path"):
             raise RuntimeError(f"No image selected for segment {segment['segment_id']}")
 
+    # ========== PHASE 4: Production ==========
     print("[PIPELINE] Step 9: Narration generation", flush=True)
     segments = synthesize_audio(
         config,
@@ -189,6 +248,7 @@ def run_pipeline(config, topic):
         background_mode=config["background_mode"],
     )
 
+    # Save complete manifest for debugging/reproducibility
     manifest_path = run_dir / "manifest.json"
     _write_json(
         manifest_path,
@@ -215,7 +275,17 @@ def run_pipeline(config, topic):
 
 
 def _create_run_dir(config, topic):
-    """Create a run directory for the documentary."""
+    """Create a timestamped run directory for this documentary.
+
+    Directory name format: YYYYMMDD-HHMMSS-topic-slug
+
+    Args:
+        config: Pipeline configuration
+        topic: Documentary topic
+
+    Returns:
+        Path to created run directory
+    """
     now = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     dir_name = f"{now}-{slugify(topic)[:60]}"
     run_dir = config["run_root"] / dir_name
@@ -224,7 +294,12 @@ def _create_run_dir(config, topic):
 
 
 def _write_json(path, payload):
-    """Write JSON data to a file."""
+    """Write JSON data to a file with proper encoding.
+
+    Args:
+        path: Output file path
+        payload: Python object to serialize as JSON
+    """
     path.write_text(
         json.dumps(payload, ensure_ascii=True, indent=2, default=str),
         encoding="utf-8",
@@ -232,7 +307,14 @@ def _write_json(path, payload):
 
 
 def _segment_manifest_entry(segment):
-    """Create a manifest entry for a segment."""
+    """Create a manifest entry for a segment (for debugging/output).
+
+    Args:
+        segment: Segment dict with all data
+
+    Returns:
+        Dict with serializable segment data for manifest
+    """
     return {
         "segment_id": segment["segment_id"],
         "text": segment["text"],

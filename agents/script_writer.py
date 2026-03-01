@@ -1,4 +1,17 @@
-"""Script writer agent."""
+"""Script Writer Agent.
+
+This agent writes the actual narration script for the documentary.
+It uses:
+- The narrative plan (structure, tone, pacing)
+- Retrieved research notes (context from RAG)
+- Its own knowledge (primary source)
+
+The script is written in spoken-language style suitable for narration,
+not formal written prose.
+
+Agent Type: LLM-based (Groq API)
+Model: meta-llama/llama-4-scout-17b-16e-instruct
+"""
 
 from groq import Groq
 
@@ -9,17 +22,25 @@ from core.models import NarrativePlan
 def write_script(context, topic: str, plan: NarrativePlan, retrieved_notes: list[dict]):
     """Write a documentary script based on the plan and retrieved research notes.
 
-    The script is generated using the LLM's own knowledge as the primary source,
-    with research notes as supplementary context for verification and enrichment.
+    This is the core content generation step. The agent:
+    1. Uses its own knowledge as the primary source (more complete)
+    2. Uses research notes for verification and additional facts
+    3. Writes in spoken-language style (for TTS narration)
+    4. Follows the section structure from the narrative plan
+
+    The output is plain text (no markdown) suitable for:
+    - Text-to-speech synthesis
+    - Image segmentation (finding breakpoints)
+    - Timeline creation
 
     Args:
         context: Dict with 'groq_client' and 'config' keys
-        topic: Documentary topic
-        plan: NarrativePlan Pydantic model
-        retrieved_notes: List of retrieved notes from RAG (already filtered/relevant)
+        topic: Documentary topic string
+        plan: NarrativePlan with section structure
+        retrieved_notes: List of relevant notes from RAG
 
     Returns:
-        Generated script text
+        Plain text script suitable for narration
     """
     print(
         f"[SCRIPT] Writing script for '{topic}' using {len(retrieved_notes)} retrieved notes",
@@ -29,11 +50,13 @@ def write_script(context, topic: str, plan: NarrativePlan, retrieved_notes: list
     groq_client = context["groq_client"]
     config = context["config"]
 
+    # Build section brief for the prompt
     section_brief = "\n".join(
         f"- {section.title} ({section.duration_seconds}s): {section.objective}"
         for section in plan.sections
     )
 
+    # Include research notes as supplementary context
     context_notes = "\n".join(
         f"- [{note.get('source_url', 'unknown')}] {note.get('text', '')}"
         for note in retrieved_notes
@@ -79,7 +102,7 @@ Now write the complete documentary narration script:
     response = groq_client.chat.completions.create(
         messages=[{"role": "user", "content": prompt}],
         model="meta-llama/llama-4-scout-17b-16e-instruct",
-        temperature=0.55,
+        temperature=0.55,  # Higher temp for more natural, engaging writing
     )
 
     script = response.choices[0].message.content

@@ -1,4 +1,17 @@
-"""Narrative architect agent."""
+"""Narrative Architect Agent.
+
+This agent is responsible for creating the structural plan for a documentary.
+It analyzes the topic and determines:
+- Overall narrative arc (intro, body, conclusion)
+- Section structure (3-4 main sections)
+- Tone and pacing style
+- Target duration for each section
+
+The plan serves as a blueprint for script writing and image selection.
+
+Agent Type: LLM-based (Groq API)
+Model: openai/gpt-oss-20b
+"""
 
 from groq import Groq
 
@@ -9,17 +22,33 @@ from core.models import NarrativePlan, NarrativeSection
 def build_narrative_plan(context, topic):
     """Build a narrative plan for the given topic.
 
+    This is the first step in the pipeline. The agent analyzes the topic
+    and creates a structured outline with sections, each having:
+    - title: Engaging name for the section
+    - objective: What this section should cover
+    - duration_seconds: Target length
+
+    The plan guides all subsequent steps:
+    - Query generation uses section objectives
+    - Script writing follows the section structure
+    - Image selection matches section themes
+
     Args:
         context: Dict with 'groq_client' and 'config' keys
         topic: Documentary topic string
 
-    Returns a NarrativePlan Pydantic model.
+    Returns:
+        NarrativePlan Pydantic model with sections and metadata
+
+    Raises:
+        ValueError: If plan has no sections
     """
     print(f"[NARRATIVE] Building narrative plan for topic: {topic}", flush=True)
 
     groq_client = context["groq_client"]
     config = context["config"]
 
+    # System prompt explaining the agent's role and outputs
     prompt = f"""
 You are the Narrative Architect for Narrate-AI, a documentary generator that creates slideshow-style educational videos. Your role is to structure the documentary content into a compelling narrative flow.
 
@@ -51,12 +80,13 @@ Constraints:
     response = groq_client.chat.completions.create(
         messages=[{"role": "user", "content": prompt}],
         model="openai/gpt-oss-20b",
-        temperature=0.2,
+        temperature=0.2,  # Low temp for consistent, structured output
     )
 
     json_data = extract_json(response.choices[0].message.content)
     plan = validate_pydantic(json_data, NarrativePlan)
 
+    # Ensure minimum duration per section (at least 15 seconds)
     for section in plan.sections:
         section.duration_seconds = max(15, section.duration_seconds)
 
