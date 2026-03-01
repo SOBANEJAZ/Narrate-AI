@@ -32,7 +32,6 @@ class VisualIntelligence(BaseModel):
     """Pydantic model for visual intelligence output."""
 
     search_queries: list[str]
-    visual_description: str
 
 
 class ImageZone(BaseModel):
@@ -131,7 +130,6 @@ def create_script_segment(
     start_sentence,
     end_sentence,
     search_queries=None,
-    visual_description="",
     candidate_images=None,
     selected_image_path=None,
     narration_audio_path=None,
@@ -146,8 +144,6 @@ def create_script_segment(
     }
     if search_queries is not None:
         result["search_queries"] = search_queries
-    if visual_description:
-        result["visual_description"] = visual_description
     if candidate_images is not None:
         result["candidate_images"] = candidate_images
     if selected_image_path is not None:
@@ -167,7 +163,6 @@ def create_timeline_item(
     duration_seconds,
     image_path,
     audio_path,
-    visual_description="",
 ):
     """Create a TimelineItem instance."""
     result = {
@@ -179,6 +174,4 @@ def create_timeline_item(
         "image_path": image_path,
         "audio_path": audio_path,
     }
-    if visual_description:
-        result["visual_description"] = visual_description
     return result

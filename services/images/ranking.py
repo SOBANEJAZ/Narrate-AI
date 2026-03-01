@@ -100,7 +100,10 @@ def _rank_with_clip(state, segment):
     assert state["clip_preprocess"] is not None
     assert state["clip_tokenizer"] is not None
 
-    visual_desc = segment.get("visual_description", "")
+    search_queries = segment.get("search_queries", [])
+    ranking_text = (
+        " ".join(search_queries) if search_queries else segment.get("text", "")
+    )
     valid_candidates = [
         candidate
         for candidate in segment.get("candidate_images", [])
@@ -112,7 +115,7 @@ def _rank_with_clip(state, segment):
         )
 
     with torch.no_grad():
-        text_tokens = state["clip_tokenizer"]([visual_desc]).to(state["device"])
+        text_tokens = state["clip_tokenizer"]([ranking_text]).to(state["device"])
         text_features = state["clip_model"].encode_text(text_tokens)
         text_features /= text_features.norm(dim=-1, keepdim=True)
 

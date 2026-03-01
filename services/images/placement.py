@@ -50,7 +50,6 @@ def build_segments(script, segmentation: ImageSegmentation):
                 text=zone_text,
                 start_sentence=zone.start_sentence,
                 end_sentence=end_idx,
-                visual_description=zone.description,
             )
         )
 

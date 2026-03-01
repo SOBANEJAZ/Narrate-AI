@@ -77,7 +77,7 @@ Narrate-AI/
 │   ├── narrative_architect.py # Structures documentary outline
 │   ├── query_generator.py     # Generates semantic search queries
 │   ├── script_writer.py       # Writes narration script
-│   └── visual_intelligence.py # Generates image descriptions
+│   └── image_segmentation.py  # Segments script into visual zones
 ├── services/                  # Domain-specific service modules
 │   ├── __init__.py
 │   ├── audio/                 # Audio synthesis (TTS)

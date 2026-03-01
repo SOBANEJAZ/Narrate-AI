@@ -10,7 +10,6 @@ from agents import (
     crawl_and_build_notes,
     create_ranking_state,
     discover_sources,
-    enrich_segments,
     generate_section_queries,
     rank_images,
     retrieve_images,
@@ -145,18 +144,10 @@ def run_pipeline(config, topic):
             flush=True,
         )
 
-    print("[PIPELINE] Step 8: Visual intelligence prompts", flush=True)
-    segments = enrich_segments(
-        agent_context,
-        topic,
-        segments,
-        config["max_queries_per_segment"],
-    )
-
-    print("[PIPELINE] Step 9: Image retrieval", flush=True)
+    print("[PIPELINE] Step 8: Image retrieval", flush=True)
     segments = retrieve_images(config, cache, segments, run_dir / "images")
 
-    print("[PIPELINE] Step 10: Image ranking", flush=True)
+    print("[PIPELINE] Step 9: Image ranking", flush=True)
     ranking_state = create_ranking_state()
     segments = rank_images(ranking_state, segments)
 
@@ -164,7 +155,7 @@ def run_pipeline(config, topic):
         if not segment.get("selected_image_path"):
             raise RuntimeError(f"No image selected for segment {segment['segment_id']}")
 
-    print("[PIPELINE] Step 11: Narration generation", flush=True)
+    print("[PIPELINE] Step 9: Narration generation", flush=True)
     segments = synthesize_audio(
         config,
         segments,
@@ -172,7 +163,7 @@ def run_pipeline(config, topic):
         config.get("tts_provider", "elevenlabs"),
     )
 
-    print("[PIPELINE] Step 12: Timeline synchronization", flush=True)
+    print("[PIPELINE] Step 10: Timeline synchronization", flush=True)
     timeline = build_timeline(segments)
     if not timeline:
         raise RuntimeError(
@@ -187,7 +178,7 @@ def run_pipeline(config, topic):
     timeline_path = run_dir / "timeline.json"
     _write_json(timeline_path, timeline)
     final_video_path = run_dir / "final_output.mp4"
-    print("[PIPELINE] Step 13: Video assembly", flush=True)
+    print("[PIPELINE] Step 11: Video assembly", flush=True)
     assemble_video(
         timeline,
         final_video_path,
@@ -247,7 +238,6 @@ def _segment_manifest_entry(segment):
         "text": segment["text"],
         "text_range": f"Sentence {segment['start_sentence']}-{segment['end_sentence']}",
         "search_queries": segment.get("search_queries", []),
-        "visual_description": segment.get("visual_description", ""),
         "image_candidates": segment.get("candidate_images", []),
         "selected_image_path": str(segment.get("selected_image_path"))
         if segment.get("selected_image_path")

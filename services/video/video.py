@@ -114,7 +114,6 @@ def build_timeline(segments):
                 duration_seconds=duration,
                 image_path=selected_image,
                 audio_path=narration_audio,
-                visual_description=segment.get("visual_description", ""),
             )
         )
         cursor += duration
@@ -222,50 +221,10 @@ def _build_segment_clip(
 
     clips = [background, foreground]
 
-    if item.get("visual_description"):
-        subtitle = _create_subtitle_clip(
-            item["visual_description"],
-            duration=duration,
-            resolution=resolution,
-        )
-        clips.append(subtitle)
-
     composite = CompositeVideoClip(clips, size=resolution).with_duration(duration)
     audio_clip = AudioFileClip(str(item["audio_path"]))
     composite = composite.with_audio(audio_clip)
     return composite
-
-
-def _create_subtitle_clip(text, duration, resolution):
-    """Create an animated subtitle clip with fade effect."""
-    width, height = resolution
-    font_size = int(height * 0.035)
-    padding = int(width * 0.05)
-
-    subtitle = (
-        TextClip(
-            text=text,
-            font=_get_available_font(),
-            font_size=font_size,
-            color="white",
-            stroke_color="black",
-            stroke_width=2,
-            method="caption",
-            size=(width - padding * 2, None),
-        )
-        .with_duration(duration)
-        .with_fps(10)
-    )
-
-    x_pos = "center"
-    y_pos = height - int(height * 0.08)
-
-    fade_duration = min(0.4, duration * 0.15)
-    subtitle = subtitle.fadein(fade_duration).fadeout(fade_duration)
-
-    subtitle = subtitle.with_position((x_pos, y_pos))
-
-    return subtitle
 
 
 def _background_clip(

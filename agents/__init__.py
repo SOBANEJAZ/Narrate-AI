@@ -4,7 +4,6 @@ from .image_segmentation import segment_for_images
 from .narrative_architect import build_narrative_plan
 from .query_generator import generate_section_queries
 from .script_writer import write_script
-from .visual_intelligence import enrich_segments
 from services.images import (
     build_segments,
     create_ranking_state,
@@ -19,7 +18,6 @@ __all__ = [
     "build_narrative_plan",
     "generate_section_queries",
     "write_script",
-    "enrich_segments",
     "build_segments",
     "create_ranking_state",
     "rank_images",
