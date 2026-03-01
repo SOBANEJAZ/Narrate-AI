@@ -1,4 +1,13 @@
-"""Image retrieval agent."""
+"""Image Retrieval Service.
+
+This module handles:
+1. Image search - Using Serper.dev Google Images API
+2. Parallel downloading - Multiple images fetched concurrently
+3. Caching - Avoid re-downloading previously fetched images
+
+Each segment gets its own directory with candidate images that
+are later ranked by the ranking service.
+"""
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -13,17 +22,34 @@ from core.text_utils import safe_filename
 
 SERPERS_IMAGES_URL = "https://google.serper.dev/images"
 
-MAX_IMAGE_DOWNLOAD_WORKERS = 8
+MAX_IMAGE_DOWNLOAD_WORKERS = 8  # Parallel download threads
 
 
 def retrieve_images(config, cache, segments, images_root):
-    """Retrieve images for script segments."""
+    """Retrieve candidate images for all script segments.
+
+    For each segment:
+    1. Search using segment's image queries (via Serper.dev)
+    2. Download images in parallel
+    3. Store as candidate images for ranking
+
+    Uses caching to avoid redundant API calls and downloads.
+
+    Args:
+        config: Pipeline configuration
+        cache: Cache instance for search results
+        segments: List of script segment dicts
+        images_root: Root directory for downloaded images
+
+    Returns:
+        Segments dict with candidate_images added
+    """
     print(
         f"[IMAGES] Retrieving images for {len(segments)} segments",
         flush=True,
     )
     images_root.mkdir(parents=True, exist_ok=True)
-    seen_urls = set()
+    seen_urls = set()  # Avoid duplicate images across segments
 
     for segment in segments:
         segment_id = segment["segment_id"]
@@ -39,6 +65,7 @@ def retrieve_images(config, cache, segments, images_root):
 
         urls_to_download = []
 
+        # Search for each query and collect unique image URLs
         for query in queries:
             results = _search_images_with_client(config, cache, query)
             print(
@@ -63,6 +90,7 @@ def retrieve_images(config, cache, segments, images_root):
                     }
                 )
 
+        # Download images in parallel
         if urls_to_download:
             print(
                 f"[IMAGES] Segment {segment_id}: downloading {len(urls_to_download)} images in parallel",
@@ -95,10 +123,26 @@ def retrieve_images(config, cache, segments, images_root):
 
 
 def _download_image_worker(config, url, title, source, segment_dir, segment_id):
-    """Download a single image. Returns candidate dict or None on failure."""
+    """Download a single image from URL.
+
+    Checks cache first (file existence), downloads if needed.
+    Validates content-type to ensure it's actually an image.
+
+    Args:
+        config: Pipeline configuration
+        url: Image URL to download
+        title: Image title/description
+        source: Source website
+        segment_dir: Directory to save image
+        segment_id: For logging
+
+    Returns:
+        ImageCandidate dict or None if download failed
+    """
     file_name = _filename_from_url(url, prefix="img")
     path = segment_dir / file_name
 
+    # Use cached file if exists
     if path.exists():
         return create_image_candidate(
             url=url,
@@ -110,7 +154,7 @@ def _download_image_worker(config, url, title, source, segment_dir, segment_id):
     try:
         response = requests.get(
             url,
-            timeout=(3, 10),
+            timeout=(3, 10),  # Connect timeout, read timeout
             headers={"User-Agent": "Narrate-AI/1.0"},
         )
         response.raise_for_status()
@@ -131,7 +175,18 @@ def _download_image_worker(config, url, title, source, segment_dir, segment_id):
 
 
 def _search_images(config, cache, query):
-    """Search for images using Serper.dev."""
+    """Search for images using Serper.dev Google Images API.
+
+    Results are cached to avoid redundant API calls.
+
+    Args:
+        config: Pipeline configuration
+        cache: Cache instance
+        query: Search query string
+
+    Returns:
+        List of image result dicts from Serper
+    """
     cache_key = f"images::{query.lower()}"
     cached = cache.get("images", cache_key)
     if isinstance(cached, list):
@@ -170,12 +225,21 @@ def _search_images(config, cache, query):
 
 
 def _search_images_with_client(config, cache, query):
-    """Search for images using Serper.dev."""
+    """Search for images using Serper.dev (wrapper for clarity)."""
     return _search_images(config, cache, query)
 
 
 def _download_image(config, url, output_dir):
-    """Download an image from URL."""
+    """Download an image from URL (legacy function).
+
+    Args:
+        config: Pipeline configuration
+        url: Image URL
+        output_dir: Directory to save image
+
+    Returns:
+        Path to downloaded image
+    """
     file_name = _filename_from_url(url, prefix="img")
     path = output_dir / file_name
     if path.exists():
@@ -195,7 +259,15 @@ def _download_image(config, url, output_dir):
 
 
 def _filename_from_url(url, prefix):
-    """Generate safe filename from URL."""
+    """Generate safe filename from URL.
+
+    Args:
+        url: Image URL
+        prefix: Prefix for filename (e.g., "img")
+
+    Returns:
+        Safe filename with prefix
+    """
     parsed = urlparse(url)
     stem = Path(parsed.path).name or "image.jpg"
     safe_stem = safe_filename(stem, max_length=100)

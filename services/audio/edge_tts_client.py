@@ -1,4 +1,16 @@
-"""Edge TTS implementation using Microsoft's Edge TTS service."""
+"""Edge TTS Provider.
+
+Microsoft Edge TTS provides free text-to-speech synthesis.
+No API key is required - it uses the same TTS engine that
+powers Microsoft Edge's read-aloud feature.
+
+Features:
+- Free, no API key needed
+- Multiple voices across languages
+- Good quality for narration
+
+API: https://pypi.org/project/edge-tts/
+"""
 
 import asyncio
 from pathlib import Path
@@ -16,7 +28,19 @@ async def _synthesize_async(text, out_path, voice):
 
 
 def synthesize_with_edge_tts(text, out_path, config):
-    """Synthesize speech using Microsoft Edge TTS (free, no API key required)."""
+    """Synthesize speech using Microsoft Edge TTS.
+
+    This is a free alternative to ElevenLabs. Quality is lower
+    but no API key is required.
+
+    Args:
+        text: Text to synthesize
+        out_path: Output file path
+        config: TTS config with voice setting
+
+    Returns:
+        Dict with success status, audio path, and error message
+    """
     voice = config.get("edge_tts_voice", DEFAULT_EDGE_VOICE)
 
     asyncio.run(_synthesize_async(text, out_path, voice))
@@ -29,7 +53,11 @@ def synthesize_with_edge_tts(text, out_path, config):
 
 
 def get_available_voices():
-    """Get list of available Edge TTS voices."""
+    """Get list of available Edge TTS voices.
+
+    Returns:
+        List of voice dicts with name, locale, and gender
+    """
     voices = [
         {"name": "en-US-AriaNeural", "locale": "en-US", "gender": "Female"},
         {"name": "en-US-GuyNeural", "locale": "en-US", "gender": "Male"},

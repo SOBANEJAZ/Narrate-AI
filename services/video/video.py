@@ -1,4 +1,12 @@
-"""Video assembly module."""
+"""Video Assembly Service.
+
+This module handles the final video production:
+1. Timeline building - Creates time-ordered segment list
+2. Video rendering - Assembles images + audio into MP4
+3. Visual effects - Zoom animation and background handling
+
+Uses MoviePy for video manipulation with PIL for image processing.
+"""
 
 import math
 import os
@@ -43,25 +51,39 @@ def _get_available_font():
 
 
 def zoom_in_effect(clip, zoom_ratio=0.04):
-    """Apply smooth zoom-in effect using PIL for high-quality resizing."""
+    """Apply smooth zoom-in effect using PIL for high-quality resizing.
+
+    Creates aKen Burns effect by slowly zooming into the image over time.
+    Uses PIL for high-quality Lanczos resizing.
+
+    Args:
+        clip: MoviePy video clip
+        zoom_ratio: Zoom speed (0.04 = 4% zoom per second)
+
+    Returns:
+        Transformed clip with zoom effect
+    """
 
     def effect(get_frame, t):
         img = Image.fromarray(get_frame(t))
         base_size = img.size
 
+        # Calculate new size with zoom
         new_size = [
             math.ceil(img.size[0] * (1 + (zoom_ratio * t))),
             math.ceil(img.size[1] * (1 + (zoom_ratio * t))),
         ]
 
+        # Ensure even dimensions for video codec
         new_size[0] = new_size[0] + (new_size[0] % 2)
         new_size[1] = new_size[1] + (new_size[1] % 2)
 
+        # High-quality resize up
         img = img.resize(new_size, Image.Resampling.LANCZOS)
 
+        # Crop back to original size (center)
         x = math.ceil((new_size[0] - base_size[0]) / 2)
         y = math.ceil((new_size[1] - base_size[1]) / 2)
-
         img = img.crop((x, y, new_size[0] - x, new_size[1] - y)).resize(
             base_size, Image.Resampling.LANCZOS
         )
@@ -75,15 +97,29 @@ def zoom_in_effect(clip, zoom_ratio=0.04):
 
 
 def build_timeline(segments):
-    """Build a timeline from script segments."""
+    """Build a timeline from script segments.
+
+    Converts segments with images and audio into a time-ordered list
+    with precise timing. Duration is determined by audio file length.
+
+    Args:
+        segments: List of segment dicts with image and audio paths
+
+    Returns:
+        List of timeline item dicts with timing info
+
+    Raises:
+        RuntimeError: If audio file cannot be loaded
+    """
     print(f"[TIMELINE] Building timeline from {len(segments)} segments", flush=True)
     timeline = []
-    cursor = 0.0
+    cursor = 0.0  # Current timestamp
 
     for segment in segments:
         selected_image = segment.get("selected_image_path")
         narration_audio = segment.get("narration_audio_path")
 
+        # Skip segments missing required files
         if selected_image is None or narration_audio is None:
             print(
                 f"[TIMELINE] Segment {segment['segment_id']}: missing image/audio, skipped",
@@ -98,6 +134,7 @@ def build_timeline(segments):
             )
             continue
 
+        # Get duration from audio file
         try:
             with AudioFileClip(str(narration_audio)) as audio_clip:
                 duration = float(audio_clip.duration)
@@ -134,7 +171,26 @@ def assemble_video(
     zoom_strength=3.0,
     background_mode="black",
 ):
-    """Assemble video from timeline items."""
+    """Assemble final video from timeline items.
+
+    For each timeline item:
+    1. Create background (black or blurred image)
+    2. Create foreground image (centered, zoom effect)
+    3. Composite with audio
+    4. Concatenate all clips
+
+    Args:
+        timeline: List of timeline item dicts
+        output_path: Output MP4 file path
+        resolution: Video resolution (width, height)
+        fps: Frames per second
+        transition_seconds: Overlap between clips
+        zoom_strength: Zoom effect intensity (0 to disable)
+        background_mode: "black" or "blur"
+
+    Returns:
+        Path to generated video file
+    """
     if not timeline:
         raise ValueError("Timeline is empty; cannot assemble video.")
 
@@ -162,14 +218,16 @@ def assemble_video(
             )
             clips.append(clip)
 
+        # Concatenate with small negative padding for smooth transitions
         final_clip = concatenate_videoclips(
             clips,
             method="compose",
-            padding=-transition_seconds,  # type: ignore[arg-type]
+            padding=-transition_seconds,
         )
 
-        total_duration = final_clip.duration
+        final_duration = final_clip.duration
 
+        # Render final video
         final_clip.write_videofile(
             str(output_path),
             fps=fps,
@@ -195,10 +253,28 @@ def _build_segment_clip(
     background_mode,
     render_cache_dir,
 ):
-    """Build a single segment clip."""
+    """Build a single segment video clip.
+
+    Creates a composited clip with:
+    - Background (black or blurred image)
+    - Foreground image (centered, with zoom effect)
+    - Audio track
+
+    Args:
+        item: Timeline item dict
+        resolution: Video resolution
+        fps: Frames per second
+        zoom_strength: Zoom intensity
+        background_mode: "black" or "blur"
+        render_cache_dir: Directory for cached blurred images
+
+    Returns:
+        MoviePy CompositeVideoClip
+    """
     width, height = resolution
     duration = max(0.1, item["duration_seconds"])
 
+    # Create background
     background = _background_clip(
         item["image_path"],
         duration=duration,
@@ -207,20 +283,23 @@ def _build_segment_clip(
         render_cache_dir=render_cache_dir,
     )
 
+    # Create foreground image
     foreground = (
         ImageClip(str(item["image_path"])).with_duration(duration).with_fps(fps)
     )
+    # Fit image to frame (letterbox if needed)
     foreground = foreground.resized(height=height)
     if foreground.w > width:
         foreground = foreground.resized(width=width)
 
+    # Apply zoom effect
     if zoom_strength > 0:
         foreground = zoom_in_effect(foreground, zoom_ratio=zoom_strength)
 
     foreground = foreground.with_position(("center", "center"))
 
+    # Composite and add audio
     clips = [background, foreground]
-
     composite = CompositeVideoClip(clips, size=resolution).with_duration(duration)
     audio_clip = AudioFileClip(str(item["audio_path"]))
     composite = composite.with_audio(audio_clip)
@@ -234,7 +313,18 @@ def _background_clip(
     background_mode,
     render_cache_dir,
 ):
-    """Create a background clip for a segment."""
+    """Create a background clip for a segment.
+
+    Args:
+        image_path: Path to source image
+        duration: Clip duration
+        resolution: Video resolution
+        background_mode: "black" or "blur"
+        render_cache_dir: Cache directory
+
+    Returns:
+        MoviePy clip for background
+    """
     if background_mode == "blur":
         blurred_path = _build_blurred_image(image_path, resolution, render_cache_dir)
         if blurred_path is not None:
@@ -248,11 +338,31 @@ def _build_blurred_image(
     resolution,
     render_cache_dir,
 ):
-    """Build a blurred background image."""
+    """Build a blurred background image.
+
+    Creates a blurred and scaled version of the image to fill
+    the background behind the main image.
+
+    Args:
+        source_image_path: Path to source image
+        resolution: Target resolution
+        render_cache_dir: Cache directory
+
+    Returns:
+        Path to blurred image (cached)
+    """
     safe_stem = safe_filename(source_image_path.stem, max_length=80)
     out_path = render_cache_dir / f"blur_{safe_stem}.jpg"
     if out_path.exists():
         return out_path
+
+    with Image.open(source_image_path).convert("RGB"):
+        fitted = ImageOps.fit(
+            source_image_path, resolution, method=Image.Resampling.LANCZOS
+        )
+        blurred = fitted.filter(ImageFilter.GaussianBlur(28))
+        blurred.save(out_path, format="JPEG", quality=90)
+    return out_path
 
     with Image.open(source_image_path).convert("RGB") as source:
         fitted = ImageOps.fit(source, resolution, method=Image.Resampling.LANCZOS)

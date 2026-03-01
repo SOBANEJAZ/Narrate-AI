@@ -1,4 +1,14 @@
-"""Research pipeline."""
+"""Research Service: Web crawling and source discovery.
+
+This module handles:
+1. Source discovery - Finding authoritative web sources using Serper.dev
+2. Content crawling - Extracting text from discovered URLs using crawl4ai
+3. Note creation - Chunking content into research notes for RAG
+
+External APIs:
+- Serper.dev: Google search API for finding sources
+- crawl4ai: Async web crawler for extracting content
+"""
 
 import asyncio
 import re
@@ -16,6 +26,8 @@ from core.text_utils import chunk_text
 SERPER_SEARCH_URL = "https://google.serper.dev/search"
 
 
+# Domains that indicate authoritative/trustworthy sources
+# Used to prioritize .edu, .gov, Wikipedia, major news, etc.
 AUTHORITATIVE_HINTS = (
     ".gov",
     ".edu",
@@ -43,7 +55,24 @@ AUTHORITATIVE_HINTS = (
 
 
 def discover_sources(config, cache, topic):
-    """Discover authoritative sources for the given topic."""
+    """Discover authoritative web sources for a given topic.
+
+    Uses Serper.dev Google Search API to find sources, then prioritizes
+    authoritative sources (.edu, .gov, Wikipedia, major news outlets).
+
+    Caching: Results are cached to avoid redundant API calls.
+
+    Args:
+        config: Pipeline configuration with API keys
+        cache: MultiLayerCache for storing results
+        topic: Documentary topic string
+
+    Returns:
+        List of research source dicts with url, title, snippet
+
+    Raises:
+        RuntimeError: If no sources found or API key missing
+    """
     print(f"[RESEARCH] Discovering sources for topic: {topic}", flush=True)
     cache_key = f"sources::{topic.lower()}"
     cached = cache.get("research", cache_key)
@@ -60,6 +89,7 @@ def discover_sources(config, cache, topic):
             for item in cached
         ]
 
+    # Build search query optimized for finding factual sources
     query = f"{topic} history timeline facts"
     sources = []
 
@@ -84,7 +114,9 @@ def discover_sources(config, cache, topic):
         response.raise_for_status()
     except requests.HTTPError as exc:
         error_text = response.text.strip()
-        detail = f"Serper web search failed ({response.status_code}) for query '{query}'."
+        detail = (
+            f"Serper web search failed ({response.status_code}) for query '{query}'."
+        )
         if error_text:
             detail = f"{detail} Response: {error_text[:300]}"
         raise RuntimeError(detail) from exc
@@ -101,15 +133,18 @@ def discover_sources(config, cache, topic):
     if not sources:
         raise RuntimeError(f"No web sources found for topic: {topic}")
 
+    # Deduplicate by URL
     deduped = {}
     for source in sources:
         deduped[source["url"]] = source
 
     ranked = sorted(deduped.values(), key=_source_score, reverse=True)
 
+    # Separate authoritative from non-authoritative
     authoritative = [s for s in ranked if _is_authoritative(s)]
     non_authoritative = [s for s in ranked if not _is_authoritative(s)]
 
+    # Prefer authoritative sources, but have fallback
     if authoritative:
         selected = authoritative[: config["max_websites"]]
         print(
@@ -139,7 +174,23 @@ def discover_sources(config, cache, topic):
 
 
 def crawl_and_build_notes(config, cache, sources):
-    """Crawl sources and build research notes."""
+    """Crawl sources and build research notes.
+
+    For each source URL:
+    1. Crawl the page content using crawl4ai
+    2. Chunk into ~400 word segments with 100 word overlap
+    3. Create research notes with source attribution
+
+    Each note becomes a candidate for RAG retrieval.
+
+    Args:
+        config: Pipeline configuration
+        cache: Cache for storing crawled content
+        sources: List of source dicts from discover_sources
+
+    Returns:
+        List of research note dicts with source_url and text
+    """
     print(f"[RESEARCH] Crawling {len(sources)} sources and building notes", flush=True)
     notes = []
     for source in sources:
@@ -148,6 +199,7 @@ def crawl_and_build_notes(config, cache, sources):
         if not raw:
             print(f"[RESEARCH] No content extracted for: {source['url']}", flush=True)
             continue
+        # Create chunks from crawled content
         source_note_count = 0
         for index, chunk in enumerate(
             chunk_text(raw, chunk_size_words=400, overlap_words=100), start=1
@@ -159,7 +211,7 @@ def crawl_and_build_notes(config, cache, sources):
                 )
             )
             source_note_count += 1
-            if index >= 4:
+            if index >= 4:  # Limit chunks per source
                 break
         print(
             f"[RESEARCH] Built {source_note_count} notes from {source['url']}",
@@ -170,14 +222,33 @@ def crawl_and_build_notes(config, cache, sources):
 
 
 def _is_authoritative(source):
-    """Check if source matches authoritative hints."""
+    """Check if source URL matches authoritative domain hints.
+
+    Args:
+        source: Source dict with 'url' key
+
+    Returns:
+        True if domain appears in AUTHORITATIVE_HINTS
+    """
     parsed = urlparse(source["url"])
     domain = parsed.netloc.lower()
     return any(hint in domain for hint in AUTHORITATIVE_HINTS)
 
 
 def _source_score(source):
-    """Calculate authority score for a source."""
+    """Calculate authority score for ranking sources.
+
+    Scoring factors:
+    - Authoritative domain: +10
+    - Longer snippet: +1 per 40 chars (max +5)
+    - www prefix: +1
+
+    Args:
+        source: Source dict
+
+    Returns:
+        Integer score (higher = more authoritative)
+    """
     parsed = urlparse(source["url"])
     domain = parsed.netloc.lower()
     score = 0
@@ -191,7 +262,18 @@ def _source_score(source):
 
 
 def _crawl_url(config, cache, url):
-    """Crawl a URL and return text content."""
+    """Crawl a URL and return extracted text content.
+
+    Uses cache to avoid re-crawling same URL.
+
+    Args:
+        config: Pipeline configuration
+        cache: Cache instance
+        url: URL to crawl
+
+    Returns:
+        Extracted text content (or empty string if failed)
+    """
     cache_key = f"page::{url}"
     cached = cache.get("crawl", cache_key)
     if isinstance(cached, dict) and cached.get("text"):
@@ -206,7 +288,16 @@ def _crawl_url(config, cache, url):
 
 
 def _crawl_with_crawl4ai(url):
-    """Crawl URL using crawl4ai."""
+    """Crawl URL using crawl4ai async web crawler.
+
+    Extracts markdown or cleaned HTML from the page.
+
+    Args:
+        url: URL to crawl
+
+    Returns:
+        Extracted text content as string
+    """
 
     async def _run():
         async with AsyncWebCrawler() as crawler:
