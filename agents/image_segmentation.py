@@ -40,7 +40,7 @@ Consider:
 
 Guidelines:
 - Minimum 2 sentences per image zone (don't fragment too much)
-- Maximum ~8-10 sentences per zone (keep images fresh)
+- Maximum 4 sentences per image zone (keep images fresh)
 - Each zone needs a brief description (2-5 words) of what the image should show
 - The description should be a concise noun phrase (e.g., "Viet Minh soldiers", "Saigon 1975", "Vietnam map")
 
