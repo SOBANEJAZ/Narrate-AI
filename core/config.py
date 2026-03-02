@@ -1,12 +1,11 @@
 """Configuration module.
 
 This module provides configuration as a dictionary with factory functions
-instead of a dataclass. It also manages singleton Groq client caching.
+instead of a dataclass.
 
 Configuration Flow:
 1. create_default_config() - Sets all sensible defaults
 2. create_config_from_env() - Overrides with environment variables
-3. update_config() - Applies CLI/UI overrides (immutable update)
 
 Environment Variables:
 - GROQ_API_KEY: LLM API key (required for agents)
@@ -21,37 +20,6 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-from groq import Groq
-
-
-# Singleton Groq client cache - avoids recreating client for each request
-_groq_client_cache = None
-
-
-def get_groq_client(api_key: str, model: str = None) -> Groq:
-    """Get or create a Groq client (cached singleton).
-
-    Uses a global singleton to avoid creating multiple Groq client instances.
-    This is safe because the Groq client is stateless after initialization.
-
-    Args:
-        api_key: Groq API key (from config["groq_api_key"])
-        model: Optional model name (stored in client for reference, not used)
-
-    Returns:
-        Groq client instance - singleton, shared across all agents
-
-    Raises:
-        ValueError: If API key is missing/empty
-    """
-    global _groq_client_cache
-
-    if _groq_client_cache is None:
-        if not api_key:
-            raise ValueError("Missing GROQ_API_KEY")
-        _groq_client_cache = Groq(api_key=api_key)
-
-    return _groq_client_cache
 
 
 def create_default_config():
@@ -113,48 +81,3 @@ def create_config_from_env():
         }
     )
     return config
-
-
-def get_resolution(config):
-    """Get the video resolution as a tuple (width, height).
-
-    Args:
-        config: Pipeline configuration dict
-
-    Returns:
-        Tuple of (width, height) in pixels
-    """
-    return (config["resolution_width"], config["resolution_height"])
-
-
-def get_top_k(config):
-    """Get the top_k value for RAG retrieval.
-
-    This determines how many relevant text chunks are retrieved from
-    the vector database for each search query.
-
-    Args:
-        config: Pipeline configuration dict
-
-    Returns:
-        Integer number of results to retrieve (default 1)
-    """
-    return config.get("top_k", 1)
-
-
-def update_config(config, **kwargs):
-    """Create a new config with updated values (immutable update).
-
-    Creates a copy of the config and applies updates, leaving the
-    original unchanged. This is useful for CLI overrides.
-
-    Args:
-        config: Original configuration dict
-        **kwargs: Keys and values to update
-
-    Returns:
-        New config dict with updates applied
-    """
-    new_config = dict(config)
-    new_config.update(kwargs)
-    return new_config

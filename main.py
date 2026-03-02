@@ -16,11 +16,7 @@ Environment Variables:
 import argparse
 from pathlib import Path
 
-from core.config import (
-    create_config_from_env,
-    get_resolution,
-    update_config,
-)
+from core.config import create_config_from_env
 from core.pipeline import run_pipeline
 
 
@@ -74,13 +70,13 @@ def main():
 
     # Build configuration from defaults + environment + CLI args
     config = create_config_from_env()
-    config = update_config(
-        config,
-        run_root=args.run_root,
-        max_websites=max(1, args.max_websites),
-        max_queries_per_segment=max(1, args.max_queries),
-        tts_provider=args.tts_provider,
-    )
+    config = {
+        **config,
+        "run_root": args.run_root,
+        "max_websites": max(1, args.max_websites),
+        "max_queries_per_segment": max(1, args.max_queries),
+        "tts_provider": args.tts_provider,
+    }
 
     # Log configuration
     print(

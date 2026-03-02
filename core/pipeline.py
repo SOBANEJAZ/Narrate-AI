@@ -32,8 +32,8 @@ from agents import (
     synthesize_audio,
     write_script,
 )
-from core.config import get_resolution, get_groq_client, get_top_k
 from core.models import create_script_segment, create_timeline_item
+from groq import Groq
 from services.rag_manager import create_pinecone_manager
 from services.video_assembly import assemble_video, build_timeline
 
@@ -170,7 +170,7 @@ def run_pipeline(config, topic):
 
     # Initialize Groq client and create agent context
     # The context is passed to all agents so they can access LLM and config
-    groq_client = get_groq_client(config["groq_api_key"])
+    groq_client = Groq(api_key=config["groq_api_key"])
     agent_context = {
         "groq_client": groq_client,
         "config": config,
@@ -213,7 +213,7 @@ def run_pipeline(config, topic):
                 namespace=namespace,
                 query=sq.search_query,
                 topic=topic,
-                top_k=get_top_k(config),
+                top_k=config.get("top_k", 1),
             )
             all_retrieved_notes.extend(retrieved)
     else:
@@ -300,7 +300,7 @@ def run_pipeline(config, topic):
     assemble_video(
         timeline,
         final_video_path,
-        resolution=get_resolution(config),
+        resolution=(config["resolution_width"], config["resolution_height"]),
         fps=config["fps"],
         transition_seconds=config["transition_seconds"],
         zoom_strength=config["zoom_strength"],
