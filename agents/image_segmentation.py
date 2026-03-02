@@ -79,41 +79,42 @@ def segment_for_images(context, script: str):
 
     groq_client = context["groq_client"]
 
-    prompt = f"""You are an expert at analyzing documentary scripts to determine optimal image placement.
+    prompt = f"""You are a documentary visual editor. Segment the script into image zones so each zone can be illustrated by one strong image.
 
-Given the script below, analyze it and determine where images should change to best illustrate the content.
+Task:
+- Split by visual meaning, not just equal length
+- Change zones at clear boundaries: new subject, place, time, actor, event, or consequence
+- Keep continuity where ideas are tightly connected
 
-Consider:
-- Topic shifts (e.g., from historical context to specific events)
-- Location changes (different places should show different images)
-- Time period changes (different eras need different imagery)
-- Mood shifts (dramatic moments may need different imagery)
-- Key visual moments (specific people, places, or events mentioned)
+Zone constraints:
+- 2 to 4 sentences per zone
+- Zones must be sequential and fully cover the script from sentence 1 to the final sentence
+- No overlaps, no gaps
+- zone_id must start at 1 and increase by 1
 
-Guidelines:
-- Minimum 2 sentences per image zone (don't fragment too much)
-- Maximum 4 sentences per image zone (keep images fresh)
-- Each zone needs a brief description (2-5 words) of what the image should show
-- The description should be a concise noun phrase (e.g., "Viet Minh soldiers", "Saigon 1975", "Vietnam map")
+Description constraints (critical for image retrieval):
+- 2 to 6 words
+- Concrete noun phrase, not a full sentence
+- Prefer specific entities/time/place when available
+- Avoid vague labels like "historical scene", "people talking", "important event"
+- Good examples: "Napoleon at Waterloo", "Berlin Wall 1989", "Saturn V launch"
 
-IMPORTANT: Return ONLY valid JSON. No markdown, no explanations.
+Output format (STRICT):
+- Return ONLY valid JSON (no markdown, no explanation)
+- Use exactly:
+{{
+  "zones": [
+    {{
+      "zone_id": 1,
+      "start_sentence": 1,
+      "end_sentence": 3,
+      "description": "..."
+    }}
+  ]
+}}
 
 Script:
 {script}
-
-Output as JSON with this structure:
-{{
-    "zones": [
-        {{
-            "zone_id": 1,
-            "start_sentence": 1,
-            "end_sentence": 3,
-            "description": "brief image description"
-        }}
-    ]
-}}
-
-Make sure zones are sequential with no gaps in sentence numbers.
 """
 
     response = groq_client.chat.completions.create(

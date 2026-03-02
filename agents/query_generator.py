@@ -74,14 +74,7 @@ def generate_section_queries(context, plan):
     )
 
     prompt = f"""
-You are a query generation agent for Narrate-AI, a documentary generator that creates slideshow-style educational videos. Your role is to generate semantic search queries that will retrieve the most relevant research notes from a vector database to support each section of the documentary.
-
-Context:
-- Narrate-AI produces documentary videos by combining narration audio with relevant images
-- Research notes retrieved by your queries will be used to enrich the script with factual details
-- Each section will be illustrated with images retrieved and ranked using OpenCLIP
-- The final video displays images centered on screen with subtle zoom effects over time
-- Target audience expects historically accurate and visually compelling content
+You are a retrieval-query specialist for Narrate-AI. Generate high-signal semantic queries for each section so vector search returns factual, section-specific evidence.
 
 Topic: {plan.topic}
 Tone: {plan.tone}
@@ -89,15 +82,33 @@ Tone: {plan.tone}
 Sections:
 {sections_brief}
 
-For each section, generate a search query that will help retrieve the most relevant
-research notes from a vector database. The query should be:
-- Concise (2-6 keywords)
-- Focused on the specific aspect of the topic covered in that section
-- Optimized for semantic search
-- Aligned with the documentary's educational and historical accuracy goals
+Goal:
+- Produce ONE query per section that is precise enough to avoid generic matches
+- Queries should maximize factual retrieval (dates, people, places, events, mechanisms, outcomes)
 
-Return JSON with:
-- queries: list of objects with section_title, section_objective, and search_query
+Query-writing rules:
+- 3-10 words each
+- Include concrete anchors when possible: names, years, locations, event names, institutions
+- Avoid vague fillers ("history", "overview", "important facts", "introduction")
+- Keep each query distinct from the others; minimize overlap
+- Match each section's objective directly
+
+Output format (STRICT):
+- Return ONLY valid JSON, no markdown or explanation
+- JSON shape:
+  {{
+    "queries": [
+      {{
+        "section_title": "...",
+        "section_objective": "...",
+        "search_query": "..."
+      }}
+    ]
+  }}
+
+Integrity constraints:
+- Keep section_title and section_objective aligned to the provided section list
+- Number of query objects must equal the number of provided sections
 """
 
     response = groq_client.chat.completions.create(

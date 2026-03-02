@@ -29,7 +29,7 @@ CONFIG = {
     "resolution": (1280, 720),
     "fps": 10,
     "transition_seconds": 0.3,
-    "zoom_strength": 0.08,
+    "zoom_strength": 0.5,
 }
 
 

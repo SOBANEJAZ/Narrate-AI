@@ -61,41 +61,39 @@ def write_script(context, topic: str, plan: NarrativePlan, retrieved_notes: list
         for note in retrieved_notes
     )
 
-    prompt = f"""You are a documentary script writer for Narrate-AI, a system that creates slideshow-style educational videos. Your role is to write an engaging, historically accurate narration script that will be paired with relevant images.
-
-Context:
-- Narrate-AI produces documentary videos by combining narration audio with relevant images
-- Each section of your script will be illustrated with images retrieved using search queries and ranked using OpenCLIP
-- The final video displays images centered on screen with subtle zoom effects over time
-- Target audience expects historically accurate and visually compelling content
-- Images will be selected based on visual descriptions generated from your script segments
-- The script should be engaging when viewed alongside supporting imagery
+    prompt = f"""You are a senior documentary narration writer for Narrate-AI. Write one continuous voiceover script that is compelling, accurate, and visually concrete.
 
 Topic: {topic}
+Target duration: {plan.target_duration_seconds} seconds
+Tone: {plan.tone}
+Pacing: {plan.pacing}
 
-STRUCTURE (use this as your outline):
+Required outline (follow this progression):
 {section_brief}
 
-TARGET DURATION: {plan.target_duration_seconds} seconds
-TONE: {plan.tone}
-PACING: {plan.pacing}
+Production constraints:
+- Script will be narrated with TTS and paired with changing images
+- Each part should include concrete visual anchors (people, places, artifacts, events, dates)
+- Avoid abstract-only passages that are hard to illustrate
 
-WRITING INSTRUCTIONS:
-1. Write the script primarily using YOUR OWN KNOWLEDGE as the base
-2. The research notes below are ONLY for additional context and verification
-3. Do NOT rely solely on the notes - use your knowledge to fill gaps
-4. If notes contain relevant facts, you may incorporate them naturally
-5. Write in a spoken-language style, vivid but factual - keep in mind that this will be narrated aloud
-6. Include smooth transitions between sections that help maintain visual continuity
-7. No markdown headings - just flowing prose suitable for voiceover narration
-8. Consider how each sentence will translate to visual content - make references concrete enough for image matching
-9. Maintain the documentary tone and pacing specified above
-10. Ensure historical accuracy while keeping the content engaging for viewers
+Writing rules:
+1. Primary source is your general knowledge; research notes are supplemental evidence
+2. Prioritize factual reliability; if a detail is uncertain, use cautious phrasing instead of inventing precision
+3. Write natural spoken prose (no bullet points, no markdown headings, no citations)
+4. Use smooth transitions so section boundaries feel coherent
+5. Maintain narrative momentum: setup, development, stakes, consequence, takeaway
+6. Vary sentence length for listenability, but keep wording clear and concise
+7. Keep chronology and causality explicit when relevant
+8. Prefer specific nouns/verbs over vague language
 
-RESEARCH NOTES (supplementary):
+Length guidance:
+- Aim for roughly {int(plan.target_duration_seconds * 2.2)} to {int(plan.target_duration_seconds * 2.8)} words total
+- Keep coverage balanced across sections according to their durations
+
+RESEARCH NOTES (supplementary context, may be partial/noisy):
 {context_notes}
 
-Now write the complete documentary narration script:
+Return only the final narration script text.
 """
 
     response = groq_client.chat.completions.create(

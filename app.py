@@ -5,6 +5,7 @@ This module provides a cinematic web interface for generating documentaries.
 """
 
 import os
+import re
 import subprocess
 import sys
 from html import escape
@@ -21,6 +22,31 @@ MAIN_SCRIPT = APP_ROOT / "main.py"
 
 DEFAULT_MAX_WEBSITES = 4
 DEFAULT_TTS_PROVIDER = "elevenlabs"
+
+PIPELINE_STAGES = [
+    ("search", "Research"),
+    ("file-text", "Script"),
+    ("image", "Images"),
+    ("volume-2", "Narration"),
+    ("film", "Export"),
+]
+
+STEP_STAGE_BY_NUMBER = {
+    1: 0,  # Narrative planning
+    2: 0,  # Research discovery
+    3: 0,  # Research notes
+    4: 0,  # Pinecone indexing
+    5: 0,  # Section queries
+    6: 0,  # Vector retrieval
+    7: 1,  # Script generation
+    8: 1,  # Image segmentation
+    9: 1,  # Image placement segmentation
+    10: 2,  # Image retrieval
+    11: 2,  # Image ranking
+    12: 3,  # Narration generation
+    13: 3,  # Timeline synchronization
+    14: 4,  # Video assembly
+}
 
 
 CUSTOM_CSS = """
@@ -327,17 +353,10 @@ def render_header():
     )
 
 
-def render_pipeline():
-    stages = [
-        ("search", "Research", True),
-        ("file-text", "Script", False),
-        ("image", "Images", False),
-        ("volume-2", "Narration", False),
-        ("film", "Export", False),
-    ]
-
+def render_pipeline(active_stage=0):
     stage_html = '<div class="pipeline-container">'
-    for i, (icon, label, active) in enumerate(stages):
+    for i, (icon, label) in enumerate(PIPELINE_STAGES):
+        active = i == active_stage
         active_class = "active" if active else ""
         icon_svg = get_icon(icon)
         stage_html += f"""
@@ -348,11 +367,24 @@ def render_pipeline():
             <span class="pipeline-label">{label}</span>
         </div>
         """
-        if i < len(stages) - 1:
+        if i < len(PIPELINE_STAGES) - 1:
             stage_html += '<span class="pipeline-arrow">→</span>'
 
     stage_html += "</div>"
     st.markdown(stage_html, unsafe_allow_html=True)
+
+
+def _infer_stage_from_log_line(line, current_stage):
+    """Infer pipeline stage index from one log line."""
+    match = re.search(r"\[PIPELINE\]\s+Step\s+(\d+):", line)
+    if match:
+        step_number = int(match.group(1))
+        return STEP_STAGE_BY_NUMBER.get(step_number, current_stage)
+
+    if line.startswith("[VIDEO]") or "Completed successfully:" in line:
+        return 4
+
+    return current_stage
 
 
 def get_icon(name):
@@ -454,7 +486,10 @@ def main():
     render_custom_css()
 
     render_header()
-    render_pipeline()
+    pipeline_box = st.empty()
+    current_stage = 0
+    with pipeline_box.container():
+        render_pipeline(current_stage)
 
     with st.container(border=True):
         st.markdown("### Documentary Setup")
@@ -528,6 +563,11 @@ def main():
     assert process.stdout is not None
     for line in process.stdout:
         logs.append(line.rstrip("\n"))
+        next_stage = _infer_stage_from_log_line(line, current_stage)
+        if next_stage != current_stage:
+            current_stage = next_stage
+            with pipeline_box.container():
+                render_pipeline(current_stage)
         with log_box.container():
             render_terminal(logs)
 
@@ -538,6 +578,8 @@ def main():
         return
 
     st.success("✓ Documentary generated successfully!")
+    with pipeline_box.container():
+        render_pipeline(4)
 
     render_output_paths(logs)
 

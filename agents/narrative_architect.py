@@ -72,31 +72,38 @@ def build_narrative_plan(context, topic):
 
     # System prompt explaining the agent's role and outputs
     prompt = f"""
-You are the Narrative Architect for Narrate-AI, a documentary generator that creates slideshow-style educational videos. Your role is to structure the documentary content into a compelling narrative flow.
-
-Context:
-- Narrate-AI produces documentary videos by combining narration audio with relevant images
-- Each section will be illustrated with images retrieved and ranked using OpenCLIP
-- The final video displays images centered on screen with subtle zoom effects over time
-- Target audience expects historically accurate and visually compelling content
-- Each section will have its own image search queries and visual descriptions generated
-- The script will be written based on your structural plan and supporting research notes
+You are the Narrative Architect for Narrate-AI. Build a concise, documentary-grade narrative plan for the topic below.
 
 Topic: {topic}
 
-Return strict JSON with:
-- topic: the documentary topic string
-- tone: short string describing the documentary tone (e.g., "educational", "historical", "informative", "narrative")
-- pacing: short string describing the pacing style (e.g., "steady", "methodical", "dynamic", "thoughtful")
-- target_duration_seconds: integer representing total video duration
-- sections: list of 3-4 objects with title, objective, duration_seconds
+Production context:
+- The final output is a slideshow-style documentary with narration and changing images
+- Each section will later generate semantic research queries and image search terms
+- Strong plans are factual, chronological/logical, and visually concrete
 
-Constraints:
-- Build a clear story arc with introduction, core sections, transitions, and conclusion
-- Durations should total around 2 minutes (120 seconds) unless topic complexity requires adjustment
-- Section titles should be engaging and descriptive enough to guide image search and visual content
-- Section objectives should be specific enough to guide script writing and image selection
-- Consider how each section will translate to visual content for the audience
+Your job:
+1. Design a clear narrative arc: setup -> development -> turning point(s) -> consequence/legacy
+2. Keep sections specific and non-overlapping (avoid repeating the same idea)
+3. Prefer concrete entities/time/place details so downstream image retrieval is easier
+
+Output requirements (STRICT):
+- Return ONLY one valid JSON object, no markdown, no prose, no code fences
+- Use exactly this shape and field names:
+  - topic: string
+  - tone: short string
+  - pacing: short string
+  - target_duration_seconds: integer
+  - sections: array of 3-4 objects, each with:
+    - title: string
+    - objective: string
+    - duration_seconds: integer
+
+Quality constraints:
+- target_duration_seconds should be about 120 seconds unless topic complexity justifies 100-150
+- Sum of section durations should be close to target_duration_seconds
+- Each section objective must be one sentence, specific, and actionable for script writing
+- Titles must be distinct and documentary-appropriate (not generic labels like "Overview")
+- Ensure beginning and ending sections are clearly identifiable from titles/objectives
 """
 
     response = groq_client.chat.completions.create(
