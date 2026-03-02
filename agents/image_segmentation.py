@@ -87,7 +87,7 @@ Task:
 - Keep continuity where ideas are tightly connected
 
 Zone constraints:
-- 2 to 4 sentences per zone
+- 2 to 3 sentences per zone
 - Zones must be sequential and fully cover the script from sentence 1 to the final sentence
 - No overlaps, no gaps
 - zone_id must start at 1 and increase by 1

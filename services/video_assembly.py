@@ -27,9 +27,9 @@ from core.models import create_timeline_item
 
 CONFIG = {
     "resolution": (1280, 720),
-    "fps": 10,
+    "fps": 15,
     "transition_seconds": 0.3,
-    "zoom_strength": 0.5,
+    "zoom_strength": 0.4,
 }
 
 

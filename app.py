@@ -265,36 +265,6 @@ div[data-baseweb="radio"] label {
   text-align: center;
 }
 
-.output-paths {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.65rem;
-  margin-top: 0.75rem;
-}
-
-.output-path {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #101018;
-  padding: 0.65rem 0.8rem;
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-}
-
-.output-path-icon {
-  width: 16px;
-  height: 16px;
-  color: var(--gold);
-}
-
-.output-path-text {
-  color: #d3cdc2 !important;
-  font-size: 0.8rem;
-  font-family: "JetBrains Mono", monospace !important;
-  word-break: break-all;
-}
-
 #MainMenu, footer {
   visibility: hidden !important;
 }
@@ -441,39 +411,6 @@ def render_video_player(video_path):
     st.video(str(video_path))
 
 
-def render_output_paths(logs):
-    run_dir = _extract_value(logs, "Run directory:")
-    script_path = _extract_value(logs, "Script:")
-    timeline_path = _extract_value(logs, "Timeline:")
-    manifest_path = _extract_value(logs, "Manifest:")
-    final_video = _extract_value(logs, "Final video:")
-
-    paths = [
-        ("folder", "Run Directory", run_dir),
-        ("file-text", "Script", script_path),
-        ("calendar", "Timeline", timeline_path),
-        ("database", "Manifest", manifest_path),
-        ("film", "Final Video", final_video),
-    ]
-
-    path_html = '<div class="output-paths">'
-    for icon, label, value in paths:
-        if value:
-            icon_svg = get_icon(icon)
-            path_html += f"""
-            <div class="output-path">
-                <svg class="output-path-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    {icon_svg}
-                </svg>
-                <span class="output-path-text">{label}: {value}</span>
-            </div>
-            """
-    path_html += "</div>"
-
-    if any(p[2] for p in paths):
-        st.markdown(path_html, unsafe_allow_html=True)
-
-
 def main():
     st.set_page_config(
         page_title="Narrate-AI | Documentary Generator",
@@ -580,8 +517,6 @@ def main():
     st.success("✓ Documentary generated successfully!")
     with pipeline_box.container():
         render_pipeline(4)
-
-    render_output_paths(logs)
 
     final_video = _extract_value(logs, "Final video:")
     if final_video and Path(final_video).exists():
