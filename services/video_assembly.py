@@ -27,9 +27,9 @@ from core.models import create_timeline_item
 
 CONFIG = {
     "resolution": (1280, 720),
-    "fps": 15,
+    "fps": 10,
     "transition_seconds": 0.3,
-    "zoom_strength": 3.0,
+    "zoom_strength": 0.08,
 }
 
 
@@ -41,19 +41,21 @@ def zoom_in_effect(clip, zoom_ratio=CONFIG["zoom_strength"]):
 
     Args:
         clip: MoviePy video clip
-        zoom_ratio: Zoom speed (0.04 = 4% zoom per second)
+        zoom_ratio: Total zoom amount across the clip (0.08 = 8% total zoom)
 
     Returns:
         Transformed clip with zoom effect
     """
 
+    clip_duration = float(clip.duration or 0.0)
+
     def effect(get_frame, t):
-        return _apply_zoom_frame(get_frame(t), zoom_ratio, t)
+        return _apply_zoom_frame(get_frame(t), zoom_ratio, t, clip_duration)
 
     return clip.transform(effect)
 
 
-def _apply_zoom_frame(frame, zoom_ratio, time_seconds):
+def _apply_zoom_frame(frame, zoom_ratio, time_seconds, clip_duration):
     """Apply zoom transformation to a single video frame.
 
     This is the inner function that does the actual zoom processing:
@@ -66,8 +68,9 @@ def _apply_zoom_frame(frame, zoom_ratio, time_seconds):
 
     Args:
         frame: Video frame as numpy array
-        zoom_ratio: Zoom speed
+        zoom_ratio: Total zoom amount across the clip
         time_seconds: Current time in video
+        clip_duration: Total clip duration in seconds
 
     Returns:
         Transformed frame as numpy array
@@ -75,10 +78,16 @@ def _apply_zoom_frame(frame, zoom_ratio, time_seconds):
     img = Image.fromarray(frame)
     base_size = img.size
 
+    # Normalize zoom over full clip duration so long segments do not explode in size.
+    # Example: zoom_ratio=0.08 means 8% total zoom from start to end of clip.
+    duration = max(clip_duration, 0.001)
+    progress = min(max(time_seconds / duration, 0.0), 1.0)
+    scale = 1.0 + (zoom_ratio * progress)
+
     # Calculate new size with zoom
     new_size = [
-        math.ceil(img.size[0] * (1 + (zoom_ratio * time_seconds))),
-        math.ceil(img.size[1] * (1 + (zoom_ratio * time_seconds))),
+        math.ceil(img.size[0] * scale),
+        math.ceil(img.size[1] * scale),
     ]
 
     # Ensure even dimensions for video codec compatibility

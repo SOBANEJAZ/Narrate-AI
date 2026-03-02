@@ -186,7 +186,7 @@ def run_pipeline(config, topic):
     print("[PIPELINE] Step 3: Research notes", flush=True)
     notes = crawl_and_build_notes(config, cache, sources)
 
-    print("[PIPELINE] Step 3.5: Indexing notes to Pinecone", flush=True)
+    print("[PIPELINE] Step 4: Indexing notes to Pinecone", flush=True)
     namespace = slugify(topic)[:50]
     pinecone_manager = create_pinecone_manager(config)
     if pinecone_manager:
@@ -198,14 +198,14 @@ def run_pipeline(config, topic):
     else:
         print("[PIPELINE] Pinecone not available, using notes directly", flush=True)
 
-    print("[PIPELINE] Step 4: Generating section queries for RAG", flush=True)
+    print("[PIPELINE] Step 5: Generating section queries for RAG", flush=True)
     section_queries = generate_section_queries(agent_context, plan)
 
     print(f"[RAG] Semantic search queries generated:", flush=True)
     for sq in section_queries.queries:
         print(f"  - Section: {sq.section_title} | Query: {sq.search_query}", flush=True)
 
-    print("[PIPELINE] Step 5: Retrieving relevant notes from vector DB", flush=True)
+    print("[PIPELINE] Step 6: Retrieving relevant notes from vector DB", flush=True)
     all_retrieved_notes = []
     if pinecone_manager:
         for sq in section_queries.queries:
@@ -227,7 +227,7 @@ def run_pipeline(config, topic):
         pinecone_manager.clear_namespace(namespace)
 
     # ========== PHASE 2: Content Generation ==========
-    print("[PIPELINE] Step 6: Script generation", flush=True)
+    print("[PIPELINE] Step 7: Script generation", flush=True)
     script = write_script(agent_context, topic, plan, all_retrieved_notes)
 
     # Save intermediate outputs for debugging
@@ -239,10 +239,10 @@ def run_pipeline(config, topic):
     _write_json(run_dir / "retrieved_notes.json", all_retrieved_notes)
     print(f"[PIPELINE] Script saved: {script_path}", flush=True)
 
-    print("[PIPELINE] Step 6.5: Image segmentation", flush=True)
+    print("[PIPELINE] Step 8: Image segmentation", flush=True)
     segmentation = segment_for_images(agent_context, script)
 
-    print("[PIPELINE] Step 7: Image placement segmentation", flush=True)
+    print("[PIPELINE] Step 9: Image placement segmentation", flush=True)
     segments = build_segments(script, segmentation)
     if not segments:
         # Fallback: single segment covering entire script
@@ -260,10 +260,10 @@ def run_pipeline(config, topic):
         )
 
     # ========== PHASE 3: Image Retrieval ==========
-    print("[PIPELINE] Step 8: Image retrieval", flush=True)
+    print("[PIPELINE] Step 10: Image retrieval", flush=True)
     segments = retrieve_images(config, cache, segments, run_dir / "images")
 
-    print("[PIPELINE] Step 9: Image ranking", flush=True)
+    print("[PIPELINE] Step 11: Image ranking", flush=True)
     ranking_state = create_ranking_state()
     segments = rank_images(ranking_state, segments)
 
@@ -273,7 +273,7 @@ def run_pipeline(config, topic):
             raise RuntimeError(f"No image selected for segment {segment['segment_id']}")
 
     # ========== PHASE 4: Production ==========
-    print("[PIPELINE] Step 9: Narration generation", flush=True)
+    print("[PIPELINE] Step 12: Narration generation", flush=True)
     segments = synthesize_audio(
         config,
         segments,
@@ -281,7 +281,7 @@ def run_pipeline(config, topic):
         config.get("tts_provider", "elevenlabs"),
     )
 
-    print("[PIPELINE] Step 10: Timeline synchronization", flush=True)
+    print("[PIPELINE] Step 13: Timeline synchronization", flush=True)
     timeline = build_timeline(segments)
     if not timeline:
         raise RuntimeError(
@@ -296,7 +296,7 @@ def run_pipeline(config, topic):
     timeline_path = run_dir / "timeline.json"
     _write_json(timeline_path, timeline)
     final_video_path = run_dir / "final_output.mp4"
-    print("[PIPELINE] Step 11: Video assembly", flush=True)
+    print("[PIPELINE] Step 14: Video assembly", flush=True)
     assemble_video(
         timeline,
         final_video_path,
