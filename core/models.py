@@ -77,7 +77,7 @@ class ImageZone(BaseModel):
     description: str
 
 
-class ImageSegmentation(ImageZone):
+class ImageSegmentation(BaseModel):
     """Collection of image zones covering the entire script.
 
     The segmentation agent analyzes the script and determines
