@@ -25,7 +25,15 @@ from PIL import Image
 from core.models import create_timeline_item
 
 
-def zoom_in_effect(clip, zoom_ratio=0.04):
+CONFIG = {
+    "resolution": (1280, 720),
+    "fps": 15,
+    "transition_seconds": 0.3,
+    "zoom_strength": 3.0,
+}
+
+
+def zoom_in_effect(clip, zoom_ratio=CONFIG["zoom_strength"]):
     """Apply smooth zoom-in effect using PIL for high-quality resizing.
 
     Creates a Ken Burns effect by slowly zooming into the image over time.
@@ -162,10 +170,10 @@ def build_timeline(segments):
 def assemble_video(
     timeline,
     output_path,
-    resolution=(1280, 720),
-    fps=10,
-    transition_seconds=0.3,
-    zoom_strength=3.0,
+    resolution=CONFIG["resolution"],
+    fps=CONFIG["fps"],
+    transition_seconds=CONFIG["transition_seconds"],
+    zoom_strength=CONFIG["zoom_strength"],
 ):
     """Assemble final video from timeline items.
 

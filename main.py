@@ -14,9 +14,11 @@ Environment Variables:
 """
 
 import argparse
+import os
 from pathlib import Path
 
-from core.config import create_config_from_env
+from dotenv import load_dotenv
+
 from core.pipeline import run_pipeline
 
 
@@ -68,10 +70,22 @@ def main():
     """
     args = build_parser().parse_args()
 
-    # Build configuration from defaults + environment + CLI args
-    config = create_config_from_env()
+    load_dotenv()
     config = {
-        **config,
+        "groq_api_key": os.getenv("GROQ_API_KEY"),
+        "serper_api_key": os.getenv("SERPER_API_KEY"),
+        "elevenlabs_api_key": os.getenv("ELEVENLABS_API_KEY"),
+        "elevenlabs_voice_id": os.getenv("ELEVENLABS_VOICE_ID"),
+        "elevenlabs_model_id": os.getenv("ELEVENLABS_MODEL_ID"),
+        "edge_tts_voice": os.getenv("EDGE_TTS_VOICE", "en-US-AriaNeural"),
+        "tts_provider": os.getenv("TTS_PROVIDER", "elevenlabs"),
+        "pinecone_api_key": os.getenv("PINECONE_API"),
+        "pinecone_environment": os.getenv("PINECONE_ENV", "us-east-1"),
+        "top_k": int(os.getenv("TOP_K", 1)),
+        "cache_dir_name": "cache",
+        "request_timeout_seconds": 20,
+        "max_websites": 4,
+        "max_queries_per_segment": 3,
         "run_root": args.run_root,
         "max_websites": max(1, args.max_websites),
         "max_queries_per_segment": max(1, args.max_queries),

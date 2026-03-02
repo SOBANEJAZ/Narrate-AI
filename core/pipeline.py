@@ -35,7 +35,7 @@ from agents import (
 from core.models import create_script_segment, create_timeline_item
 from groq import Groq
 from services.rag_manager import create_pinecone_manager
-from services.video_assembly import assemble_video, build_timeline
+from services.video_assembly import CONFIG, assemble_video, build_timeline
 
 
 class MultiLayerCache:
@@ -300,10 +300,6 @@ def run_pipeline(config, topic):
     assemble_video(
         timeline,
         final_video_path,
-        resolution=(config["resolution_width"], config["resolution_height"]),
-        fps=config["fps"],
-        transition_seconds=config["transition_seconds"],
-        zoom_strength=config["zoom_strength"],
     )
 
     # Save complete manifest for debugging/reproducibility
