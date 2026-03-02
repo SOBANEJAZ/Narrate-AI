@@ -7,8 +7,29 @@ It maps zone boundaries (sentence numbers) to actual text content,
 creating segments that pair well-defined script portions with images.
 """
 
+import re
+
 from core.models import ImageSegmentation, create_script_segment
-from core.text_utils import split_sentences
+
+
+def split_sentences(text: str) -> list[str]:
+    """Split text into sentences.
+
+    Handles common sentence endings (. ! ?) followed by whitespace.
+    Also normalizes multiple whitespace to single spaces first.
+
+    Args:
+        text: Input text to split
+
+    Returns:
+        List of sentences (empty if input is empty)
+    """
+    cleaned = re.sub(r"\s+", " ", text).strip()
+    if not cleaned:
+        return []
+    return [
+        item.strip() for item in re.split(r"(?<=[.!?])\s+", cleaned) if item.strip()
+    ]
 
 
 def build_segments(script, segmentation: ImageSegmentation):

@@ -12,6 +12,7 @@ semantic similarity between images and text descriptions.
 """
 
 import re
+from collections import Counter
 
 import cv2
 import numpy as np
@@ -19,7 +20,35 @@ import open_clip
 import torch
 from PIL import Image
 
-from core.text_utils import extract_keywords
+# Common English stopwords to filter out during keyword extraction
+STOPWORDS = {
+    "a",
+    "an",
+    "and",
+    "are",
+    "as",
+    "at",
+    "be",
+    "by",
+    "for",
+    "from",
+    "has",
+    "he",
+    "in",
+    "is",
+    "it",
+    "its",
+    "of",
+    "on",
+    "or",
+    "that",
+    "the",
+    "to",
+    "was",
+    "were",
+    "will",
+    "with",
+}
 
 # Quality scoring constants
 QUALITY_WEIGHT_RESOLUTION = 0.6
@@ -32,6 +61,29 @@ MIN_SHARPNESS_THRESHOLD = 50  # Laplacian variance threshold
 CLIP_SCORE_WEIGHT = 0.7
 QUALITY_SCORE_WEIGHT = 0.3
 MIN_QUALITY_THRESHOLD = 0.1  # Skip images below this quality
+
+
+def extract_keywords(text: str, limit: int = 8) -> list[str]:
+    """Extract most common meaningful words from text.
+
+    Filters out:
+    - Stopwords (the, a, is, etc.)
+    - Very short words (< 3 chars)
+    - Non-alphanumeric characters
+
+    Used for generating search queries and image search terms.
+
+    Args:
+        text: Input text
+        limit: Maximum keywords to return (default 8)
+
+    Returns:
+        List of most common keywords, sorted by frequency
+    """
+    words = re.findall(r"[A-Za-z0-9][A-Za-z0-9'-]+", text.lower())
+    filtered = [word for word in words if word not in STOPWORDS and len(word) > 2]
+    freq = Counter(filtered)
+    return [word for word, _ in freq.most_common(limit)]
 
 
 def create_ranking_state(model_name="ViT-B-16", pretrained_name="laion2b_s34b_b88k"):

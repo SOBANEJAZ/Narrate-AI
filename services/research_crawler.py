@@ -11,16 +11,60 @@ External APIs:
 """
 
 import asyncio
+import json
 import re
+from hashlib import sha256
+from pathlib import Path
 from urllib.parse import urlparse
+from typing import Any
 
 import requests
 from bs4 import BeautifulSoup
 from crawl4ai import AsyncWebCrawler
 
-from core.cache import MultiLayerCache
 from core.models import create_research_note, create_research_source
-from core.text_utils import chunk_text
+
+
+class MultiLayerCache:
+    """Two-layer cache: memory (fast) + filesystem (persistent)."""
+
+    def __init__(self, root: Path) -> None:
+        self.root = root
+        self.root.mkdir(parents=True, exist_ok=True)
+        self._memory: dict[str, Any] = {}
+
+    def _hash_key(self, namespace: str, key: str) -> str:
+        raw = f"{namespace}:{key}".encode("utf-8")
+        return sha256(raw).hexdigest()
+
+    def _path(self, namespace: str, key: str) -> Path:
+        namespace_dir = self.root / namespace
+        namespace_dir.mkdir(parents=True, exist_ok=True)
+        return namespace_dir / f"{self._hash_key(namespace, key)}.json"
+
+    def get(self, namespace: str, key: str) -> Any | None:
+        memory_key = f"{namespace}:{key}"
+        if memory_key in self._memory:
+            return self._memory[memory_key]
+
+        path = self._path(namespace, key)
+        if not path.exists():
+            return None
+
+        try:
+            value = json.loads(path.read_text(encoding="utf-8"))
+            self._memory[memory_key] = value
+            return value
+        except json.JSONDecodeError:
+            return None
+
+    def set(self, namespace: str, key: str, value: Any) -> None:
+        memory_key = f"{namespace}:{key}"
+        self._memory[memory_key] = value
+        path = self._path(namespace, key)
+        path.write_text(
+            json.dumps(value, ensure_ascii=True, indent=2), encoding="utf-8"
+        )
 
 
 SERPER_SEARCH_URL = "https://google.serper.dev/search"
@@ -35,6 +79,42 @@ SCORE_AUTHORITATIVE_DOMAIN = 10
 SCORE_MAX_SNIPPET = 5
 SCORE_WWW_PREFIX = 1
 SNIPPET_LENGTH_DIVISOR = 40  # Points per 40 chars of snippet
+
+
+def chunk_text(
+    text: str, chunk_size_words: int = 180, overlap_words: int = 30
+) -> list[str]:
+    """Split text into overlapping chunks of words.
+
+    Used for preparing text for RAG indexing. The overlap ensures
+    context is preserved at chunk boundaries.
+
+    Args:
+        text: Input text to chunk
+        chunk_size_words: Maximum words per chunk (default 180)
+        overlap_words: Words to overlap between chunks (default 30)
+
+    Returns:
+        List of text chunks
+    """
+    words = text.split()
+    if not words:
+        return []
+    if chunk_size_words <= overlap_words:
+        overlap_words = 0
+
+    chunks: list[str] = []
+    start = 0
+    while start < len(words):
+        end = min(len(words), start + chunk_size_words)
+        chunk = " ".join(words[start:end]).strip()
+        if chunk:
+            chunks.append(chunk)
+        if end == len(words):
+            break
+        start = end - overlap_words
+    return chunks
+
 
 # Domains that indicate authoritative/trustworthy sources
 # Used to prioritize .edu, .gov, Wikipedia, major news, etc.

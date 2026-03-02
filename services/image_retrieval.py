@@ -9,20 +9,95 @@ Each segment gets its own directory with candidate images that
 are later ranked by the ranking service.
 """
 
+import json
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from hashlib import sha256
 from pathlib import Path
+from typing import Any
 from urllib.parse import urlparse
 
 import requests
 
-from core.cache import MultiLayerCache
 from core.models import create_image_candidate
-from core.text_utils import safe_filename
+
+
+class MultiLayerCache:
+    """Two-layer cache: memory (fast) + filesystem (persistent)."""
+
+    def __init__(self, root: Path) -> None:
+        self.root = root
+        self.root.mkdir(parents=True, exist_ok=True)
+        self._memory: dict[str, Any] = {}
+
+    def _hash_key(self, namespace: str, key: str) -> str:
+        raw = f"{namespace}:{key}".encode("utf-8")
+        return sha256(raw).hexdigest()
+
+    def _path(self, namespace: str, key: str) -> Path:
+        namespace_dir = self.root / namespace
+        namespace_dir.mkdir(parents=True, exist_ok=True)
+        return namespace_dir / f"{self._hash_key(namespace, key)}.json"
+
+    def get(self, namespace: str, key: str) -> Any | None:
+        memory_key = f"{namespace}:{key}"
+        if memory_key in self._memory:
+            return self._memory[memory_key]
+
+        path = self._path(namespace, key)
+        if not path.exists():
+            return None
+
+        try:
+            value = json.loads(path.read_text(encoding="utf-8"))
+            self._memory[memory_key] = value
+            return value
+        except json.JSONDecodeError:
+            return None
+
+    def set(self, namespace: str, key: str, value: Any) -> None:
+        memory_key = f"{namespace}:{key}"
+        self._memory[memory_key] = value
+        path = self._path(namespace, key)
+        path.write_text(
+            json.dumps(value, ensure_ascii=True, indent=2), encoding="utf-8"
+        )
 
 
 SERPERS_IMAGES_URL = "https://google.serper.dev/images"
 
 MAX_IMAGE_DOWNLOAD_WORKERS = 8  # Parallel download threads
+
+
+def safe_filename(name: str, max_length: int = 100) -> str:
+    """Sanitize and truncate a filename to avoid filesystem errors.
+
+    Removes unsafe characters and ensures the filename doesn't exceed
+    the maximum length. Attempts to preserve file extensions when truncating.
+
+    Args:
+        name: Original filename (may include extension)
+        max_length: Maximum allowed length (default 100)
+
+    Returns:
+        Safe filename truncated to max_length characters
+    """
+    safe = "".join(ch for ch in name if ch.isalnum() or ch in {".", "_", "-"})
+    if not safe:
+        safe = "unnamed"
+    if len(safe) > max_length:
+        if "." in safe:
+            parts = safe.rsplit(".", 1)
+            stem, ext = parts[0], parts[1]
+            ext_len = len(ext) + 1
+            max_stem = max_length - ext_len
+            if max_stem > 0:
+                safe = f"{stem[:max_stem]}.{ext}"
+            else:
+                safe = safe[:max_length]
+        else:
+            safe = safe[:max_length]
+    return safe
 
 
 def retrieve_images(config, cache, segments, images_root):

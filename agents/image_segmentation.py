@@ -16,8 +16,30 @@ Model: llama-3.3-70b-versatile
 
 from groq import Groq
 
-from core.llm import extract_json
+import json
+
 from core.models import ImageSegmentation
+
+
+def extract_json(text: str) -> dict:
+    text = text.strip()
+    if text.startswith("{") and text.endswith("}"):
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            pass
+    start = text.find("{")
+    if start == -1:
+        raise ValueError("LLM did not return JSON.")
+    depth = 0
+    for i, char in enumerate(text[start:], start):
+        if char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+            if depth == 0:
+                return json.loads(text[start : i + 1])
+    raise ValueError("LLM did not return valid JSON.")
 
 
 def segment_for_images(context, script: str):

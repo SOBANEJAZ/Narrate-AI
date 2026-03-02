@@ -80,30 +80,19 @@ Narrate-AI/
 │   └── image_segmentation.py  # Segments script into visual zones
 ├── services/                  # Domain-specific service modules
 │   ├── __init__.py
-│   ├── audio/                 # Audio synthesis (TTS)
-│   │   ├── base.py
-│   │   ├── elevenlabs.py
-│   │   ├── edge_tts_client.py
-│   │   ├── factory.py
-│   │   └── narration.py
-│   ├── images/                # Image retrieval and ranking
-│   │   ├── retrieval.py
-│   │   ├── ranking.py
-│   │   └── placement.py
-│   ├── video/                 # Video assembly
-│   │   └── video.py
-│   ├── rag/                   # Vector database management
-│   │   └── manager.py
-│   ├── research/              # Web research and crawling
-│   │   └── crawler.py
+│   ├── audio_generator.py     # TTS and narration synthesis
+│   ├── image_placement.py     # Script segmentation for images
+│   ├── image_ranking.py       # CLIP-based image ranking
+│   ├── image_retrieval.py     # Image search and download
+│   ├── rag_manager.py         # Pinecone vector database operations
+│   ├── research_crawler.py    # Web crawling and source discovery
+│   └── video_assembly.py      # Video assembly and timeline building
 ├── core/                      # Core utilities and models
 │   ├── __init__.py
-│   ├── cache.py               # Multi-layer caching system
 │   ├── config.py              # Configuration and Groq client management
 │   ├── llm.py                 # LLM utility functions
 │   ├── models.py              # Pydantic data models
-│   ├── pipeline.py            # Main documentary generation pipeline
-│   └── text_utils.py          # Text processing utilities
+│   └── pipeline.py            # Main documentary generation pipeline
 ├── main.py                    # CLI entry point
 ├── streamlit_app.py           # Web UI
 └── README.md                  # This file

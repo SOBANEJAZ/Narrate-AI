@@ -15,8 +15,30 @@ Model: openai/gpt-oss-20b
 
 from groq import Groq
 
-from core.llm import extract_json, validate_pydantic
+import json
+
 from core.models import PlanQueries, SectionQuery
+
+
+def extract_json(text: str) -> dict:
+    text = text.strip()
+    if text.startswith("{") and text.endswith("}"):
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            pass
+    start = text.find("{")
+    if start == -1:
+        raise ValueError("LLM did not return JSON.")
+    depth = 0
+    for i, char in enumerate(text[start:], start):
+        if char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+            if depth == 0:
+                return json.loads(text[start : i + 1])
+    raise ValueError("LLM did not return valid JSON.")
 
 
 def generate_section_queries(context, plan):
@@ -85,7 +107,7 @@ Return JSON with:
     )
 
     json_data = extract_json(response.choices[0].message.content)
-    result = validate_pydantic(json_data, PlanQueries)
+    result = PlanQueries.model_validate(json_data)
 
     print(f"[QUERY] Generated {len(result.queries)} search queries", flush=True)
     return result
