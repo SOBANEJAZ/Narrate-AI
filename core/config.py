@@ -20,35 +20,12 @@ Environment Variables:
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
 from groq import Groq
 
 
 # Singleton Groq client cache - avoids recreating client for each request
 _groq_client_cache = None
-
-
-def _load_dotenv_if_present(path: Path = Path(".env")) -> None:
-    """Load simple KEY=VALUE pairs from .env if file exists.
-
-    This is a minimal .env loader that only handles KEY=VALUE format.
-    Skips comments (#), empty lines, and already-set environment variables.
-
-    Args:
-        path: Path to .env file (defaults to ".env" in project root)
-    """
-    if not path.exists():
-        return
-
-    for raw_line in path.read_text(encoding="utf-8").splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        key = key.strip()
-        value = value.strip().strip("'\"")
-        if not key or key in os.environ:
-            continue
-        os.environ[key] = value
 
 
 def get_groq_client(api_key: str, model: str = None) -> Groq:
@@ -117,7 +94,7 @@ def create_config_from_env():
     Returns:
         Dict with defaults overridden by environment variables
     """
-    _load_dotenv_if_present()
+    load_dotenv()
     config = create_default_config()
     config.update(
         {
