@@ -247,20 +247,26 @@ def assemble_video(
             fade_duration = CONFIG["music_fade_duration"]
 
             original_audio = final_clip.audio
-            with AudioFileClip(str(background_music_path)) as bg_music:
+            bg_music = AudioFileClip(str(background_music_path))
+            try:
                 bg_music = bg_music.with_duration(final_duration)
 
                 if fade_duration > 0 and final_duration > fade_duration:
                     from moviepy import afx
 
-                    bg_music = bg_music.with_audio_faded_in(
-                        fade_duration
-                    ).with_audio_faded_out(fade_duration)
+                    bg_music = bg_music.with_effects(
+                        [
+                            afx.AudioFadeIn(fade_duration),
+                            afx.AudioFadeOut(fade_duration),
+                        ]
+                    )
 
                 bg_music = bg_music.with_volume_scalar(music_volume)
 
                 final_audio = CompositeAudioClip([original_audio, bg_music])
                 final_clip = final_clip.with_audio(final_audio)
+            finally:
+                bg_music.close()
 
         # Render final video
         final_clip.write_videofile(
