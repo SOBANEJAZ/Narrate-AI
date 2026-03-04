@@ -290,6 +290,6 @@ def synthesize_audio(config, segments, audio_root, provider="elevenlabs"):
             flush=True,
         )
 
-        segment["narration_audio_path"] = out_path
+        segment["narration_audio_path"] = result["audio_path"]
 
     return segments
