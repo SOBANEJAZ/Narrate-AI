@@ -98,7 +98,7 @@ Return only the final narration script text.
 
     response = groq_client.chat.completions.create(
         messages=[{"role": "user", "content": prompt}],
-        model="openai/gpt-oss-120b",
+        model="meta-llama/llama-4-scout-17b-16e-instruct",
         temperature=0.55,  # Higher temp for more natural, engaging writing
     )
 

@@ -20,7 +20,7 @@ load_dotenv()
 APP_ROOT = Path(__file__).resolve().parent
 MAIN_SCRIPT = APP_ROOT / "main.py"
 
-DEFAULT_MAX_WEBSITES = 4
+DEFAULT_MAX_WEBSITES = 1
 DEFAULT_TTS_PROVIDER = "elevenlabs"
 
 PIPELINE_STAGES = [
